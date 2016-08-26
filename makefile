@@ -10,7 +10,7 @@ LINK   = -lm -l:imgui.a -lglfw3 -lopengl32 -lgdi32
 
 default: bin/main
 
-bin/main: src/main.cpp
+bin/main: src/main.cpp bin/imgui.a
 	$(CC) $(CFLAGS) src/main.cpp -o bin/main $(LINK)
 
 bin/imgui.a: lib/imgui/*.cpp
