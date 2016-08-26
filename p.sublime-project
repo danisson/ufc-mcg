@@ -1,0 +1,30 @@
+{
+	"folders":
+	[
+		{
+			"name": "Source",
+			"path": "./src",
+		},
+		{
+			"name": "Includes",
+			"path": "./inc",
+		},
+		{
+			"name": "Root",
+			"path": ".",
+			"folder_exclude_patterns" : ["*"]
+		}
+	],
+	"settings":
+	{
+		"tab_size": 4,
+		"default_line_ending": "unix",
+		"ensure_newline_at_eof_on_save": true,
+		"rulers": [80],
+		"show_encoding": true,
+		"word_wrap": true,
+		"wrap_width": 80,
+		"translate_tabs_to_spaces": false,
+		"use_tab_stops": true
+	}
+}
