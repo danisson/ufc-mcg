@@ -10,6 +10,10 @@
 			"path": "./inc",
 		},
 		{
+			"name": "ImGui",
+			"path": "./lib/imgui",
+		},
+		{
 			"name": "Root",
 			"path": ".",
 			"folder_exclude_patterns" : ["*"]

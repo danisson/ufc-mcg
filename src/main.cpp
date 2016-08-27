@@ -2,42 +2,30 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 
-struct UIState
-{
-	int mousex;
-	int mousey;
-	int mousedown;
-
-	int hotitem;
-	int activeitem;
-};
-
-
-double colorTable[3][3] = {{0.1, 0.2, 0.3}, {0.2, 0.3, 0.1}, {0.3, 0.1, 0.2}}; 
+double colorTable[3][3] = {{0.1, 0.2, 0.3}, {0.2, 0.3, 0.1}, {0.3, 0.1, 0.2}};
 int currentColor = 0;
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-    	currentColor++;
-    	if (currentColor > 2)
-    		currentColor = 0;
-    } if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)  {
-    	currentColor--;
-    	if (currentColor < 0)
-    		currentColor = 2;
-    }
-
+void key_callback(auto window, auto key, auto scancode, auto action, auto mods) {
+	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+		currentColor++;
+		if (currentColor > 2)
+			currentColor = 0;
+	} if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)  {
+		currentColor--;
+		if (currentColor < 0)
+			currentColor = 2;
+	}
+	ImGui_ImplGlFw_KeyCallback(window,key,scancode,action,mods);
 }
 
 int main(void) {
 	GLFWwindow* window;
 
-	/* Initialize the library */
+	// Initialize the library
 	if (!glfwInit())
 		return 1;
 
-	/* Create a windowed mode window and its OpenGL context */
+	// Create a windowed mode window and its OpenGL context
 	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
 
 	if (!window) {
@@ -45,18 +33,20 @@ int main(void) {
 		return 1;
 	}
 
-	/* Init ImGui */
+	// Init ImGui
 	ImGui_ImplGlfw_Init(window, true);
-	/* Make the window's context current */
+	// Disable .ini
+	ImGui::GetIO().IniFilename = nullptr;
+	// Make the window's context current
 	glfwMakeContextCurrent(window);
 
-	/* Loop until the user closes the window */
+	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
 
 		glfwSetKeyCallback(window, key_callback);
 
-		/* Render here */
+		// Render here
 		glClear(GL_COLOR_BUFFER_BIT);
 		glShadeModel(GL_SMOOTH);
 		glBegin(GL_TRIANGLES);
@@ -78,17 +68,17 @@ int main(void) {
 			glClearColor(0.,0.,1.,1.);
 		}
 
-		{
-			ImGui::Text("Hello, world!");
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::Text("Mouse position: %.3f x %.3f y", ImGui::GetMousePos().x, ImGui::GetMousePos().y);
-		}
+		ImGui::Text("Hello, world!");
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("Mouse position: %.3f x %.3f y", ImGui::GetMousePos().x, ImGui::GetMousePos().y);
 
-		/* Swap front and back buffers */
+		ImGui::ShowTestWindow();
+
+		// Swap front and back buffers
 		ImGui::Render();
 		glfwSwapBuffers(window);
 
-		/* Poll for and process events */
+		// Poll for and process events
 		glfwPollEvents();
 	}
 
