@@ -2,9 +2,9 @@
 CC = g++
 
 # Escolher OpenGL e GLFW dependendo do OS
-LINKGL = -lgflw -lGL
+LINKGL = -lglfw -lGL
 ifeq "$(OS)" "Windows_NT"
-LINKGL = -lgflw3 -lopengl32
+LINKGL = -lglfw3 -lopengl32
 endif
 
 # compiler flags:
