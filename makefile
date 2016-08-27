@@ -1,10 +1,10 @@
 # usando g++ como compilador
 CC = g++
 
-# Escolher OpenGL dependendo do OS
-LINKGL = -lGL
+# Escolher OpenGL e GLFW dependendo do OS
+LINKGL = -lgflw -lGL
 ifeq "$(OS)" "Windows_NT"
-LINKGL = -lopengl32
+LINKGL = -lgflw3 -lopengl32
 endif
 
 # compiler flags:
@@ -12,7 +12,7 @@ endif
 #  -Wall     ativa a maioria dos erros de compilação
 #  -std=c+11 usa o standard mais recente
 CFLAGS = -g -Wall -std=c++11 -L lib -L bin -I inc
-LINK = -lm -l:imgui.a -lglfw3 $(LINKGL)
+LINK = -lm -l:imgui.a $(LINKGL)
 
 default: bin/main
 
