@@ -27,6 +27,16 @@ namespace octree {
 		
 	// };
 
+	struct BoundingBox
+	{
+		glm::vec3 corner;
+		float depth;
+
+		BoundingBox(glm::vec3 _corner, float _depth);
+		void draw() const;
+		BoundingBox operator[](int position) const;
+	};
+
 	struct Tree {
 		Color color;
 		std::array<Tree*,8> children;
@@ -35,16 +45,8 @@ namespace octree {
 		Tree(std::array<Tree*,8> children);
 		// Constructor for leafs
 		Tree();
-	};
-	
-	struct BoundingBox
-	{
-		glm::vec3 corner;
-		float depth;
-
-		BoundingBox(glm::vec3 _corner, float _depth);
-		void draw();
-		BoundingBox getSubBox(int position);
+		//Drawing function
+		void draw(const BoundingBox& bb);
 	};
 
 	using Classifier = std::function<Color(const BoundingBox&)>;
