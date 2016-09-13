@@ -24,6 +24,11 @@ namespace octree {
 	struct Tree {
 		Color color;
 		std::array<Tree*,8> children;
+
+		// Constructor for intermediate nodes
+		Tree(std::array<Tree*,8> children);
+		// Constructor for leafs
+		Tree();
 	};
 	struct BoundingBox;
 
