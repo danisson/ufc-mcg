@@ -17,7 +17,7 @@ float angle = 0.;
 Camera camera;
 
 void key_callback(auto window, auto key, auto scancode, auto action, auto mods) {
-	float speed = 0.5f;
+	float speed = 0.05f;
 
 	if(key == GLFW_KEY_W)
 	    camera.pos += speed * camera.front;

@@ -2,6 +2,7 @@
 #define _H_MODEL
 #include <glm/glm.hpp>
 #include <array>
+#include <string>
 #include <functional>
 
 namespace tnw {
@@ -22,11 +23,6 @@ namespace octree {
 		white, black, gray
 	};
 
-	// enum Color
-	// {
-		
-	// };
-
 	struct BoundingBox
 	{
 		glm::vec3 corner;
@@ -40,16 +36,24 @@ namespace octree {
 	struct Tree {
 		Color color;
 		std::array<Tree*,8> children;
+		Tree* parent;
 
 		// Constructor for intermediate nodes
-		Tree(std::array<Tree*,8> children);
+		Tree(std::array<Tree*,8> children, Tree* parent = nullptr);
 		// Constructor for leafs
-		Tree();
+		Tree(Tree* parent = nullptr);
 		//Drawing function
 		void draw(const BoundingBox& bb);
+
+		Tree*& operator[](size_t i);
+
+		std::string serialize() const;
 	};
 
 	using Classifier = std::function<Color(const BoundingBox&)>;
+
+	// Builds a tree from a file, stops reading until end of line
+	Tree make_from_file(FILE* f);
 } // namespace tnw::octree
 
 class Octree : public Model { };

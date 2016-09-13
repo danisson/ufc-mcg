@@ -11,13 +11,13 @@ endif
 #  -g        adiciona informações de debug no executável
 #  -Wall     ativa a maioria dos erros de compilação
 #  -std=c+14 usa o standard mais recente
-CFLAGS = -g -Wall -std=c++14 -L lib -L bin -I inc
+CFLAGS = -g -Wall -std=c++14 -L lib -L bin -I inc -fdiagnostics-color=always
 LINK = -lm -l:imgui.a $(LINKGL)
 
 default: bin/main
 
-bin/main: src/boundingbox.cpp src/octree.cpp src/main.cpp bin/imgui.a
-	$(CC) $(CFLAGS) src/boundingbox.cpp src/octree.cpp src/main.cpp -o bin/main $(LINK)
+bin/main: src/main.cpp bin/imgui.a bin/octree.o bin/boundingbox.o
+	$(CC) $(CFLAGS) bin/octree.o bin/boundingbox.o src/main.cpp -o bin/main $(LINK)
 
 bin/imgui.a: lib/imgui/*.cpp
 	$(CC) $(CFLAGS) -c lib/imgui/imgui.cpp -o bin/imgui.o
@@ -27,8 +27,11 @@ bin/imgui.a: lib/imgui/*.cpp
 	ar rvs bin/imgui.a bin/imgui.o bin/imgui_demo.o bin/imgui_draw.o bin/imgui_impl_glfw.o
 	rm bin/imgui.o bin/imgui_demo.o bin/imgui_draw.o bin/imgui_impl_glfw.o
 
-bin/boundingbox: src/boundingbox.cpp
-	$(CC) $(CFLAGS) src/boundingbox.cpp -o bin/boundingbox $(LINK)	
+bin/boundingbox.o: src/boundingbox.cpp src/model.h
+	$(CC) $(CFLAGS) -c src/boundingbox.cpp -o bin/boundingbox.o
+
+bin/octree.o: src/octree.cpp src/model.h
+	$(CC) $(CFLAGS) -c src/octree.cpp -o bin/octree.o
 
 clear:
 	rm bin/main{,.exe} bin/imgui.a
