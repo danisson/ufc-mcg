@@ -16,8 +16,27 @@ public:
 	virtual double volume() = 0;
 };
 
+namespace octree {
+	enum class Color {
+		white, black, gray;
+	}
 
-using Classificador = std::function<bool(glm::mat3x4)>;
+	struct Tree
+	{
+		Color color;
+		std::array<Tree*, 8> children;
+	};
+
+	struct BoundingBox
+	{
+		glm::vec3 corner;
+		float depth;
+		void draw();
+
+	};
+}
+
+using Classifier = std::function<bool(glm::mat3x4)>;
 class Octree : public Model {
 public:
 	Octree();
