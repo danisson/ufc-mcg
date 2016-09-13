@@ -44,6 +44,7 @@ namespace octree {
 
 		BoundingBox(glm::vec3 _corner, float _depth);
 		void draw();
+		BoundingBox getSubBox(int position);
 	};
 
 	using Classifier = std::function<Color(const BoundingBox&)>;

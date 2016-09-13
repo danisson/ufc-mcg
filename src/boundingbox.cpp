@@ -45,3 +45,28 @@ void tnw::octree::BoundingBox::draw(){
 
 	glEnd();
 }
+
+// A posição das sub-bounding boxes é de acordo com a ordem definida em sala
+
+tnw::octree::BoundingBox tnw::octree::BoundingBox::getSubBox(int position){
+	glm::vec3 corner;
+	float depth = this->depth/2;
+
+	switch(position){
+		case 0: {
+			corner = this->corner;
+			break;
+		}
+		case 1: {
+			corner = this->corner + depth*x;
+			break;
+		}
+		case 2: {
+			corner = this->corner - depth*z;
+		}
+
+		case 3: {
+			corner = this->corner - depth*z + depth*x;
+		}
+	}
+}
