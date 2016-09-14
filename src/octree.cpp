@@ -57,7 +57,9 @@ tnw::octree::Tree::Tree(Tree* parent) {
 tnw::octree::Tree::Tree(std::array<Tree*,8> children, Tree* parent) {
 	this->children = children;
 	for (auto&& child : children) {
-		child->parent = this;
+		if (child != nullptr) {
+			child->parent = this;
+		}
 	}
 	color = Color::gray;
 	this->parent = parent;
