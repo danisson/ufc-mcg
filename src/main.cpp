@@ -2,33 +2,82 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
+#include <iostream>
 
 struct Camera
 {
-	glm::vec3 pos = glm::vec3(.0,.0,1.);
-	glm::vec3 front = glm::vec3(.0, .0, -1.);
-	glm::vec3 up = glm::vec3(.0,1.,.0);
+	float pitch, yaw, roll;
+	int lastxpos, lastypos;
 };
 
-float angle = 0.;
 Camera camera;
 
 void key_callback(auto window, auto key, auto scancode, auto action, auto mods) {
-	float speed = 0.05f;
-
-	if(key == GLFW_KEY_W)
-	    camera.pos += speed * camera.front;
-	if(key == GLFW_KEY_S)
-	    camera.pos -= speed * camera.front;
-	if(key == GLFW_KEY_A)
-	    camera.pos -= glm::normalize(glm::cross(camera.front, camera.up)) * speed;
-	if(key == GLFW_KEY_D)
-	    camera.pos += glm::normalize(glm::cross(camera.front, camera.up)) * speed;
-	ImGui_ImplGlFw_KeyCallback(window,key,scancode,action,mods);
+	
 }
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+
+	
+	int stateRight = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+	if (stateRight == GLFW_PRESS) {
+		float xoffset = xpos - camera.lastxpos,
+			  sensibility = 0.05f;
+		
+		camera.lastxpos = xpos;
+	      
+
+		xoffset *= sensibility;
+
+		camera.yaw += xoffset;
+		std::cout << "camera yaw: " << camera.yaw << "\n";
+
+	}
+
+	int stateLeft = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+	if (stateLeft == GLFW_PRESS){
+		float yoffset = camera.lastypos - ypos,
+			  sensibility = 0.05f;
+
+		camera.lastypos = ypos;
+		yoffset *= sensibility;
+
+		camera.pitch += yoffset;
+		std::cout << "camera pitch: " << camera.pitch << "\n";
+		
+
+	}
+
+}
+
+
+// void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+
+	
+// 	int stateRight = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+// 	if (stateRight == GLFW_PRESS) {
+// 		glm::vec2 currvec = glm::vec2(xpos, ypos), lastvec = glm::vec2(camera.lastxpos, camera.lastypos);
+// 		float distance = glm::distance(currvec, lastvec);
+
+// 		distance *= 0.0005f;
+// 		camera.yaw += distance;		
+// 	}
+
+// 	int stateLeft = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+// 	if (stateLeft == GLFW_PRESS){
+// 		glm::vec2 currvec = glm::vec2(xpos, ypos), lastvec = glm::vec2(camera.lastxpos, camera.lastypos);
+// 		float distance = glm::distance(currvec, lastvec);
+
+// 		distance *= 0.0005f;
+// 		camera.pitch += distance;
+
+// 	}
+
+// }
 
 int main(void) {
 	GLFWwindow* window;
@@ -52,13 +101,18 @@ int main(void) {
 	// Make the window's context current
 	glfwMakeContextCurrent(window);
 	glClearColor(1.,1.,1.,1.);
-	
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+
+	camera.lastxpos = width / 2; camera.lastypos = height/2;
+
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
 
 		glfwSetKeyCallback(window, key_callback);
-
+		//glfwSetMouseButtonCallback(window, mouse_button_callback);
+		glfwSetCursorPosCallback(window, mouse_callback);
 		// Render here
 		glClear(GL_COLOR_BUFFER_BIT);
 		glShadeModel(GL_SMOOTH);
@@ -83,11 +137,9 @@ int main(void) {
 
 		glPushMatrix();
 
-		glm::mat4 view = glm::lookAt(camera.pos, camera.pos + camera.front, camera.up);
+		glm::mat4 view = glm::yawPitchRoll(camera.yaw, camera.pitch, camera.roll);
 
 		glLoadMatrixf(glm::value_ptr(view));
-
-		glRotatef(angle, 0., 1., 0.);
 
 		oct->draw(tnw::octree::BoundingBox(glm::vec3(0.,0.,0.), 0.5)); 
 
