@@ -78,7 +78,7 @@ int main(void) {
 		chld[4] = soct4;
 		chld[5] = soct5;
 		tnw::octree::Tree* oct = new tnw::octree::Tree(chld);
-		
+
 		//RENDERIZAÇÃO MESMO VAI AQUI
 
 		glPushMatrix();
