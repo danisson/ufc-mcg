@@ -29,7 +29,8 @@ namespace octree {
 		float depth;
 		BoundingBox(glm::vec3 _corner, float _depth);
 		void draw() const;
-		BoundingBox operator[](int position) const;
+		BoundingBox operator[](size_t position) const;
+		glm::vec3 getVertice(unsigned int i) const;
 	};
 
 	using Classifier = std::function<Color(const BoundingBox&)>;

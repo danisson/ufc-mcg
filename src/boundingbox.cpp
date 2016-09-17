@@ -45,9 +45,55 @@ void tnw::octree::BoundingBox::draw() const{
 	glEnd();
 }
 
+//Retorna cada canto da bouding box
+glm::vec3 tnw::octree::BoundingBox::getVertice(unsigned int i) const {
+	glm::vec3 corner, x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.);
+	float depth = this->depth;
+
+	switch(i){
+		case 0: {
+			corner = this->corner;
+			break;
+		}
+		case 1: {
+			corner = this->corner + depth*x;
+			break;
+		}
+		case 2: {
+			corner = this->corner - depth*z;
+			break;
+		}
+
+		case 3: {
+			corner = this->corner - depth*z + depth*x;
+			break;
+		}
+
+		case 4: {
+			corner = this->corner + depth*y;
+			break;
+		}
+
+		case 5: {
+			corner = this->corner + depth*y + depth*x;
+			break;
+		}
+
+		case 6: {
+			corner = this->corner + depth*y - depth*z;
+			break;
+		}
+
+		case 7: {
+			corner = this->corner + depth*y - depth*z + depth*x;
+		}
+	}
+
+	return corner;
+}
 // A posição das sub-bounding boxes é de acordo com a ordem definida em sala
 
-tnw::octree::BoundingBox tnw::octree::BoundingBox::operator[](int position) const{
+tnw::octree::BoundingBox tnw::octree::BoundingBox::operator[](size_t position) const{
 	glm::vec3 corner, x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.);
 	float depth = this->depth/2;
 

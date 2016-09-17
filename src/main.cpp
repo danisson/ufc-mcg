@@ -20,6 +20,13 @@ void key_callback(auto window, auto key, auto scancode, auto action, auto mods) 
 	
 }
 
+tnw::octree::Color teste_paia(const tnw::octree::BoundingBox &bb){
+	if (glm::distance(glm::vec2(bb.getVertice(0)), glm::vec2(0,0)) < 0.25) {
+		return tnw::octree::Color::black;
+	}
+	return tnw::octree::Color::gray;
+}
+
 void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 
 	
@@ -105,7 +112,10 @@ int main(void) {
 	glfwGetWindowSize(window, &width, &height);
 
 	camera.lastxpos = width / 2; camera.lastypos = height/2;
-
+	tnw::octree::Tree* oct = new tnw::octree::Tree(/*chld*/);
+	tnw::octree::Classifier f = teste_paia;
+	oct->classify(f, tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,0.), 1), 4, 0);
+	
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
@@ -118,20 +128,20 @@ int main(void) {
 		glShadeModel(GL_SMOOTH);
 
 
-		tnw::octree::Tree *soct0 = new tnw::octree::Tree(),
-						*soct1 = new tnw::octree::Tree(),
-						*soct2 = new tnw::octree::Tree(),
-						*soct4 = new tnw::octree::Tree(),
-						*soct5 = new tnw::octree::Tree();
+		// tnw::octree::Tree *soct0 = new tnw::octree::Tree(),
+		// 				*soct1 = new tnw::octree::Tree(),
+		// 				*soct2 = new tnw::octree::Tree(),
+		// 				*soct4 = new tnw::octree::Tree(),
+		// 				*soct5 = new tnw::octree::Tree();
 
-		std::array<tnw::octree::Tree*, 8> chld;
-		chld.fill(nullptr);
-		chld[0] = soct0;
-		chld[1] = soct1;
-		chld[2] = soct2;
-		chld[4] = soct4;
-		chld[5] = soct5;
-		tnw::octree::Tree* oct = new tnw::octree::Tree(chld);
+		// std::array<tnw::octree::Tree*, 8> chld;
+		// chld.fill(nullptr);
+		// chld[0] = soct0;
+		// chld[1] = soct1;
+		// chld[2] = soct2;
+		// chld[4] = soct4;
+		// chld[5] = soct5;
+		//tnw::octree::Tree* oct = new tnw::octree::Tree(/*chld*/);
 
 		//RENDERIZAÇÃO MESMO VAI AQUI
 
@@ -141,7 +151,9 @@ int main(void) {
 
 		glLoadMatrixf(glm::value_ptr(view));
 
-		oct->draw(tnw::octree::BoundingBox(glm::vec3(0.,0.,0.), 0.5)); 
+		oct->draw(tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,0.), 1));
+		// tnw::octree::Classifier f = circle;
+		// oct->classify(f, tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,0.), 1), 2, 0); 
 
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		glPopMatrix();

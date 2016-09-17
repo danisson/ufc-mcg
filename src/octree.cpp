@@ -2,6 +2,7 @@
 #include <vector>
 #include <GL/gl.h>
 #include <iostream>
+#include <memory>
 using namespace tnw::octree;
 
 /* Recebe a própria bounding box do pai, e dependendo da sua cor faz o seguinte
@@ -130,14 +131,17 @@ std::string tnw::octree::Tree::serialize() const {
 void tnw::octree::Tree::classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth){
 	Color color = function(bb);
 	this->color = color;
-
-	if (currDepth == maxDepth) return;
+	if (currDepth >= maxDepth) return;
 	if (color == Color::gray) {
 		for (int i = 0; i < 8; ++i)
 		{
+			std::cout << "gray\n";
 			//Cria um filho com ela como pai
 			Tree *child = new Tree(this);
-			
+			//Adiciona o filho a própria árvore
+			(*this)[i] = child;
+			//Chama recursivamente na árvore filha
+			child->classify(function, bb[i], maxDepth, currDepth+1);	
 		}
 	}
 }
