@@ -31,6 +31,7 @@ namespace octree {
 		void draw() const;
 		BoundingBox operator[](size_t position) const;
 		glm::vec3 getVertice(unsigned int i) const;
+		glm::vec3 getCenter() const;
 	};
 
 	using Classifier = std::function<Color(const BoundingBox&)>;

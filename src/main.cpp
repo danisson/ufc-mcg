@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <iostream>
@@ -18,6 +19,70 @@ Camera camera;
 
 void key_callback(auto window, auto key, auto scancode, auto action, auto mods) {
 	
+}
+
+tnw::octree::Color circle(const tnw::octree::BoundingBox &bb){
+	unsigned int count = 0;
+	for (int i = 0; i < 8; ++i)
+	{
+		if (glm::distance(glm::vec3(0,0,0), bb.getVertice(i)) < 0.4) {
+			count++;
+		}
+	}
+	if (count >= 8) { return tnw::octree::Color::black; }
+	return tnw::octree::Color::gray;
+}
+
+tnw::octree::Color square(const tnw::octree::BoundingBox &bb) {
+	unsigned int count = 0;
+	float l = 0.5,d = 0.5,h = 0.5;
+	glm::vec3 c(0,0,-1), p/*, x(1,0,0), y(0,1,0), z(0,0,1)*/;
+	for (int i = 0; i < 8; ++i){
+		unsigned int countcoords = 0;
+		p = bb.getVertice(i);
+		std::cout << "p: " << to_string(p) << "\n";
+		if (p[0] >= c[0] - l/2.f && p[0] <= c[0] + l/2.f) {
+			countcoords++;
+		}
+		if (p[1] >= c[1] - h/2.f && p[1] <= c[1] + h/2.f) {
+			countcoords++;
+		}
+		if (p[2] >= c[2] - d/2.f && p[2] <= c[2] + d/2.f) {
+			countcoords++;
+		}
+		std::cout << "count coords: " << countcoords << "\n";
+		if (countcoords >= 3) {
+			count++;
+		}
+	}
+	std::cout << "count: " << count << "\n";
+	if (count >= 8){
+		return tnw::octree::Color::black;
+	} else if (count > 0) {
+		return tnw::octree::Color::gray;
+	} else {
+		return tnw::octree::Color::gray;
+	}
+}
+
+tnw::octree::Color cilinder(const tnw::octree::BoundingBox &bb) {
+	unsigned int count = 0;
+	glm::vec3 p, c(0,0,-1), y(0,1,0);
+	float h = 0.5, r = 0.5;
+	for (int i = 0; i < 8; ++i)
+	{
+		p = bb.getVertice(i);
+		std::cout << "p: " << to_string(p) << "c: " << to_string(c+(p[1]-c[1])*y) << "\n";
+		if ((p[1] >= c[1]) && (p[1] <= c[1]+h) && (glm::distance(p, c+(p[1]-c[1])*y) <= r)){
+			count++;
+		}
+	}
+	std::cout << "===\n";
+	if (count >= 8){
+		return tnw::octree::Color::black;
+	} else {
+		return tnw::octree::Color::gray;
+	}
 }
 
 tnw::octree::Color teste_paia(const tnw::octree::BoundingBox &bb){
@@ -107,14 +172,18 @@ int main(void) {
 	ImGui::GetIO().IniFilename = nullptr;
 	// Make the window's context current
 	glfwMakeContextCurrent(window);
-	glClearColor(1.,1.,1.,1.);
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 
+	//Opções de OpenGL
+	glClearColor(1.,1.,1.,1.);
+	glEnable(GL_LINE_SMOOTH);
+
 	camera.lastxpos = width / 2; camera.lastypos = height/2;
 	tnw::octree::Tree* oct = new tnw::octree::Tree(/*chld*/);
-	tnw::octree::Classifier f = teste_paia;
-	oct->classify(f, tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,0.), 1), 4, 0);
+	tnw::octree::Classifier f = cilinder;
+	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,-0.5), 1);
+	oct->classify(f, bb, 4, 0);
 	
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
@@ -124,7 +193,7 @@ int main(void) {
 		//glfwSetMouseButtonCallback(window, mouse_button_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);
 		// Render here
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glShadeModel(GL_SMOOTH);
 
 
@@ -151,7 +220,7 @@ int main(void) {
 
 		glLoadMatrixf(glm::value_ptr(view));
 
-		oct->draw(tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,0.), 1));
+		oct->draw(bb);
 		// tnw::octree::Classifier f = circle;
 		// oct->classify(f, tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,0.), 1), 2, 0); 
 

@@ -16,13 +16,13 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 			break;
 		}
 		case Color::gray: {
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			//Por enquanto desenhando com um cinza claro
-			glColor3f(.5,.5,.5);
-			glLineWidth(1.5);
-			bb.draw();
-			glLineWidth(1.0);
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			// //Por enquanto desenhando com um cinza claro
+			// glColor3f(.5,.5,.5);
+			// glLineWidth(0.01);
+			// bb.draw();
+			// glLineWidth(1.0);
+			// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 			for (int i = 0; i < 8; ++i)
 			{
@@ -36,13 +36,13 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 			//Por enquanto desenhando com um cinza claro
 			glColor3f(.5,.5,.5);
-			glLineWidth(1.5);
+			glLineWidth(0.5);
 			bb.draw();
 			glLineWidth(1.0);
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			//Por enquanto desenha vermelho
-			glColor3f(.0,.0,0.8);
-			bb.draw();
+			//Por enquanto desenha azul
+			//glColor3f(.0,.0,0.8);
+			//bb.draw();
 		}
 
 	}
@@ -135,7 +135,6 @@ void tnw::octree::Tree::classify(Classifier function, BoundingBox bb, unsigned i
 	if (color == Color::gray) {
 		for (int i = 0; i < 8; ++i)
 		{
-			std::cout << "gray\n";
 			//Cria um filho com ela como pai
 			Tree *child = new Tree(this);
 			//Adiciona o filho a própria árvore
