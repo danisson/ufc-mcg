@@ -180,7 +180,7 @@ int main(void) {
 	glEnable(GL_LINE_SMOOTH);
 
 	camera.lastxpos = width / 2; camera.lastypos = height/2;
-	tnw::octree::Tree* oct = new tnw::octree::Tree(/*chld*/);
+	tnw::octree::Tree* oct = new tnw::octree::Tree();
 	tnw::octree::Classifier f = cilinder;
 	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,-0.5), 1);
 	oct->classify(f, bb, 4, 0);
@@ -192,27 +192,10 @@ int main(void) {
 		glfwSetKeyCallback(window, key_callback);
 		//glfwSetMouseButtonCallback(window, mouse_button_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);
+
 		// Render here
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glShadeModel(GL_SMOOTH);
-
-
-		// tnw::octree::Tree *soct0 = new tnw::octree::Tree(),
-		// 				*soct1 = new tnw::octree::Tree(),
-		// 				*soct2 = new tnw::octree::Tree(),
-		// 				*soct4 = new tnw::octree::Tree(),
-		// 				*soct5 = new tnw::octree::Tree();
-
-		// std::array<tnw::octree::Tree*, 8> chld;
-		// chld.fill(nullptr);
-		// chld[0] = soct0;
-		// chld[1] = soct1;
-		// chld[2] = soct2;
-		// chld[4] = soct4;
-		// chld[5] = soct5;
-		//tnw::octree::Tree* oct = new tnw::octree::Tree(/*chld*/);
-
-		//RENDERIZAÇÃO MESMO VAI AQUI
 
 		glPushMatrix();
 
@@ -221,23 +204,9 @@ int main(void) {
 		glLoadMatrixf(glm::value_ptr(view));
 
 		oct->draw(bb);
-		// tnw::octree::Classifier f = circle;
-		// oct->classify(f, tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,0.), 1), 2, 0); 
 
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		glPopMatrix();
-
-		// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		
-		// if (ImGui::Button("Red")){
-		// 	glClearColor(1.,0.,0.,1.);
-		// }
-		// if (ImGui::Button("Green")){
-		// 	glClearColor(0.,1.,0.,1.);
-		// }
-		// if (ImGui::Button("Blue")){
-		// 	glClearColor(0.,0.,1.,1.);
-		// }
 
 		// ImGui::Text("Hello, world!");
 		// ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);

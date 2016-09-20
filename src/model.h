@@ -54,6 +54,44 @@ namespace octree {
 		void classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth);
 	};
 
+	class Shape
+	{
+	public:
+		Shape();
+		~Shape();
+		virtual Color operator()(const BoundingBox);		
+	};
+
+	class Sphere : public Shape
+	{
+	public:
+		Sphere(glm::vec3 center, float radius);
+		~Sphere();
+	private:
+		glm::vec3 center;
+		float radius;
+	};
+
+	class Parallelogram : public Shape
+	{
+	public:
+		Parallelogram(center, length, depth, height);
+		~Parallelogram();
+	private:
+		glm::vec3 center;
+		float length, depth, height;
+	};
+
+	class Cilinder : public Shape
+	{
+	public:
+		Cilinder(inferiorPoint, height, radius);
+		~Cilinder();
+	private:
+		glm::vec3 inferiorPoint;
+		float height, radius;
+	};
+
 	// Builds a tree from a file, stops reading until end of line
 	Tree make_from_file(FILE* f);
 } // namespace tnw::octree
