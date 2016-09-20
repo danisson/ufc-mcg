@@ -57,7 +57,9 @@ tnw::octree::Tree::Tree(Tree* parent) {
 tnw::octree::Tree::Tree(std::array<Tree*,8> children, Tree* parent) {
 	this->children = children;
 	for (auto&& child : children) {
-		child->parent = this;
+		if (child != nullptr) {
+			child->parent = this;
+		}
 	}
 	color = Color::gray;
 	this->parent = parent;
@@ -123,4 +125,19 @@ std::string tnw::octree::Tree::serialize() const {
 	}
 
 	return o;
+}
+
+void tnw::octree::Tree::classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth){
+	Color color = function(bb);
+	this->color = color;
+
+	if (currDepth == maxDepth) return;
+	if (color == Color::gray) {
+		for (int i = 0; i < 8; ++i)
+		{
+			//Cria um filho com ela como pai
+			Tree *child = new Tree(this);
+			
+		}
+	}
 }

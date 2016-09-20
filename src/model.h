@@ -27,11 +27,12 @@ namespace octree {
 	{
 		glm::vec3 corner;
 		float depth;
-
 		BoundingBox(glm::vec3 _corner, float _depth);
 		void draw() const;
 		BoundingBox operator[](int position) const;
 	};
+
+	using Classifier = std::function<Color(const BoundingBox&)>;
 
 	struct Tree {
 		Color color;
@@ -48,9 +49,8 @@ namespace octree {
 		Tree*& operator[](size_t i);
 
 		std::string serialize() const;
+		void classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth);
 	};
-
-	using Classifier = std::function<Color(const BoundingBox&)>;
 
 	// Builds a tree from a file, stops reading until end of line
 	Tree make_from_file(FILE* f);
