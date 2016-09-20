@@ -34,4 +34,4 @@ bin/octree.o: src/octree.cpp src/model.h
 	$(CC) $(CFLAGS) -c src/octree.cpp -o bin/octree.o
 
 clear:
-	rm bin/main{,.exe} bin/imgui.a
+	rm -f bin/main{,.exe} bin/imgui.a bin/*.o
