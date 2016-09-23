@@ -38,8 +38,9 @@ namespace octree {
 		Color color;
 		std::array<Tree*,8> children;
 		Tree* parent;
+		float drawColor[3];
 
-		// Constructor for intermediate nodes
+ 		// Constructor for intermediate nodes
 		Tree(std::array<Tree*,8> children, Tree* parent = nullptr);
 		// Constructor for leafs
 		Tree(Tree* parent = nullptr);

@@ -2,6 +2,7 @@
 #include <vector>
 #include <GL/gl.h>
 #include <iostream>
+#include <random>
 using namespace tnw::octree;
 
 /* Recebe a própria bounding box do pai, e dependendo da sua cor faz o seguinte
@@ -15,13 +16,6 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 			break;
 		}
 		case Color::gray: {
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			//Por enquanto desenhando com um cinza claro
-			glColor3f(.5,.5,.5);
-			glLineWidth(1.5);
-			bb.draw();
-			glLineWidth(1.0);
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 			for (int i = 0; i < 8; ++i)
 			{
@@ -29,19 +23,29 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 					children[i]->draw(bb[i]);
 				}
 			}
-			break;
-		}
-		case Color::black: {
+
+			//Desenha wireframe cinza
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			//Por enquanto desenhando com um cinza claro
 			glColor3f(.5,.5,.5);
 			glLineWidth(1.5);
 			bb.draw();
 			glLineWidth(1.0);
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			//Por enquanto desenha vermelho
-			glColor3f(.0,.0,0.8);
+
+			break;
+		}
+		case Color::black: {
+			//Desenha sólido em Cor aleatória
+			glColor3f(drawColor[0], drawColor[1], drawColor[2]);
 			bb.draw();
+
+			//Desenha wireframe cinza
+			glPolygonMode( GL_FRONT, GL_LINE );
+			glColor3f(.5,.5,.5);
+			glLineWidth(1.5);
+			bb.draw();
+			glLineWidth(1.0);
+			glPolygonMode( GL_FRONT, GL_FILL );			
 		}
 
 	}
@@ -52,6 +56,17 @@ tnw::octree::Tree::Tree(Tree* parent) {
 	children.fill(nullptr);
 	color = Color::black;
 	this->parent = parent;
+
+	std::random_device r;
+	std::default_random_engine gen(r());
+
+	std::uniform_real_distribution<> dis(0,1);
+
+	for (int i = 0; i < 3; ++i)
+	{
+		drawColor[i] = dis(gen);
+	}
+
 }
 
 tnw::octree::Tree::Tree(std::array<Tree*,8> children, Tree* parent) {
@@ -63,6 +78,17 @@ tnw::octree::Tree::Tree(std::array<Tree*,8> children, Tree* parent) {
 	}
 	color = Color::gray;
 	this->parent = parent;
+
+	std::random_device r;
+	std::default_random_engine gen(r());
+
+	std::uniform_real_distribution<> dis(0,1);
+
+	for (int i = 0; i < 3; ++i)
+	{
+		drawColor[i] = dis(gen);
+	}
+
 }
 
 Tree*& tnw::octree::Tree::operator[](size_t i) {
