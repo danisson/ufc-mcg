@@ -21,6 +21,14 @@ struct IsometricCamera
 
 IsometricCamera camera;
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    	glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+        
+}
+
 void desenharEixos(){
 	glBegin(GL_LINES);
 		glColor3f(1.000000f, 0.000000f, 0.000000f);
@@ -39,30 +47,31 @@ void desenharEixos(){
 glm::mat4 isometric(float scale, float near, float far, bool positive_hor, bool positive_ver)
 {
 	float rot_y = 45.0; 
-	float rot_x = std::asin(std::tan(glm::radians(30.0f))) * 180.0f / M_PI;
+	float rot_x = glm::degrees(std::asin(std::tan(glm::radians(45.0f))));
+	
 	if (!positive_ver){
 		rot_y = -rot_y;
 	}
 	if (!positive_hor){
 		rot_x = -rot_x;
 	}
-	//glm::mat4 a = glm::rotate(glm::mat4(), rot_y, glm::vec3(0.0,1.0,0.0));
-	//glm::mat4 b = glm::rotate(glm::mat4(), rot_x, glm::vec3(1.0,0.0,0.0));
-	glm::mat4 b;
-	b[0][0] = sqrt(3);
-	b[0][2] = -sqrt(3);
-	b[1][0] = 1;
-	b[1][1] = 2;
-	b[1][2] = 1;
-	b[2][0] = sqrt(2);
-	b[2][1] = -sqrt(2);
-	b[2][2] = sqrt(2);
+	glm::mat4 a = glm::rotate(glm::mat4(), rot_y, glm::vec3(0.0,1.0,0.0));
+	glm::mat4 b = glm::rotate(glm::mat4(), rot_x, glm::vec3(1.0,0.0,0.0));
+	// glm::mat4 b;
+	// b[0][0] = sqrt(3);
+	// b[0][2] = -sqrt(3);
+	// b[1][0] = 1;
+	// b[1][1] = 2;
+	// b[1][2] = 1;
+	// b[2][0] = sqrt(2);
+	// b[2][1] = -sqrt(2);
+	// b[2][2] = sqrt(2);
 
-	b *= 1.0/sqrt(6);
+	// b *= 1.0/sqrt(6);
 	glm::mat4 o = glm::ortho(-scale, scale, -scale, scale, near, far);
 	//std::cout<<glm::to_string((sqrt(6))*b*a)<<std::endl;
 	//exit(0);
-	return b/*a*/;
+	return o*b*a;
 }
 
 int main(void) {
@@ -117,7 +126,7 @@ int main(void) {
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
 
-		//glfwSetKeyCallback(window, key_callback);
+		glfwSetKeyCallback(window, key_callback);
 		//glfwSetMouseButtonCallback(window, mouse_button_callback);
 		//glfwSetCursorPosCallback(window, mouse_callback);
 		// Render here
@@ -135,15 +144,11 @@ int main(void) {
 
 		glLoadMatrixf(glm::value_ptr(view));
 
-		oct->draw(bb);
+		desenharEixos();
+		oct->draw(bb); 
 
-		desenharEixos(); 
-
-		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		glPopMatrix();
 
-		// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		
 		// if (ImGui::Button("Red")){
 		// 	glClearColor(1.,0.,0.,1.);
 		// }
