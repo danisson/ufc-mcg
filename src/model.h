@@ -40,8 +40,9 @@ namespace octree {
 		Color color;
 		std::array<Tree*,8> children;
 		Tree* parent;
+		float drawColor[3];
 
-		// Constructor for intermediate nodes
+ 		// Constructor for intermediate nodes
 		Tree(std::array<Tree*,8> children, Tree* parent = nullptr);
 		// Constructor for leafs
 		Tree(Tree* parent = nullptr);
@@ -57,16 +58,17 @@ namespace octree {
 	class Shape
 	{
 	public:
-		Shape();
-		~Shape();
-		virtual Color operator()(const BoundingBox);		
+		Shape() = default;
+		~Shape() = default;
+		virtual Color operator()(const BoundingBox&) = 0;		
 	};
 
 	class Sphere : public Shape
 	{
 	public:
 		Sphere(glm::vec3 center, float radius);
-		~Sphere();
+		~Sphere() = default;
+		Color operator()(const BoundingBox&);
 	private:
 		glm::vec3 center;
 		float radius;
@@ -75,8 +77,9 @@ namespace octree {
 	class Parallelogram : public Shape
 	{
 	public:
-		Parallelogram(center, length, depth, height);
-		~Parallelogram();
+		Parallelogram(glm::vec3 center, float length, float depth, float height);
+		~Parallelogram() = default;
+		Color operator()(const BoundingBox&);
 	private:
 		glm::vec3 center;
 		float length, depth, height;
@@ -85,8 +88,9 @@ namespace octree {
 	class Cilinder : public Shape
 	{
 	public:
-		Cilinder(inferiorPoint, height, radius);
-		~Cilinder();
+		Cilinder(glm::vec3 inferiorPoint, float height, float radius);
+		~Cilinder() = default;
+		Color operator()(const BoundingBox&);
 	private:
 		glm::vec3 inferiorPoint;
 		float height, radius;

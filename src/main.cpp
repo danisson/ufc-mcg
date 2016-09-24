@@ -4,152 +4,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include <glm/ext.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <iostream>
+#include <math.h>
 
-struct Camera
+struct IsometricCamera
 {
-	float pitch, yaw, roll;
-	int lastxpos, lastypos;
+	float scale = 2.0, near = 10.0, far = -10.0;
+	bool positive_hor = true, positive_ver = true;
 };
 
-Camera camera;
-
-void key_callback(auto window, auto key, auto scancode, auto action, auto mods) {
-	
-}
-
-tnw::octree::Color circle(const tnw::octree::BoundingBox &bb){
-	unsigned int count = 0;
-	for (int i = 0; i < 8; ++i)
-	{
-		if (glm::distance(glm::vec3(0,0,0), bb.getVertice(i)) < 0.4) {
-			count++;
-		}
-	}
-	if (count >= 8) { return tnw::octree::Color::black; }
-	return tnw::octree::Color::gray;
-}
-
-tnw::octree::Color square(const tnw::octree::BoundingBox &bb) {
-	unsigned int count = 0;
-	float l = 0.5,d = 0.5,h = 0.5;
-	glm::vec3 c(0,0,-1), p/*, x(1,0,0), y(0,1,0), z(0,0,1)*/;
-	for (int i = 0; i < 8; ++i){
-		unsigned int countcoords = 0;
-		p = bb.getVertice(i);
-		std::cout << "p: " << to_string(p) << "\n";
-		if (p[0] >= c[0] - l/2.f && p[0] <= c[0] + l/2.f) {
-			countcoords++;
-		}
-		if (p[1] >= c[1] - h/2.f && p[1] <= c[1] + h/2.f) {
-			countcoords++;
-		}
-		if (p[2] >= c[2] - d/2.f && p[2] <= c[2] + d/2.f) {
-			countcoords++;
-		}
-		std::cout << "count coords: " << countcoords << "\n";
-		if (countcoords >= 3) {
-			count++;
-		}
-	}
-	std::cout << "count: " << count << "\n";
-	if (count >= 8){
-		return tnw::octree::Color::black;
-	} else if (count > 0) {
-		return tnw::octree::Color::gray;
-	} else {
-		return tnw::octree::Color::gray;
-	}
-}
-
-tnw::octree::Color cilinder(const tnw::octree::BoundingBox &bb) {
-	unsigned int count = 0;
-	glm::vec3 p, c(0,0,-1), y(0,1,0);
-	float h = 0.5, r = 0.5;
-	for (int i = 0; i < 8; ++i)
-	{
-		p = bb.getVertice(i);
-		std::cout << "p: " << to_string(p) << "c: " << to_string(c+(p[1]-c[1])*y) << "\n";
-		if ((p[1] >= c[1]) && (p[1] <= c[1]+h) && (glm::distance(p, c+(p[1]-c[1])*y) <= r)){
-			count++;
-		}
-	}
-	std::cout << "===\n";
-	if (count >= 8){
-		return tnw::octree::Color::black;
-	} else {
-		return tnw::octree::Color::gray;
-	}
-}
-
-tnw::octree::Color teste_paia(const tnw::octree::BoundingBox &bb){
-	if (glm::distance(glm::vec2(bb.getVertice(0)), glm::vec2(0,0)) < 0.25) {
-		return tnw::octree::Color::black;
-	}
-	return tnw::octree::Color::gray;
-}
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos){
-
-	
-	int stateRight = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
-	if (stateRight == GLFW_PRESS) {
-		float xoffset = xpos - camera.lastxpos,
-			  sensibility = 0.05f;
-		
-		camera.lastxpos = xpos;
-	      
-
-		xoffset *= sensibility;
-
-		camera.yaw += xoffset;
-		std::cout << "camera yaw: " << camera.yaw << "\n";
-
-	}
-
-	int stateLeft = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-	if (stateLeft == GLFW_PRESS){
-		float yoffset = camera.lastypos - ypos,
-			  sensibility = 0.05f;
-
-		camera.lastypos = ypos;
-		yoffset *= sensibility;
-
-		camera.pitch += yoffset;
-		std::cout << "camera pitch: " << camera.pitch << "\n";
-		
-
-	}
-
-}
-
-
-// void mouse_callback(GLFWwindow* window, double xpos, double ypos){
-
-	
-// 	int stateRight = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
-// 	if (stateRight == GLFW_PRESS) {
-// 		glm::vec2 currvec = glm::vec2(xpos, ypos), lastvec = glm::vec2(camera.lastxpos, camera.lastypos);
-// 		float distance = glm::distance(currvec, lastvec);
-
-// 		distance *= 0.0005f;
-// 		camera.yaw += distance;		
-// 	}
-
-// 	int stateLeft = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-// 	if (stateLeft == GLFW_PRESS){
-// 		glm::vec2 currvec = glm::vec2(xpos, ypos), lastvec = glm::vec2(camera.lastxpos, camera.lastypos);
-// 		float distance = glm::distance(currvec, lastvec);
-
-// 		distance *= 0.0005f;
-// 		camera.pitch += distance;
-
-// 	}
-
-// }
+void key_callback(GLFWwindow*, int, int, int, int);
+void desenharEixos();
+glm::mat4 isometric(float, float, float, bool, bool);
 
 int main(void) {
 	GLFWwindow* window;
@@ -172,26 +41,35 @@ int main(void) {
 	ImGui::GetIO().IniFilename = nullptr;
 	// Make the window's context current
 	glfwMakeContextCurrent(window);
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
+
+	int window_width, window_height;
+	glfwGetWindowSize(window, &window_width, &window_height);
 
 	//Opções de OpenGL
 	glClearColor(1.,1.,1.,1.);
 	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 
-	camera.lastxpos = width / 2; camera.lastypos = height/2;
-	tnw::octree::Tree* oct = new tnw::octree::Tree();
-	tnw::octree::Classifier f = cilinder;
-	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-0.5,-0.5,-0.5), 1);
-	oct->classify(f, bb, 4, 0);
+	//Set callbacks
+	glfwSetKeyCallback(window, key_callback);
+		//glfwSetMouseButtonCallback(window, mouse_button_callback);
+		//glfwSetCursorPosCallback(window, mouse_callback);
 	
+
+	//Camera initalization
+	IsometricCamera camera;
+
+	tnw::octree::Tree* oct = new tnw::octree::Tree();
+	//tnw::octree::Classifier f = circle;
+	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-1,-1,1), 2);
+	//oct->classify(f, bb, 6, 0);
+	tnw::octree::Sphere s(glm::vec3(0,0,0), 0.5);
+	oct->classify(s, bb, 6, 0);
+
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
-
-		glfwSetKeyCallback(window, key_callback);
-		//glfwSetMouseButtonCallback(window, mouse_button_callback);
-		glfwSetCursorPosCallback(window, mouse_callback);
 
 		// Render here
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -199,18 +77,29 @@ int main(void) {
 
 		glPushMatrix();
 
-		glm::mat4 view = glm::yawPitchRoll(camera.yaw, camera.pitch, camera.roll);
-
+		glm::mat4 view = isometric(camera.scale, camera.near, camera.far, camera.positive_hor, camera.positive_ver);
 		glLoadMatrixf(glm::value_ptr(view));
+		oct->draw(bb); 
+		desenharEixos();
 
-		oct->draw(bb);
-
-		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		glPopMatrix();
 
-		// ImGui::Text("Hello, world!");
-		// ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		// ImGui::Text("Mouse position: %.3f x %.3f y", ImGui::GetMousePos().x, ImGui::GetMousePos().y);
+		//Interface construction	
+		ImGui::Begin("Menu");
+
+		if (ImGui::Button("+ Scale")) {
+			camera.scale += 1;
+		}
+		if (ImGui::Button("- Scale")) {
+			camera.scale -= 1;
+		} 
+		if (ImGui::Button("Flip X")) {
+			camera.positive_hor = !camera.positive_hor;
+		}
+		if (ImGui::Button("Flip Y")) {
+			camera.positive_ver = !camera.positive_ver;
+		}
+		ImGui::End();
 
 		//ImGui::ShowTestWindow();
 
@@ -225,4 +114,46 @@ int main(void) {
 	ImGui_ImplGlfw_Shutdown();
 	glfwTerminate();
 	return 0;
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    	glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+        
+}
+
+void desenharEixos(){
+	glBegin(GL_LINES);
+		glColor3f(1.000000f, 0.000000f, 0.000000f);
+		glVertex3d(0, 0, 0);
+		glVertex3d(1, 0, 0);
+		glColor3f(0.000000f, 1.000000f, 0.000000f);
+		glVertex3d(0, 0, 0);
+		glVertex3d(0, 1, 0);
+		glColor3f(0.000000f, 0.000000f, 1.000000f);
+		glVertex3d(0, 0, 0);
+		glVertex3d(0, 0, 1);
+		glColor3f(1.0f, 1.0f, 1.0f);
+	glEnd();
+}
+
+glm::mat4 isometric(float scale, float near, float far, bool positive_hor, bool positive_ver)
+{
+	float rot_y = glm::radians(45.0); 
+	float rot_x = std::asin(std::tan(glm::radians(30.0f)));
+	
+	if (!positive_ver){
+		rot_y = -rot_y;
+	}
+	if (!positive_hor){
+		rot_x = -rot_x;
+	}
+	glm::mat4 a = glm::rotate(glm::mat4(), rot_y, glm::vec3(0.0,1.0,0.0));
+	glm::mat4 b = glm::rotate(glm::mat4(), rot_x, glm::vec3(1.0,0.0,0.0));
+
+	glm::mat4 o = glm::ortho(-scale, scale, -scale, scale, near, far);
+
+	return o*b*a;
 }
