@@ -36,16 +36,17 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 		}
 		case Color::black: {
 			//Desenha sólido em Cor aleatória
-			glColor3f(drawColor[0], drawColor[1], drawColor[2]);
-			bb.draw();
+			//glColor3f(drawColor[0], drawColor[1], drawColor[2]);
+			//glColor3f(0,0,0.8);
+			//bb.draw();
 
 			//Desenha wireframe cinza
-			glPolygonMode( GL_FRONT, GL_LINE );
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 			glColor3f(.5,.5,.5);
 			glLineWidth(1.5);
 			bb.draw();
 			glLineWidth(1.0);
-			glPolygonMode( GL_FRONT, GL_FILL );			
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );			
 		}
 
 	}
