@@ -15,15 +15,15 @@ tnw::octree::BoundingBox::BoundingBox(glm::vec3 _corner, float _depth) : corner(
 // 0-------1
 void tnw::octree::BoundingBox::draw() const{
 	glm::vec3 x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.),
-			  v0 = corner, 
-			  v1 = v0 + depth*x, 
-			  v2 = v0 - depth*z, 
-			  v3 = v0 - depth*z + depth*x, 
-			  v4 = v0 + depth*y, 
-			  v5 = v0 + depth*y + depth*x, 
-			  v6 = v0 + depth*y - depth*z, 
+			  v0 = corner,
+			  v1 = v0 + depth*x,
+			  v2 = v0 - depth*z,
+			  v3 = v0 - depth*z + depth*x,
+			  v4 = v0 + depth*y,
+			  v5 = v0 + depth*y + depth*x,
+			  v6 = v0 + depth*y - depth*z,
 			  v7 = v0 + depth*y - depth*z + depth*x;
-	
+
 	std::array<glm::vec3, 4> f0 = {v0, v2, v3, v1},
 							 f1 = {v0, v4, v6, v2},
 							 f2 = {v1, v3, v7, v5},
@@ -35,7 +35,7 @@ void tnw::octree::BoundingBox::draw() const{
 
 
 	glBegin(GL_QUADS);
-		
+
 		for (std::array<glm::vec3, 4>& face : quads) {
 			for (glm::vec3& vertice : face) {
 				glVertex3f(vertice.x, vertice.y, vertice.z);
@@ -44,7 +44,7 @@ void tnw::octree::BoundingBox::draw() const{
 
 	glEnd();
 }
-//Retorna o centro da bounding box 
+//Retorna o centro da bounding box
 glm::vec3 tnw::octree::BoundingBox::getCenter() const {
 	glm::vec3 x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.);
 	float depth = this->depth/2;

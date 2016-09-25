@@ -3,8 +3,10 @@
 #include "model.h"
 
 namespace tnw {
-	template <typename T>
-	using owner_ptr = T*;
+
+template <typename T>
+using owner_ptr = T*;
+
 namespace octree {
 	enum class Color {
 		white, black, gray
@@ -31,11 +33,13 @@ namespace octree {
 		float drawColor[3];
 
 		// Constructor for intermediate nodes
-		Tree(array<unique_ptr<Tree>,8> children, Tree* parent = nullptr);
+		Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent = nullptr);
 		// Constructor for leafs
 		Tree(Tree* parent = nullptr);
 		//Drawing function
 		void draw(const BoundingBox& bb);
+
+		void set(size_t i, unique_ptr<Tree>&& t);
 
 		std::string serialize() const;
 		void classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth);
@@ -69,6 +73,6 @@ namespace octree {
 	};
 
 	// Builds a tree from a file, stops reading until end of line
-	Tree make_from_file(FILE* f);
+	tnw::owner_ptr<Tree> make_from_file(FILE* f);
 }} // namespace tnw::octree
 #endif
