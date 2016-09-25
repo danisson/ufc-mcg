@@ -74,11 +74,11 @@ namespace octree {
 		float radius;
 	};
 
-	class Parallelogram : public Shape
+	class Box : public Shape
 	{
 	public:
-		Parallelogram(glm::vec3 center, float length, float depth, float height);
-		~Parallelogram() = default;
+		Box(glm::vec3 center, float length, float depth, float height);
+		~Box() = default;
 		Color operator()(const BoundingBox&);
 	private:
 		glm::vec3 center;

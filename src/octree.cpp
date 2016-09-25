@@ -192,11 +192,11 @@ Color tnw::octree::Sphere::operator()(const BoundingBox& bb){
 	return tnw::octree::Color::gray;
 }
 
-tnw::octree::Parallelogram::Parallelogram(glm::vec3 center, float length, float depth, float height) : center(center), length(length), depth(depth), height(height){
+tnw::octree::Box::Box(glm::vec3 center, float length, float depth, float height) : center(center), length(length), depth(depth), height(height){
 
 }
 
-Color tnw::octree::Parallelogram::operator()(const BoundingBox& bb){
+Color tnw::octree::Box::operator()(const BoundingBox& bb){
 	unsigned int count = 0;
 	glm::vec3 p/*, x(1,0,0), y(0,1,0), z(0,0,1)*/;
 	for (int i = 0; i < 8; ++i){
