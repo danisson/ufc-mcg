@@ -6,57 +6,10 @@
 #include <random>
 
 using namespace tnw::octree;
-
-/* Recebe a própria bounding box do pai, e dependendo da sua cor faz o seguinte
- * Cinza - Chama o draw nos filhos, e desenha a própria bounding box como  wireframe
- * Preto - Desenha a própria bounding box como preenchida
- */
-void tnw::octree::Tree::draw(const BoundingBox& bb){
-	switch (color) {
-		case Color::white: {
-			//Não é pra acontecer!
-			break;
-		}
-		case Color::gray: {
-
-			for (int i = 0; i < 8; ++i)
-			{
-				if (children[i] != nullptr) {
-					children[i]->draw(bb[i]);
-				}
-			}
-
-			//Desenha wireframe cinza
-			// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			// glColor3f(.5,.5,.5);
-			// glLineWidth(1.5);
-			// bb.draw();
-			// glLineWidth(1.0);
-			// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
-			break;
-		}
-		case Color::black: {
-			//Desenha sólido em Cor aleatória
-			//glColor3f(drawColor[0], drawColor[1], drawColor[2]);
-			//glColor3f(0,0,0.8);
-			//bb.draw();
-
-			//Desenha wireframe cinza
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			glColor3f(.5,.5,.5);
-			glLineWidth(0.5);
-			bb.draw();
-			glLineWidth(1.0);
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		}
-
-	}
-}
-
+using tnw::owner_ptr;
+using std::make_unique;
 
 tnw::octree::Tree::Tree(Tree* parent) {
-	children.fill(nullptr);
 	color = Color::black;
 	this->parent = parent;
 
@@ -72,10 +25,10 @@ tnw::octree::Tree::Tree(Tree* parent) {
 
 }
 
-tnw::octree::Tree::Tree(std::array<Tree*,8> children, Tree* parent) {
-	this->children = children;
+tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
+	this->children = std::move(children);
 	for (auto&& child : children) {
-		if (child != nullptr) {
+		if (child) {
 			child->parent = this;
 		}
 	}
@@ -87,43 +40,43 @@ tnw::octree::Tree::Tree(std::array<Tree*,8> children, Tree* parent) {
 
 	std::uniform_real_distribution<> dis(0,1);
 
-	for (int i = 0; i < 3; ++i)
-	{
+	for (int i = 0; i < 3; ++i) {
 		drawColor[i] = dis(gen);
 	}
 
 }
 
-Tree*& tnw::octree::Tree::operator[](size_t i) {
-	return children[i];
+void tnw::octree::Tree::set(size_t i, unique_ptr<Tree>&& t) {
+	children[i] = std::move(t);
 }
 
-Tree tnw::octree::make_from_file(FILE* f) {
+tnw::owner_ptr<Tree> tnw::octree::make_from_file(FILE* f) {
 	char c;
 	std::vector<int> counter{0};
 	fgetc(f); // ignore first '('
 
-	Tree root;
-	root.color = Color::gray;
+	owner_ptr<Tree> root = new Tree();
+	root->color = Color::gray;
 
-	Tree* cursor = &root;
+	Tree* cursor = root;
 
 	while ((c = std::fgetc(f)) != '\n' && c != EOF) {
 		switch(c) {
 			case '(': {
-				(*cursor)[counter.back()] = new Tree(cursor);
-				cursor = (*cursor)[counter.back()];
+				Tree* aux = cursor;
+				cursor = new Tree(cursor);
+				aux->set(counter.back(),unique_ptr<Tree>(cursor));
 				cursor->color = Color::gray;
 				counter.back()++;
 				counter.push_back(0);
 				break;
 			}
 			case 'b': {
-				(*cursor)[counter.back()++] = new Tree(cursor);
+				cursor->set(counter.back()++,make_unique<Tree>(cursor));
 				break;
 			}
 			case 'w': {
-				(*cursor)[counter.back()++] = nullptr;
+				cursor->set(counter.back()++,nullptr);
 				break;
 			}
 		}
@@ -162,15 +115,60 @@ void tnw::octree::Tree::classify(Classifier function, BoundingBox bb, unsigned i
 	this->color = color;
 	if (currDepth >= maxDepth) return;
 	if (color == Color::gray) {
-		for (int i = 0; i < 8; ++i)
-		{
+		for (int i = 0; i < 8; ++i) {
 			//Cria um filho com ela como pai
-			Tree *child = new Tree(this);
-			//Adiciona o filho a própria árvore
-			(*this)[i] = child;
+			auto child = make_unique<Tree>(this);
 			//Chama recursivamente na árvore filha
 			child->classify(function, bb[i], maxDepth, currDepth+1);
+			//Adiciona o filho a própria árvore
+			set(i,std::move(child));
 		}
+	}
+}
+
+/* Recebe a própria bounding box do pai, e dependendo da sua cor faz o seguinte
+ * Cinza - Chama o draw nos filhos, e desenha a própria bounding box como  wireframe
+ * Preto - Desenha a própria bounding box como preenchida
+ */
+void tnw::octree::Tree::draw(const BoundingBox& bb){
+	switch (color) {
+		case Color::white: {
+			//Não é pra acontecer!
+			break;
+		}
+		case Color::gray: {
+
+			for (int i = 0; i < 8; ++i) {
+				if (children[i]) {
+					children[i]->draw(bb[i]);
+				}
+			}
+
+			//Desenha wireframe cinza
+			// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			// glColor3f(.5,.5,.5);
+			// glLineWidth(1.5);
+			// bb.draw();
+			// glLineWidth(1.0);
+			// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+			break;
+		}
+		case Color::black: {
+			//Desenha sólido em Cor aleatória
+			//glColor3f(drawColor[0], drawColor[1], drawColor[2]);
+			//glColor3f(0,0,0.8);
+			//bb.draw();
+
+			//Desenha wireframe cinza
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			glColor3f(.5,.5,.5);
+			glLineWidth(0.5);
+			bb.draw();
+			glLineWidth(1.0);
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+		}
+
 	}
 }
 

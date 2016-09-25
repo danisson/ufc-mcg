@@ -4,10 +4,10 @@
 #include <array>
 #include <string>
 #include <functional>
+#include <memory>
 #include "octree.h"
 
 namespace tnw {
-
 class Model {
 public:
 	virtual void draw() = 0;
@@ -19,7 +19,10 @@ public:
 	virtual double volume() = 0;
 };
 
-class Octree : public Model {};
+class Octree : public Model {
+private:
+	std::unique_ptr<octree::Tree> tree;
+};
 
 } // namespace tnw
 #endif
