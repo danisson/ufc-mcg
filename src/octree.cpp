@@ -246,3 +246,26 @@ Color tnw::octree::Cilinder::operator()(const BoundingBox& bb){
 		return tnw::octree::Color::gray;
 	}
 }
+
+tnw::octree::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height, float basis) : inferiorPoint(inferiorPoint), height(height), basis(basis) {}
+Color tnw::octree::SquarePyramid::operator()(const BoundingBox& bb){
+	unsigned int count = 0;
+	glm::vec3 p;
+	for (int i = 0; i < 8; ++i)
+	{
+		bool xPos, yPos, zPos;
+		p = bb.getVertice(i);
+
+		xPos = (p[0] >= inferiorPoint[0]-basis/2.0) && (p[0] <= inferiorPoint[0]+basis/2.0);
+		yPos = (p[1] >= inferiorPoint[1]) && (p[1] <= inferiorPoint[1]+height);
+		zPos = (p[2] >= inferiorPoint[2]-basis/2.0) && (p[2] <= inferiorPoint[2]+basis/2.0); 
+		if (yPos && xPos && zPos){
+			count++;
+		}
+	}	
+	if (count >= 8){
+		return tnw::octree::Color::black;
+	} else {
+		return tnw::octree::Color::gray;
+	}	
+}

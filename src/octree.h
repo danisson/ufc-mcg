@@ -1,6 +1,7 @@
 #ifndef _H_OCTREE
 #define _H_OCTREE
 #include "model.h"
+#include <memory>
 
 namespace tnw {
 	template <typename T>
@@ -66,6 +67,15 @@ namespace octree {
 	private:
 		glm::vec3 inferiorPoint;
 		float height, radius;
+	};
+
+	class SquarePyramid {
+	public:
+		SquarePyramid(glm::vec3 inferiorPoint, float height, float basis);
+		Color operator()(const BoundingBox&);
+	private:
+		glm::vec3 inferiorPoint;
+		float basis, radius;
 	};
 
 	// Builds a tree from a file, stops reading until end of line
