@@ -36,14 +36,22 @@ namespace octree {
 		Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent = nullptr);
 		// Constructor for leafs
 		Tree(Tree* parent = nullptr);
+
+		// Copy
+		Tree(Tree& o);
+
 		//Drawing function
 		void draw(const BoundingBox& bb);
 
 		void set(size_t i, unique_ptr<Tree>&& t);
-
-		std::string serialize() const;
-		void classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth);
+		Tree* get(size_t);
 	};
+
+	// Builds a tree from a file, stops reading until end of line
+	tnw::owner_ptr<Tree> make_from_file(FILE* f);
+	tnw::owner_ptr<Tree> tree_and(Tree* t1, Tree* t2);
+	std::string serialize(Tree* t);
+	tnw::owner_ptr<Tree> classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth);
 
 	class Sphere {
 	public:
@@ -71,8 +79,5 @@ namespace octree {
 		glm::vec3 inferiorPoint;
 		float height, radius;
 	};
-
-	// Builds a tree from a file, stops reading until end of line
-	tnw::owner_ptr<Tree> make_from_file(FILE* f);
 }} // namespace tnw::octree
 #endif

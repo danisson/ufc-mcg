@@ -46,14 +46,53 @@ tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
 
 }
 
+tnw::octree::Tree::Tree(Tree& o) {
+	parent = nullptr;
+	color = o.color;
+	for (size_t i = 0; i < 3; ++i) {
+		drawColor[i] = o.drawColor[i];
+	}
+	for (size_t i = 0; i < 8; ++i) {
+		if (o.children[i]) {
+			children[i] = make_unique<Tree>(*o.children[i]);
+			children[i]->parent = this;
+		}
+	}
+}
+
 void tnw::octree::Tree::set(size_t i, unique_ptr<Tree>&& t) {
 	children[i] = std::move(t);
+}
+
+Tree* tnw::octree::Tree::get(size_t i) {
+	return children[i].get();
+}
+
+tnw::owner_ptr<Tree> tnw::octree::tree_and(Tree* t1, Tree* t2) {
+	if (!t1 || !t2) return nullptr;
+	if (t1->color == Color::black) return new Tree(*t2);
+	if (t2->color == Color::black) return new Tree(*t1);
+
+	owner_ptr<Tree> r = new Tree();
+	r->color = Color::gray;
+
+	for (size_t i = 0; i < 8; ++i) {
+		r->children[i] = unique_ptr<Tree>(tree_and(t1->get(i),t2->get(i)));
+	}
+
+	return r;
 }
 
 tnw::owner_ptr<Tree> tnw::octree::make_from_file(FILE* f) {
 	char c;
 	std::vector<int> counter{0};
-	fgetc(f); // ignore first '('
+
+	switch(fgetc(f)) {
+		case 'b':
+			return new Tree();
+		case 'w':
+			return nullptr;
+	}
 
 	owner_ptr<Tree> root = new Tree();
 	root->color = Color::gray;
@@ -91,18 +130,16 @@ tnw::owner_ptr<Tree> tnw::octree::make_from_file(FILE* f) {
 }
 
 // Todo - Make recursive version using std::vector
-std::string tnw::octree::Tree::serialize() const {
+std::string tnw::octree::serialize(Tree* t) {
+	if(!t) return "w";
+
 	std::string o;
-	if (color == Color::gray) {
+	if (t->color == Color::gray) {
 		o += "(";
-		for (auto&& c : children) {
-			if (c)
-				o += c->serialize();
-			else
-				o += "w";
-		}
+		for (auto&& c : t->children)
+			o += serialize(c.get());
 	}
-	if (color == Color::black) {
+	if (t->color == Color::black) {
 		o += "b";
 	}
 
@@ -110,20 +147,23 @@ std::string tnw::octree::Tree::serialize() const {
 }
 
 // Todo - Make recursive version using std::vector
-void tnw::octree::Tree::classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth){
-	Color color = function(bb);
-	this->color = color;
-	if (currDepth >= maxDepth) return;
-	if (color == Color::gray) {
-		for (int i = 0; i < 8; ++i) {
-			//Cria um filho com ela como pai
-			auto child = make_unique<Tree>(this);
-			//Chama recursivamente na árvore filha
-			child->classify(function, bb[i], maxDepth, currDepth+1);
-			//Adiciona o filho a própria árvore
-			set(i,std::move(child));
-		}
+owner_ptr<Tree> tnw::octree::classify(Classifier c, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth){
+	switch (c(bb)) {
+		case Color::white:
+			return nullptr;
+		case Color::black:
+			return new Tree();
+		case Color::gray: break;
 	}
+	if (currDepth >= maxDepth) 	return new Tree();
+
+	owner_ptr<Tree> r = new Tree();
+	r->color = Color::gray;
+
+	for (size_t i = 0; i < 8; ++i)
+		r->children[i].reset(classify(c, bb[i], maxDepth, currDepth+1));
+
+	return r;
 }
 
 /* Recebe a própria bounding box do pai, e dependendo da sua cor faz o seguinte
