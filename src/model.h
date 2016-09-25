@@ -55,41 +55,27 @@ namespace octree {
 		void classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth);
 	};
 
-	class Shape
-	{
-	public:
-		Shape() = default;
-		~Shape() = default;
-		virtual Color operator()(const BoundingBox&) = 0;		
-	};
-
-	class Sphere : public Shape
-	{
+	class Sphere {
 	public:
 		Sphere(glm::vec3 center, float radius);
-		~Sphere() = default;
 		Color operator()(const BoundingBox&);
 	private:
 		glm::vec3 center;
 		float radius;
 	};
 
-	class Box : public Shape
-	{
+	class Box {
 	public:
 		Box(glm::vec3 center, float length, float depth, float height);
-		~Box() = default;
 		Color operator()(const BoundingBox&);
 	private:
 		glm::vec3 center;
 		float length, depth, height;
 	};
 
-	class Cilinder : public Shape
-	{
+	class Cilinder {
 	public:
 		Cilinder(glm::vec3 inferiorPoint, float height, float radius);
-		~Cilinder() = default;
 		Color operator()(const BoundingBox&);
 	private:
 		glm::vec3 inferiorPoint;

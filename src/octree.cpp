@@ -48,7 +48,7 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 			glLineWidth(0.5);
 			bb.draw();
 			glLineWidth(1.0);
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );			
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
 
 	}
@@ -169,15 +169,13 @@ void tnw::octree::Tree::classify(Classifier function, BoundingBox bb, unsigned i
 			//Adiciona o filho a própria árvore
 			(*this)[i] = child;
 			//Chama recursivamente na árvore filha
-			child->classify(function, bb[i], maxDepth, currDepth+1);	
+			child->classify(function, bb[i], maxDepth, currDepth+1);
 		}
 	}
 }
 
 //SHAPE IMPLEMENTATIONS
-tnw::octree::Sphere::Sphere(glm::vec3 center, float radius) : center(center), radius(radius) {
-
-}
+tnw::octree::Sphere::Sphere(glm::vec3 center, float radius) : center(center), radius(radius) {}
 
 Color tnw::octree::Sphere::operator()(const BoundingBox& bb){
 	unsigned int count = 0;
@@ -228,10 +226,8 @@ Color tnw::octree::Box::operator()(const BoundingBox& bb){
 
 }
 
-tnw::octree::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {
+tnw::octree::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
 
-}
- 
 Color tnw::octree::Cilinder::operator()(const BoundingBox& bb){
 		unsigned int count = 0;
 	glm::vec3 p, y(0,1,0);
