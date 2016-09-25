@@ -10,6 +10,11 @@
 #include <iostream>
 #include <math.h>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+#undef near
+#undef far
+#endif
+
 struct IsometricCamera
 {
 	float scale = 2.0, near = 10.0, far = -10.0;
@@ -55,7 +60,7 @@ int main(void) {
 	glfwSetKeyCallback(window, key_callback);
 		//glfwSetMouseButtonCallback(window, mouse_button_callback);
 		//glfwSetCursorPosCallback(window, mouse_callback);
-	
+
 
 	//Camera initalization
 	IsometricCamera camera;
@@ -79,12 +84,12 @@ int main(void) {
 
 		glm::mat4 view = isometric(camera.scale, camera.near, camera.far, camera.positive_hor, camera.positive_ver);
 		glLoadMatrixf(glm::value_ptr(view));
-		oct->draw(bb); 
+		oct->draw(bb);
 		desenharEixos();
 
 		glPopMatrix();
 
-		//Interface construction	
+		//Interface construction
 		ImGui::Begin("Menu");
 
 		if (ImGui::Button("+ Scale")) {
@@ -92,7 +97,7 @@ int main(void) {
 		}
 		if (ImGui::Button("- Scale")) {
 			camera.scale -= 1;
-		} 
+		}
 		if (ImGui::Button("Flip X")) {
 			camera.positive_hor = !camera.positive_hor;
 		}
@@ -121,7 +126,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     	glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-        
+
 }
 
 void desenharEixos(){
@@ -141,9 +146,9 @@ void desenharEixos(){
 
 glm::mat4 isometric(float scale, float near, float far, bool positive_hor, bool positive_ver)
 {
-	float rot_y = glm::radians(45.0); 
+	float rot_y = glm::radians(45.0);
 	float rot_x = std::asin(std::tan(glm::radians(30.0f)));
-	
+
 	if (!positive_ver){
 		rot_y = -rot_y;
 	}
