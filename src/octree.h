@@ -79,7 +79,7 @@ namespace octree {
 		Color operator()(const BoundingBox&);
 	private:
 		glm::vec3 inferiorPoint;
-		float basis, radius;
+		float height, basis;
 	};
 
 	// Builds a tree from a file, stops reading until end of line

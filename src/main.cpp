@@ -68,8 +68,8 @@ int main(void) {
 	tnw::octree::Tree* oct = new tnw::octree::Tree();
 	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-1,-1,1), 2);
 	tnw::octree::Sphere s(glm::vec3(0,0,0), 0.5);
-	tnw::octree::SquarePyramid sp(glm::vec3(0,-1,0), 0.5, 2);
-	oct->classify(sp, bb, 6, 0);
+	tnw::octree::SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
+	oct->classify(sp, bb, 8, 0);
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
