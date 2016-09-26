@@ -16,8 +16,8 @@ LINK = -lm -l:imgui.a $(LINKGL)
 
 default: bin/main
 
-bin/main: src/main.cpp bin/imgui.a bin/octree.o bin/boundingbox.o
-	$(CC) $(CFLAGS) bin/octree.o bin/boundingbox.o src/main.cpp -o bin/main $(LINK)
+bin/main: src/main.cpp bin/imgui.a bin/octree.o bin/boundingbox.o bin/helper.o
+	$(CC) $(CFLAGS) bin/octree.o bin/boundingbox.o bin/helper.o src/main.cpp -o bin/main $(LINK)
 
 bin/imgui.a: lib/imgui/*.cpp
 	$(CC) $(CFLAGS) -c lib/imgui/imgui.cpp -o bin/imgui.o
@@ -33,5 +33,7 @@ bin/boundingbox.o: src/boundingbox.cpp src/model.h
 bin/octree.o: src/octree.cpp src/model.h
 	$(CC) $(CFLAGS) -c src/octree.cpp -o bin/octree.o
 
+bin/helper.o: src/helper.cpp src/helper.h
+	$(CC) $(CFLAGS) -c src/helper.cpp -o bin/helper.o
 clear:
 	rm -f bin/main{,.exe} bin/imgui.a bin/*.o
