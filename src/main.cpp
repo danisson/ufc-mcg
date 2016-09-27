@@ -1,4 +1,6 @@
 #include "model.h"
+#include "helper.h"
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -14,6 +16,17 @@
 #undef near
 #undef far
 #endif
+
+// int main(int argc, char const *argv[])
+// {
+// 		auto oct = std::make_unique<tnw::octree::Tree>();
+// 		tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-1,-1,1), 2);
+// 		tnw::octree::Sphere s(glm::vec3(0,0,0), 0.5);
+// 		tnw::octree::SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
+
+// 		oct->classify(sp, bb, 3, 0);
+// 	return 0;
+// }
 
 struct IsometricCamera
 {
@@ -54,6 +67,7 @@ int main(void) {
 	glClearColor(1.,1.,1.,1.);
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 	glFrontFace(GL_CCW);
 
 	//Set callbacks
@@ -65,12 +79,20 @@ int main(void) {
 	//Camera initalization
 	IsometricCamera camera;
 
-	tnw::octree::Tree* oct = new tnw::octree::Tree();
-	//tnw::octree::Classifier f = circle;
-	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-1,-1,1), 2);
-	//oct->classify(f, bb, 6, 0);
+	// tnw::octree::BoundingBox bb2(glm::vec3(0,0,0), 4);
+	// tnw::octree::BoundingBox bb3(glm::vec3(2,-1,1), 2);
+
+	// auto oct = std::make_unique<tnw::octree::Tree>();
+	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(0,0,0), 1);
 	tnw::octree::Sphere s(glm::vec3(0,0,0), 0.5);
-	oct->classify(s, bb, 6, 0);
+	tnw::octree::SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
+	tnw::octree::Box bx(glm::vec3(0.5,0.25,-0.25), 1, 0.5, 0.5);
+	auto oct = classify(bx, bb, 4, 0);
+
+	// std::cout << "Interseção bb1, bb2: " << (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, bb2.getCenter(), bb2.depth, bb2.depth, bb2.depth) ? std::string("true") : std::string("false")) << std::endl;
+	// std::cout << "Interseção bb1, bb3: " << (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, bb3.getCenter(), bb3.depth, bb3.depth, bb3.depth) ? std::string("true") : std::string("false")) << std::endl;
+	// std::cout << "Interseção bb2, bb3: " << (tnw::box_intersection(bb2.getCenter(), bb2.depth, bb2.depth, bb2.depth, bb3.getCenter(), bb3.depth, bb3.depth, bb3.depth) ? std::string("true") : std::string("false")) << std::endl;
+
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
@@ -84,8 +106,17 @@ int main(void) {
 
 		glm::mat4 view = isometric(camera.scale, camera.near, camera.far, camera.positive_hor, camera.positive_ver);
 		glLoadMatrixf(glm::value_ptr(view));
-		oct->draw(bb);
+
 		desenharEixos();
+
+		oct->draw(bb);
+		// glColor3f(1,0,0);
+		// bb.draw();
+		// glColor3f(0,1,0);
+		// bb2.draw();
+		// glColor3f(0,0,1);
+		// bb3.draw();
+
 
 		glPopMatrix();
 
