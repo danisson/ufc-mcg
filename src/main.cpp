@@ -30,7 +30,7 @@
 
 struct IsometricCamera
 {
-	float scale = 2.0, near = 10.0, far = -10.0;
+	float scale = 2.0, near = -10.0, far = 10.0;
 	bool positive_hor = true, positive_ver = true;
 };
 
@@ -180,12 +180,14 @@ glm::mat4 isometric(float scale, float near, float far, bool positive_hor, bool 
 	float rot_y = glm::radians(45.0);
 	float rot_x = std::asin(std::tan(glm::radians(30.0f)));
 
+	if (!positive_hor){
+		// rot_x = -rot_x;
+		rot_y = glm::radians(3*45.0);
+	}
 	if (!positive_ver){
 		rot_y = -rot_y;
 	}
-	if (!positive_hor){
-		rot_x = -rot_x;
-	}
+
 	glm::mat4 a = glm::rotate(glm::mat4(), rot_y, glm::vec3(0.0,1.0,0.0));
 	glm::mat4 b = glm::rotate(glm::mat4(), rot_x, glm::vec3(1.0,0.0,0.0));
 
