@@ -11,6 +11,7 @@
 #include <imgui_impl_glfw.h>
 #include <iostream>
 #include <math.h>
+#include <vector>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #undef near
@@ -45,11 +46,11 @@ private:
 	unsigned int selected;
 };
 
-Scene::Scene() { models(); }
+Scene::Scene() { }
 void Scene::addModel(tnw::Model* model) { models.push_back(model); }
 std::vector<tnw::Model*> Scene::getModels() {return models;}
-void Scene::setSelected(unsigned int s) {s = selected;}
-unsigned int Scene::getSelected() {return s};
+void Scene::setSelected(unsigned int s) {selected = s;}
+unsigned int Scene::getSelected() {return selected;}
 void Scene::draw() {
 	for (auto& model : models) {
 		model->draw();
@@ -118,7 +119,7 @@ int main(void) {
 	auto oct = classify(bx, bb, 4, 0);
 	auto oct2 = classify(sp, bb, 4, 0);
 
-	std::cout << "Interseção bb1, esfera: " << (tnw::sphere_box_intersection(glm::vec3(0), 3, bb.getCenter(), bb.depth, bb.depth, bb.depth)) ? "true" : "false" << std::endl;
+	std::cout << "Interseção bb1, esfera: " << (tnw::sphere_box_intersection(glm::vec3(0), 3, bb.getCenter(), bb.depth, bb.depth, bb.depth) ? "true" : "false") << std::endl;
 
 	// std::cout << "Interseção bb1, bb2: " << (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, bb2.getCenter(), bb2.depth, bb2.depth, bb2.depth) ? std::string("true") : std::string("false")) << std::endl;
 	// std::cout << "Interseção bb1, bb3: " << (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, bb3.getCenter(), bb3.depth, bb3.depth, bb3.depth) ? std::string("true") : std::string("false")) << std::endl;
