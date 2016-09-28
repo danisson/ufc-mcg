@@ -28,6 +28,26 @@
 // 	return 0;
 // }
 
+//Classe da interface que representa uma cena com vários modelos
+class Scene
+{
+public:
+	Scene();
+	void addModel(Model*);
+	std::vector<Model*> getModels();
+	void setSelected(unsigned int);
+	void draw();
+private:
+	//Array de modelos
+	std::vector<Model*> models;
+	//Modelo selecionado atualmente
+	unsigned int selected;
+};
+
+Scene::Scene() { models(); }
+void Scene::addModel(Model*) { models.push_back(model); }
+std::vector<Model*> getModels();
+
 struct IsometricCamera
 {
 	float scale = 2.0, near = 10.0, far = -10.0;
