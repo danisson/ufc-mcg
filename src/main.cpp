@@ -33,20 +33,28 @@ class Scene
 {
 public:
 	Scene();
-	void addModel(Model*);
-	std::vector<Model*> getModels();
+	void addModel(tnw::Model*);
+	std::vector<tnw::Model*> getModels();
 	void setSelected(unsigned int);
+	unsigned int getSelected();
 	void draw();
 private:
 	//Array de modelos
-	std::vector<Model*> models;
+	std::vector<tnw::Model*> models;
 	//Modelo selecionado atualmente
 	unsigned int selected;
 };
 
 Scene::Scene() { models(); }
-void Scene::addModel(Model*) { models.push_back(model); }
-std::vector<Model*> getModels();
+void Scene::addModel(tnw::Model* model) { models.push_back(model); }
+std::vector<tnw::Model*> Scene::getModels() {return models;}
+void Scene::setSelected(unsigned int s) {s = selected;}
+unsigned int Scene::getSelected() {return s};
+void Scene::draw() {
+	for (auto& model : models) {
+		model->draw();
+	}
+}
 
 struct IsometricCamera
 {
@@ -108,6 +116,9 @@ int main(void) {
 	tnw::octree::SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
 	tnw::octree::Box bx(glm::vec3(0.5,0.25,-0.25), 1, 0.5, 0.5);
 	auto oct = classify(bx, bb, 4, 0);
+	auto oct2 = classify(sp, bb, 4, 0);
+
+	std::cout << "Interseção bb1, esfera: " << (tnw::sphere_box_intersection(glm::vec3(0), 3, bb.getCenter(), bb.depth, bb.depth, bb.depth)) ? "true" : "false" << std::endl;
 
 	// std::cout << "Interseção bb1, bb2: " << (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, bb2.getCenter(), bb2.depth, bb2.depth, bb2.depth) ? std::string("true") : std::string("false")) << std::endl;
 	// std::cout << "Interseção bb1, bb3: " << (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, bb3.getCenter(), bb3.depth, bb3.depth, bb3.depth) ? std::string("true") : std::string("false")) << std::endl;
