@@ -21,6 +21,9 @@ namespace octree {
 		BoundingBox operator[](size_t position) const;
 		glm::vec3 getVertice(unsigned int i) const;
 		glm::vec3 getCenter() const;
+		Color intersect(const BoundingBox& bb) const;
+
+		bool operator==(const BoundingBox& s) const;
 	};
 
 	using Classifier = std::function<Color(const BoundingBox&)>;
@@ -37,15 +40,16 @@ namespace octree {
 		Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent = nullptr);
 		// Constructor for leafs
 		Tree(Tree* parent = nullptr);
-
 		// Copy
-		Tree(Tree& o);
+		Tree(const Tree& o);
 
 		//Drawing function
 		void draw(const BoundingBox& bb);
 
 		void set(size_t i, unique_ptr<Tree>&& t);
 		Tree* get(size_t);
+
+		Color classify(const BoundingBox& root, const BoundingBox& test) const;
 	};
 
 	// Builds a tree from a file, stops reading until end of line

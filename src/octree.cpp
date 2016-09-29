@@ -23,7 +23,6 @@ tnw::octree::Tree::Tree(Tree* parent) {
 	{
 		drawColor[i] = dis(gen);
 	}
-
 }
 
 tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
@@ -44,10 +43,9 @@ tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
 	for (int i = 0; i < 3; ++i) {
 		drawColor[i] = dis(gen);
 	}
-
 }
 
-tnw::octree::Tree::Tree(Tree& o) {
+tnw::octree::Tree::Tree(const Tree& o) {
 	parent = nullptr;
 	color = o.color;
 	for (size_t i = 0; i < 3; ++i) {
@@ -156,7 +154,7 @@ owner_ptr<Tree> tnw::octree::classify(Classifier c, BoundingBox bb, unsigned int
 			return new Tree();
 		case Color::gray: break;
 	}
-	if (currDepth >= maxDepth) 	return new Tree();
+	if (currDepth >= maxDepth) return nullptr;
 
 	owner_ptr<Tree> r = new Tree();
 	r->color = Color::gray;
@@ -229,15 +227,7 @@ Color tnw::octree::Sphere::operator()(const BoundingBox& bb){
 	return tnw::octree::Color::gray;
 }
 
-tnw::octree::Box::Box(glm::vec3 center	// tnw::octree::Tree* oct = new tnw::octree::Tree();
-	// tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-1,-1,1), 2);
-	// tnw::octree::Sphere s(glm::vec3(0,0,0), 0.5);
-	// tnw::octree::SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
-
-	// oct->classify(sp, bb, 8, 0);
-, float length, float depth, float height) : center(center), length(length), depth(depth), height(height){
-
-}
+tnw::octree::Box::Box(glm::vec3 center, float length, float depth, float height) : center(center), length(length), depth(depth), height(height) {}
 
 Color tnw::octree::Box::operator()(const BoundingBox& bb){
 	unsigned int count = 0;
@@ -272,7 +262,6 @@ Color tnw::octree::Box::operator()(const BoundingBox& bb){
 	} else {
 		return tnw::octree::Color::white;
 	}
-
 }
 
 tnw::octree::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
