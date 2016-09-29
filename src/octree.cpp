@@ -42,6 +42,6 @@ double tnw::Octree::volume() const{
 	}
 }
 //Serialize
-std::string tnw::Octree::serialize() const{
+std::string tnw::Octree::serialize() const {
 	return octree::serialize(tree.get());
 }

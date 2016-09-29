@@ -107,13 +107,7 @@ int main(void) {
 	IsometricCamera camera;
 
 	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(0,0,0), 1);
-	tnw::octree::Sphere s(glm::vec3(0,0,0), 1);
-	tnw::octree::SquarePyramid sp(glm::vec3(2,0,-2), 1, 1);
-	tnw::octree::Box bx(glm::vec3(0.5,0.25,-0.25), 1, 0.5, 0.5);
-	tnw::octree::Cilinder cl(glm::vec3(1,1,-1), 1, 0.5);
-	
-	auto oct = tnw::Octree(cl, bb, 4);
-	printf("Volume: %f\n", oct.volume());
+	tnw::Octree oct(bb);
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {

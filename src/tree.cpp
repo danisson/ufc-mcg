@@ -50,7 +50,7 @@ tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
 
 }
 
-tnw::octree::Tree::Tree(Tree& o) {
+tnw::octree::Tree::Tree(const Tree& o) {
 	parent = nullptr;
 	color = o.color;
 	for (size_t i = 0; i < 3; ++i) {
@@ -217,7 +217,7 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 	}
 }
 
-double tnw::octree::Tree::volume(){
+double tnw::octree::Tree::volume() const {
 	switch (color) {
 		case Color::black : {
 			return 1;
