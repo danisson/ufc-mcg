@@ -56,6 +56,16 @@ glm::vec3 tnw::octree::BoundingBox::getCenter() const {
 	return this->corner + depth*(x+y-z);
 }
 
+//Retorna o menor ponto da box (vértice 2?)
+glm::vec3 tnw::octree::BoundingBox::minPoint() const {
+	return getVertice(2);
+}
+
+//Retorna o maior ponto da box (vértice 5?)
+glm::vec3 tnw::octree::BoundingBox::maxPoint() const {
+	return getVertice(5);
+}
+
 //Retorna cada canto da bouding box
 glm::vec3 tnw::octree::BoundingBox::getVertice(unsigned int i) const {
 	glm::vec3 corner, x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.);

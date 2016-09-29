@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <random>
+#include <glm/gtx/string_cast.hpp>
 
 using namespace tnw::octree;
 using tnw::owner_ptr;
@@ -20,9 +21,7 @@ tnw::octree::Tree::Tree(Tree* parent) {
 	std::uniform_real_distribution<> dis(0,1);
 
 	for (int i = 0; i < 3; ++i)
-	{
 		drawColor[i] = dis(gen);
-	}
 }
 
 tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
@@ -175,25 +174,18 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 			//Não é pra acontecer!
 			break;
 		}
-		case Color::gray: {
 
+		case Color::gray: {
 			for (int i = 0; i < 8; ++i) {
 				if (children[i]) {
 					children[i]->draw(bb[i]);
 				}
 			}
-
-			// Desenha wireframe cinza
-			// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			// glColor3f(.5,.5,.5);
-			// glLineWidth(0.5);
-			// bb.draw();
-			// glLineWidth(1.0);
-			// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
 			break;
 		}
+
 		case Color::black: {
+			// std::cout << "chamando draw na black???\n";
 			// Desenha sólido em Cor aleatória
 			glColor3f(drawColor[0], drawColor[1], drawColor[2]);
 			// glColor3f(0,0,0.8);
@@ -206,6 +198,8 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 			bb.draw();
 			glLineWidth(1.0);
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+			break;
 		}
 
 	}
@@ -215,16 +209,22 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 tnw::octree::Sphere::Sphere(glm::vec3 center, float radius) : center(center), radius(radius) {}
 
 Color tnw::octree::Sphere::operator()(const BoundingBox& bb){
-	unsigned int count = 0;
-	for (int i = 0; i < 8; ++i)
-	{
-		if (glm::distance(center, bb.getVertice(i)) < radius) {
-			count++;
+	if (tnw::sphere_box_intersection(center, radius, bb.getCenter(), bb.depth, bb.depth, bb.depth)) {
+		unsigned int count = 0;
+		for (int i = 0; i < 8; ++i) {
+			if (glm::distance(center, bb.getVertice(i)) < radius) {
+				count++;
+			}
 		}
+		if (count >= 8) {
+			return tnw::octree::Color::black;
+		}
+		else {
+			return tnw::octree::Color::gray;
+		}
+	} else {
+		return tnw::octree::Color::white;
 	}
-	if (count >= 8) { /*std::cout << "black\n";*/ return tnw::octree::Color::black; }
-	//std::cout << "gray\n";
-	return tnw::octree::Color::gray;
 }
 
 tnw::octree::Box::Box(glm::vec3 center, float length, float depth, float height) : center(center), length(length), depth(depth), height(height) {}
@@ -235,7 +235,7 @@ Color tnw::octree::Box::operator()(const BoundingBox& bb){
 
 	//Bounding box intercepta a caixa
 	if (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, center, length, height, depth)){
-		for (int i = 0; i < 8; ++i){
+		for (int i = 0; i < 8; ++i) {
 			unsigned int countcoords = 0;
 			p = bb.getVertice(i);
 			//std::cout << "p: " << to_string(p) << "\n";
@@ -253,13 +253,15 @@ Color tnw::octree::Box::operator()(const BoundingBox& bb){
 				count++;
 			}
 		}
-		//std::cout << "count: " << count << "\n";
 		if (count >= 8){
+			// std::cout << "black\n";
 			return tnw::octree::Color::black;
 		} else {
+			// std::cout << "gray\n";
 			return tnw::octree::Color::gray;
 		}
 	} else {
+		// std::cout << "white\n";
 		return tnw::octree::Color::white;
 	}
 }
@@ -267,17 +269,15 @@ Color tnw::octree::Box::operator()(const BoundingBox& bb){
 tnw::octree::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
 
 Color tnw::octree::Cilinder::operator()(const BoundingBox& bb){
-		unsigned int count = 0;
+	unsigned int count = 0;
 	glm::vec3 p, y(0,1,0);
 	for (int i = 0; i < 8; ++i)
 	{
 		p = bb.getVertice(i);
-		//std::cout << "p: " << to_string(p) << "c: " << to_string(c+(p[1]-c[1])*y) << "\n";
 		if ((p[1] >= inferiorPoint[1]) && (p[1] <= inferiorPoint[1]+height) && (glm::distance(p, inferiorPoint+(p[1]-inferiorPoint[1])*y) <= radius)){
 			count++;
 		}
 	}
-	//std::cout << "===\n";
 	if (count >= 8){
 		return tnw::octree::Color::black;
 	} else {
@@ -288,24 +288,29 @@ Color tnw::octree::Cilinder::operator()(const BoundingBox& bb){
 tnw::octree::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height, float basis) : inferiorPoint(inferiorPoint), height(height), basis(basis) {}
 Color tnw::octree::SquarePyramid::operator()(const BoundingBox& bb){
 	unsigned int count = 0;
-	glm::vec3 p;
-	for (int i = 0; i < 8; ++i)
-	{
-		bool xPos, yPos, zPos;
-		float proportionalBasis;
 
-		p = bb.getVertice(i);
-		proportionalBasis = basis*(height-p[1]) / height;
-		xPos = (p[0] >= inferiorPoint[0]-proportionalBasis/2.0) && (p[0] <= inferiorPoint[0]+proportionalBasis/2.0);
-		yPos = (p[1] >= inferiorPoint[1]) && (p[1] <= inferiorPoint[1]+height);
-		zPos = (p[2] >= inferiorPoint[2]-proportionalBasis/2.0) && (p[2] <= inferiorPoint[2]+proportionalBasis/2.0);
-		if (yPos && xPos && zPos){
-			count++;
+	glm::vec3 pyramidCenter(inferiorPoint[0], inferiorPoint[1]+(height/2), inferiorPoint[2]);
+	if (box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, pyramidCenter, basis, height, basis)) {
+		glm::vec3 p;
+		for (int i = 0; i < 8; ++i) {
+			bool xPos, yPos, zPos;
+			float proportionalBasis;
+
+			p = bb.getVertice(i);
+			std::cout << "p: " << glm::to_string(p) << "\n";
+			proportionalBasis = basis*(height-p[1]) / height;
+			xPos = (p[0] >= inferiorPoint[0]-proportionalBasis/2.0) && (p[0] <= inferiorPoint[0]+proportionalBasis/2.0);
+			yPos = (p[1] >= inferiorPoint[1]) && (p[1] <= inferiorPoint[1]+height);
+			zPos = (p[2] >= inferiorPoint[2]-proportionalBasis/2.0) && (p[2] <= inferiorPoint[2]+proportionalBasis/2.0);
+			if (yPos && xPos && zPos){
+				count++;
+			}
+		}
+		if (count >= 8){
+			return tnw::octree::Color::black;
+		} else {
+			return tnw::octree::Color::gray;
 		}
 	}
-	if (count >= 8){
-		return tnw::octree::Color::black;
-	} else {
-		return tnw::octree::Color::gray;
-	}
+	return tnw::octree::Color::white;
 }

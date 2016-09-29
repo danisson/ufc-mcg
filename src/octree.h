@@ -21,6 +21,8 @@ namespace octree {
 		BoundingBox operator[](size_t position) const;
 		glm::vec3 getVertice(unsigned int i) const;
 		glm::vec3 getCenter() const;
+		glm::vec3 minPoint() const;
+		glm::vec3 maxPoint() const;
 		Color intersect(const BoundingBox& bb) const;
 
 		bool operator==(const BoundingBox& s) const;
