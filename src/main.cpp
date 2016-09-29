@@ -111,13 +111,13 @@ int main(void) {
 	// tnw::octree::BoundingBox bb3(glm::vec3(2,-1,1), 2);
 
 	// auto oct = std::make_unique<tnw::octree::Tree>();
-	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(0,0,0), 2);
-	tnw::octree::Sphere s(glm::vec3(1,1,-1), 1);
-	tnw::octree::SquarePyramid sp(glm::vec3(1,0,-1), 2, 0.5);
+	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(0,0,0), 4);
+	tnw::octree::Sphere s(glm::vec3(0,0,0), 1);
+	tnw::octree::SquarePyramid sp(glm::vec3(2,0,-2), 1, 1);
 	tnw::octree::Box bx(glm::vec3(0.5,0.25,-0.25), 1, 0.5, 0.5);
 	tnw::octree::Cilinder cl(glm::vec3(1,1,-1), 2, 0.5);
 	auto oct = classify(sp, bb, 4, 0);
-	std::cout << "color " << (oct->get(0)->get(0)->get(0)->color == tnw::octree::Color::gray) << "\n";
+	//std::cout << "color " << (oct->get(0)->get(0)->get(0)->color == tnw::octree::Color::gray) << "\n";
 	// std::cout << "Interseção bb1, esfera: " << (tnw::sphere_box_intersection(glm::vec3(1,1,1), 1, bb.getCenter(), bb.depth, bb.depth, bb.depth) ? "true" : "false") << std::endl;
 
 	// std::cout << "Interseção bb1, bb2: " << (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, bb2.getCenter(), bb2.depth, bb2.depth, bb2.depth) ? std::string("true") : std::string("false")) << std::endl;
