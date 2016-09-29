@@ -20,16 +20,17 @@
 
 // int main(int argc, char const *argv[])
 // {
-// 		auto oct = std::make_unique<tnw::octree::Tree>();
-// 		tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-1,-1,1), 2);
-// 		tnw::octree::Sphere s(glm::vec3(0,0,0), 0.5);
-// 		tnw::octree::SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
+// 	// auto oct = std::make_unique<tnw::octree::Tree>();
+// 	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-1,-1,1), 2);
+// 	// tnw::octree::Sphere s(glm::vec3(0,0,0), 0.5);
+// 	tnw::octree::SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
 
-// 		oct->classify(sp, bb, 3, 0);
+// 	auto oct = tnw::octree::classify(sp, bb, 2, 0);
+// 	printf("%s\n", tnw::octree::serialize(oct).c_str());
 // 	return 0;
 // }
 
-//Classe da interface que representa uma cena com vários modelos
+// Classe da interface que representa uma cena com vários modelos
 class Scene
 {
 public:
@@ -62,6 +63,7 @@ struct IsometricCamera
 	float scale = 2.0, near = -10.0, far = 10.0;
 	bool positive_hor = true, positive_ver = true;
 };
+
 void key_callback(GLFWwindow*, int, int, int, int);
 void desenharEixos();
 glm::mat4 isometric(float, float, float, bool, bool);
@@ -100,31 +102,19 @@ int main(void) {
 
 	//Set callbacks
 	glfwSetKeyCallback(window, key_callback);
-		//glfwSetMouseButtonCallback(window, mouse_button_callback);
-		//glfwSetCursorPosCallback(window, mouse_callback);
-
 
 	//Camera initalization
 	IsometricCamera camera;
 
-	// tnw::octree::BoundingBox bb2(glm::vec3(0,0,0), 4);
-	// tnw::octree::BoundingBox bb3(glm::vec3(2,-1,1), 2);
-
-	// auto oct = std::make_unique<tnw::octree::Tree>();
-	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(0,0,0), 4);
+	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(0,0,0), 1);
 	tnw::octree::Sphere s(glm::vec3(0,0,0), 1);
 	tnw::octree::SquarePyramid sp(glm::vec3(2,0,-2), 1, 1);
 	tnw::octree::Box bx(glm::vec3(0.5,0.25,-0.25), 1, 0.5, 0.5);
-	tnw::octree::Cilinder cl(glm::vec3(1,1,-1), 2, 0.5);
-	auto oct = classify(sp, bb, 4, 0);
-	//std::cout << "color " << (oct->get(0)->get(0)->get(0)->color == tnw::octree::Color::gray) << "\n";
-	// std::cout << "Interseção bb1, esfera: " << (tnw::sphere_box_intersection(glm::vec3(1,1,1), 1, bb.getCenter(), bb.depth, bb.depth, bb.depth) ? "true" : "false") << std::endl;
+	tnw::octree::Cilinder cl(glm::vec3(1,1,-1), 1, 0.5);
+	
+	auto oct = tnw::Octree(cl, bb, 4);
+	printf("Volume: %f\n", oct.volume());
 
-	// std::cout << "Interseção bb1, bb2: " << (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, bb2.getCenter(), bb2.depth, bb2.depth, bb2.depth) ? std::string("true") : std::string("false")) << std::endl;
-	// std::cout << "Interseção bb1, bb3: " << (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, bb3.getCenter(), bb3.depth, bb3.depth, bb3.depth) ? std::string("true") : std::string("false")) << std::endl;
-	// std::cout << "Interseção bb2, bb3: " << (tnw::box_intersection(bb2.getCenter(), bb2.depth, bb2.depth, bb2.depth, bb3.getCenter(), bb3.depth, bb3.depth, bb3.depth) ? std::string("true") : std::string("false")) << std::endl;
-
-	std::cout << "====\n";
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
@@ -139,9 +129,12 @@ int main(void) {
 		glLoadMatrixf(glm::value_ptr(view));
 
 		desenharEixos();
-
-		oct->draw(bb);
-
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+		glColor3f(0,1,0);
+		bb.draw();
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+		
+		oct.draw();
 
 		glPopMatrix();
 
@@ -178,7 +171,7 @@ int main(void) {
 
 				    if (ImGui::Button("OK", ImVec2(120,0))) {
 				    	tnw::octree::Sphere s(glm::vec3(x,y,z), r);
-				    	oct = classify(s, bb, 4, 0); 
+				    	oct = tnw::Octree(s, bb, 4);
 				    	ImGui::CloseCurrentPopup(); 
 				    }
 				    ImGui::SameLine();
@@ -205,7 +198,7 @@ int main(void) {
 
 				    if (ImGui::Button("OK", ImVec2(120,0))) {
 				    	tnw::octree::Box bx(glm::vec3(x,y,z), l, h, d);
-				    	oct = classify(bx, bb, 4, 0); 
+				    	oct = tnw::Octree(bx, bb, 4);
 				    	ImGui::CloseCurrentPopup(); 
 				    }
 				    ImGui::SameLine();
@@ -231,7 +224,7 @@ int main(void) {
 
 					if (ImGui::Button("OK", ImVec2(120,0))) {
 						tnw::octree::Cilinder cl(glm::vec3(x,y,z), h, r);
-						oct = classify(cl, bb, 4, 0); 
+						oct = tnw::Octree(cl, bb, 4);
 						ImGui::CloseCurrentPopup(); 
 					}
 					ImGui::SameLine();
@@ -256,8 +249,8 @@ int main(void) {
 					ImGui::InputFloat("lado", &l);					
 
 					if (ImGui::Button("OK", ImVec2(120,0))) {
-						tnw::octree::SquarePyramid sp(glm::vec3(x,y,z), h,l);
-						oct = classify(sp, bb, 4, 0); 
+						tnw::octree::SquarePyramid sp({x,y,z}, h, l);
+						oct = tnw::Octree(sp, bb, 4);
 						ImGui::CloseCurrentPopup(); 
 					}
 					ImGui::SameLine();

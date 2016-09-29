@@ -154,3 +154,8 @@ tnw::octree::BoundingBox tnw::octree::BoundingBox::operator[](size_t position) c
 
 	return tnw::octree::BoundingBox(corner, depth);
 }
+
+
+double tnw::octree::BoundingBox::volume() const {
+	return depth*depth*depth;
+}

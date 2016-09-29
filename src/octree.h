@@ -5,8 +5,8 @@
 
 namespace tnw {
 
-template <typename T>
-using owner_ptr = T*;
+	template <typename T>
+	using owner_ptr = T*;
 
 namespace octree {
 	enum class Color {
@@ -23,6 +23,7 @@ namespace octree {
 		glm::vec3 getCenter() const;
 		glm::vec3 minPoint() const;
 		glm::vec3 maxPoint() const;
+		double volume() const;
 	};
 
 	using Classifier = std::function<Color(const BoundingBox&)>;
@@ -48,6 +49,8 @@ namespace octree {
 
 		void set(size_t i, unique_ptr<Tree>&& t);
 		Tree* get(size_t);
+
+		double volume();
 	};
 
 	// Builds a tree from a file, stops reading until end of line
