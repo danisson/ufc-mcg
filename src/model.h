@@ -20,6 +20,8 @@ public:
 	virtual double volume() const = 0;
 	//Serialize
 	virtual std::string serialize() const = 0;
+	//Set color
+	virtual void setColor(float c[3]) = 0;
 };
 
 class Octree : public Model {
@@ -32,6 +34,8 @@ public:
 	Octree(octree::Classifier c, const octree::BoundingBox& _bb, unsigned int depth);
 	//Octree a partir de um arquivo
 	Octree(FILE *f);
+
+	virtual void setColor(float c[3]) override;
 
 	virtual void draw() const override;
 	// Geometric operations

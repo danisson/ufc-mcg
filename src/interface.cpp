@@ -58,12 +58,12 @@ void MainMenu::draw() {
 
 		if (ImGui::BeginPopupModal("União", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
-			static int selected_and = -1;
+			static int selected_or = -1;
 			ImGui::Combo("selecione a árvore com que operar", &selected_and, tree_names, model_names.size());
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
 				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
-					models[curr_item]->bool_and(*models[selected_and]);
+					models[curr_item]->bool_or(*models[selected_and]);
 				}
 				ImGui::CloseCurrentPopup(); 
 			}
@@ -74,17 +74,37 @@ void MainMenu::draw() {
 
 		ImGui::SameLine();
 		if (ImGui::Button("Interseção")) {
-			ImGui::OpenPopup("Interseção");
+			ImGui::OpenPopup("Parâmetros de Interseção");
 		}
 
-		if (ImGui::BeginPopupModal("Interseção", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal("Parâmetros de Interseção", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
-			static int selected_or = -1;
+			static int selected_and = -1;
 			ImGui::Combo("selecione a árvore com que operar", &selected_or, tree_names, model_names.size());
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
 				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
 					models[curr_item]->bool_and(*models[selected_or]);
+				}
+				ImGui::CloseCurrentPopup(); 
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("Cor")) {
+			ImGui::OpenPopup("Parâmetros de Cor");
+		}
+
+		if (ImGui::BeginPopupModal("Parâmetros de Cor", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			
+			ImGui::ColorEdit3("cor", color);
+			
+			if (ImGui::Button("OK", ImVec2(120,0))) {
+				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
+					models[curr_item]->setColor(color);
 				}
 				ImGui::CloseCurrentPopup(); 
 			}

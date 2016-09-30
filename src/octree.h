@@ -47,6 +47,7 @@ namespace octree {
 
 		//Drawing function
 		void draw(const BoundingBox& bb);
+		void setColor(float c[3]);
 
 		void set(size_t i, unique_ptr<Tree>&& t);
 		Tree* get(size_t);

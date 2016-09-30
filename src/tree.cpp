@@ -245,6 +245,17 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 	}
 }
 
+void tnw::octree::Tree::setColor(float c[3]) {
+	drawColor[0] = c[0];
+	drawColor[1] = c[1];
+	drawColor[2] = c[2];
+	if (color == Color::gray) {
+		for (auto&& child : children) {
+			if (child) child->setColor(c);
+		}
+	}
+}
+
 double tnw::octree::Tree::volume() const {
 	switch (color) {
 		case Color::black : {

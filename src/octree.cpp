@@ -45,7 +45,16 @@ double tnw::Octree::volume() const{
 		return 0;
 	}
 }
+
 //Serialize
 std::string tnw::Octree::serialize() const {
 	return octree::serialize(tree.get());
+}
+
+//Set color
+void tnw::Octree::setColor(float c[3]){
+	std::cout << "set color!\n";
+	if (tree) {
+		tree->setColor(c);
+	}
 }
