@@ -37,15 +37,17 @@ void tnw::Octree::translate(const glm::vec3& dv) {
 // Boolean operations
 tnw::BooleanErrorCodes tnw::Octree::bool_and(const Model& y) {
 	if (std::type_index(typeid(y)) == std::type_index(typeid(Octree))) {
-		auto&& y2 = static_cast<const Octree&>(y);
-		tree = std::unique_ptr<Tree>(octree::tree_and(tree.get(), y2.tree.get()));
+		auto&& y_oct = static_cast<const Octree&>(y);
+		if (bb != y_oct.bb) { return tnw::BooleanErrorCodes::boundingboxMismatch;}
+		tree = std::unique_ptr<Tree>(octree::tree_and(tree.get(), y_oct.tree.get()));
 		return tnw::BooleanErrorCodes::success;
 	} else return tnw::BooleanErrorCodes::unimplementedType;
 }
 tnw::BooleanErrorCodes tnw::Octree::bool_or(const Model& y) {
 	if (std::type_index(typeid(y)) == std::type_index(typeid(Octree))) {
-		auto&& y2 = static_cast<const Octree&>(y);
-		tree = std::unique_ptr<Tree>(octree::tree_or(tree.get(), y2.tree.get()));
+		auto&& y_oct = static_cast<const Octree&>(y);
+		if (bb != y_oct.bb) { return tnw::BooleanErrorCodes::boundingboxMismatch;}
+		tree = std::unique_ptr<Tree>(octree::tree_or(tree.get(), y_oct.tree.get()));
 		return tnw::BooleanErrorCodes::success;
 	} else return tnw::BooleanErrorCodes::unimplementedType;
 }

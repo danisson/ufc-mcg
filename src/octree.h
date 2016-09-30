@@ -26,6 +26,7 @@ namespace octree {
 		double volume() const;
 		Color intersect(const BoundingBox& bb) const;
 		bool operator==(const BoundingBox& s) const;
+		bool operator!=(const BoundingBox& s) const;
 	};
 
 	using Classifier = std::function<Color(const BoundingBox&)>;
