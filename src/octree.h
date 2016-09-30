@@ -58,6 +58,7 @@ namespace octree {
 	// Builds a tree from a file, stops reading until end of line
 	tnw::owner_ptr<Tree> make_from_file(FILE* f);
 	tnw::owner_ptr<Tree> tree_and(Tree* t1, Tree* t2);
+	tnw::owner_ptr<Tree> tree_or(Tree* t1, Tree* t2);
 	std::string serialize(Tree* t);
 	tnw::owner_ptr<Tree> classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth);
 

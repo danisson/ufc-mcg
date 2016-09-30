@@ -12,25 +12,31 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
+#include <sstream>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #undef near
 #undef far
 #endif
 
-// int main(int argc, char const *argv[])
-// {
+// int main(int argc, char const *argv[]) {
+// 	using namespace tnw::octree;
 // 	// auto oct = std::make_unique<tnw::octree::Tree>();
-// 	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(-1,-1,1), 2);
-// 	// tnw::octree::Sphere s(glm::vec3(0,0,0), 0.5);
-// 	tnw::octree::SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
+// 	BoundingBox bb({0,0,0}, 1);
+// 	// Box({.25,.25,-.25}, .5,.5,.5);
+// 	// Box({.75,.25,-.75}, .5,.5,.5);
+// 	// Sphere s(glm::vec3(0,0,0), 0.5);
+// 	// SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
 
-// 	auto oct = tnw::octree::classify(sp, bb, 2, 0);
-// 	printf("%s\n", tnw::octree::serialize(oct).c_str());
+// 	auto oct  = classify(Box({.25,.25,-.25}, .5,.5,.5), bb, 4, 0);
+// 	auto oct2 = classify(Box({.75,.25,-.75}, .5,.5,.5), bb, 4, 0);
+// 	printf("%s\n", serialize(oct).c_str());
+// 	printf("%s\n", serialize(oct2).c_str());
+// 	printf("%s\n", serialize(tree_or(oct,oct2)).c_str());
 // 	return 0;
 // }
 
-// Classe da interface que representa uma cena com vários modelos
+// //Classe da interface que representa uma cena com vários modelos
 class Scene
 {
 public:
@@ -107,7 +113,11 @@ int main(void) {
 	IsometricCamera camera;
 
 	tnw::octree::BoundingBox bb = tnw::octree::BoundingBox(glm::vec3(0,0,0), 1);
-	tnw::Octree oct(bb);
+	// auto oct = std::make_unique<tnw::Octree>(bb);
+	std::vector<std::unique_ptr<tnw::Octree>> models;
+	// models.push_back(std::move(oct));
+	std::vector<std::string> model_names;
+	// model_names.push_back("Tree 0");
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
@@ -128,7 +138,10 @@ int main(void) {
 		bb.draw();
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		
-		oct.draw();
+		// oct.draw();
+		for (auto& model : models) {
+			model->draw();
+		}
 
 		glPopMatrix();
 
@@ -148,6 +161,74 @@ int main(void) {
 		}
 
 		if (ImGui::CollapsingHeader("Objetos")) {
+			const char* tree_names[model_names.size()];
+
+			for (unsigned int i = 0; i < model_names.size(); i++){
+				
+				tree_names[i] = model_names[i].c_str();
+			}
+
+			static int curr_item = 0;
+
+			ImGui::PushItemWidth(-1);
+			ImGui::ListBox("##cena", &curr_item, tree_names, models.size(), models.size());
+			ImGui::PopItemWidth();
+
+			if (ImGui::Button("Translação")) {
+				ImGui::OpenPopup("Parâmetros da Translação");
+			}
+			if (ImGui::BeginPopupModal("Parâmetros da Translação", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+				float x,y,z;
+				ImGui::InputFloat("x", &x);
+				ImGui::InputFloat("y", &y); 
+				ImGui::InputFloat("z", &z);
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					models[curr_item]->translate(glm::vec3(x,y,z));
+					ImGui::CloseCurrentPopup(); 
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("União")) {
+				ImGui::OpenPopup("União");
+			}
+
+			if (ImGui::BeginPopupModal("União", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+				
+					static int selected_and = -1;
+					ImGui::Combo("selecione a árvore com que operar", &selected_and, tree_names, model_names.size());
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					models[curr_item]->bool_and(*models[selected_and]);
+					ImGui::CloseCurrentPopup(); 
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Interseção")) {
+				ImGui::OpenPopup("Interseção");
+			}
+
+			if (ImGui::BeginPopupModal("Interseção", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+				
+					static int selected_or = -1;
+					ImGui::Combo("selecione a árvore com que operar", &selected_or, tree_names, model_names.size());
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					models[curr_item]->bool_and(*models[selected_or]);
+					ImGui::CloseCurrentPopup(); 
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}			
 
 			if (ImGui::CollapsingHeader("Nova Primitiva")) {
 				if (ImGui::Button("Esfera")) {
@@ -165,7 +246,11 @@ int main(void) {
 
 				    if (ImGui::Button("OK", ImVec2(120,0))) {
 				    	tnw::octree::Sphere s(glm::vec3(x,y,z), r);
-				    	oct = tnw::Octree(s, bb, 4);
+				    	auto newoct = std::make_unique<tnw::Octree>(s, bb, 4);
+				    	models.push_back(std::move(newoct));
+				    	std::stringstream ss;
+				    	// ss << "Tree " << model_names.size();
+				    	model_names.push_back(ss.str().c_str());
 				    	ImGui::CloseCurrentPopup(); 
 				    }
 				    ImGui::SameLine();
@@ -192,7 +277,11 @@ int main(void) {
 
 				    if (ImGui::Button("OK", ImVec2(120,0))) {
 				    	tnw::octree::Box bx(glm::vec3(x,y,z), l, h, d);
-				    	oct = tnw::Octree(bx, bb, 4);
+				    	auto newoct = std::make_unique<tnw::Octree>(bx, bb, 4);
+				    	models.push_back(std::move(newoct));
+				    	std::stringstream ss;
+				    	ss << "Tree " << model_names.size();
+				    	model_names.push_back(ss.str().c_str());
 				    	ImGui::CloseCurrentPopup(); 
 				    }
 				    ImGui::SameLine();
@@ -218,7 +307,11 @@ int main(void) {
 
 					if (ImGui::Button("OK", ImVec2(120,0))) {
 						tnw::octree::Cilinder cl(glm::vec3(x,y,z), h, r);
-						oct = tnw::Octree(cl, bb, 4);
+						auto newoct = std::make_unique<tnw::Octree>(cl, bb, 4);
+						models.push_back(std::move(newoct));
+						std::stringstream ss;
+				    	ss << "Tree " << model_names.size();
+				    	model_names.push_back(ss.str().c_str());
 						ImGui::CloseCurrentPopup(); 
 					}
 					ImGui::SameLine();
@@ -244,7 +337,11 @@ int main(void) {
 
 					if (ImGui::Button("OK", ImVec2(120,0))) {
 						tnw::octree::SquarePyramid sp({x,y,z}, h, l);
-						oct = tnw::Octree(sp, bb, 4);
+						auto newoct = std::make_unique<tnw::Octree>(sp, bb, 4);
+						models.push_back(std::move(newoct));
+						std::stringstream ss;
+				    	ss << "Tree " << model_names.size();
+				    	model_names.push_back(ss.str().c_str());
 						ImGui::CloseCurrentPopup(); 
 					}
 					ImGui::SameLine();

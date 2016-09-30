@@ -79,10 +79,35 @@ tnw::owner_ptr<Tree> tnw::octree::tree_and(Tree* t1, Tree* t2) {
 
 	owner_ptr<Tree> r = new Tree();
 	r->color = Color::gray;
+	size_t whiteCounter = 0;
 
 	for (size_t i = 0; i < 8; ++i) {
 		r->children[i] = unique_ptr<Tree>(tree_and(t1->get(i),t2->get(i)));
+		if (!r->children[i]) whiteCounter++;
 	}
+
+	if (whiteCounter == 8) return nullptr;
+
+	return r;
+}
+
+tnw::owner_ptr<Tree> tnw::octree::tree_or(Tree* t1, Tree* t2) {
+	if (!t1 && !t2) return nullptr;
+	if (!t1) return new Tree(*t2);
+	if (!t2) return new Tree(*t1);
+	if (t1->color == Color::black) return new Tree();
+	if (t2->color == Color::black) return new Tree();
+
+	owner_ptr<Tree> r = new Tree();
+	r->color = Color::gray;
+	size_t blackCounter = 0;
+
+	for (size_t i = 0; i < 8; ++i) {
+		r->children[i] = unique_ptr<Tree>(tree_or(t1->get(i),t2->get(i)));
+		if (r->children[i] && r->children[i]->color == Color::black) blackCounter++;
+	}
+
+	if (blackCounter == 8) return new Tree();
 
 	return r;
 }
@@ -164,14 +189,17 @@ owner_ptr<Tree> tnw::octree::classify(Classifier c, BoundingBox bb, unsigned int
 
 	owner_ptr<Tree> r = new Tree();
 	r->color = Color::gray;
-	size_t count = 0;
+	size_t countB = 0;
+	size_t countW = 0;
 
 	for (size_t i = 0; i < 8; ++i) {
 		r->children[i].reset(classify(c, bb[i], maxDepth, currDepth+1));
-		if(r->children[i] && r->children[i]->color == Color::black) count++;
+		if(r->children[i] && r->children[i]->color == Color::black) countB++;
+		if(!r->children[i]) countW++;
 	}
 
-	if (count == 8) return new Tree();
+	if (countB == 8) return new Tree();
+	assert(countW < 8);
 
 	return r;
 }

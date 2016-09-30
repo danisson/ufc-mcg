@@ -2,6 +2,7 @@
 #include "octree.h"
 #include <typeindex>
 #include <typeinfo>
+#include <iostream>
 
 using namespace tnw;
 using namespace tnw::octree;
@@ -24,14 +25,17 @@ void tnw::Octree::draw() const{
 }
 // Geometric operations
 void tnw::Octree::translate(const glm::vec3& dv) {
-	if (tree) return;
+	bb.corner = bb.corner + dv;
 }
 // Boolean operations
 void tnw::Octree::bool_and(const Model& y) {
 	if (std::type_index(typeid(y)) == std::type_index(typeid(Octree))) {
 		auto&& y2 = static_cast<const Octree&>(y);
+		std::cout << tnw::octree::serialize(tree.get()) << std::endl;
+		std::cout << tnw::octree::serialize(y2.tree.get()) << std::endl;
 		tree = std::unique_ptr<Tree>(octree::tree_and(tree.get(), y2.tree.get()));
-	}
+		std::cout << tnw::octree::serialize(tree.get()) << std::endl;
+	} else throw 1;
 }
 // Geometric analysis
 double tnw::Octree::volume() const{
