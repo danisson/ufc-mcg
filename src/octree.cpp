@@ -56,7 +56,6 @@ std::string tnw::Octree::serialize() const {
 
 //Set color
 void tnw::Octree::setColor(float c[3]){
-	std::cout << "set color!\n";
 	if (tree) {
 		tree->setColor(c);
 	}
