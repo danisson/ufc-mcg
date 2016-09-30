@@ -102,7 +102,7 @@ int main(void) {
 
 		glPopMatrix();
 
-		ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiSetCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(350,350), ImGuiSetCond_FirstUseEver);
 
 		//Interface construction
 		mainMenu.draw();
@@ -132,7 +132,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	auto x = std::min(width,height);
 	if (x == width)
-		glViewport(0, (height-x)/2, x, x);
+		glViewport(0,(height-x)/2, x, x);
 	else
 		glViewport((width-x)/2, 0, x, x);
 }

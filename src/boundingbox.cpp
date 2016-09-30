@@ -39,6 +39,7 @@ void tnw::octree::BoundingBox::draw() const{
 	std::array<std::array<glm::vec3, 4>, 6> quads = {f0,f1,f2,f3,f4,f5};
 
 
+	
 	glBegin(GL_QUADS);
 
 		for (std::array<glm::vec3, 4>& face : quads) {

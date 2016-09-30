@@ -9,14 +9,20 @@
 
 namespace tnw {
 
+enum class BooleanErrorCodes {
+	success,
+	unimplementedType,
+	boundingboxMismatch
+};
+
 class Model {
 public:
 	virtual void draw() const = 0;
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
 	// Boolean operations
-	virtual void bool_and(const Model& y) = 0;
-	virtual void bool_or(const Model& y) = 0;
+	virtual BooleanErrorCodes bool_and(const Model& y) = 0;
+	virtual BooleanErrorCodes bool_or(const Model& y) = 0;
 	// Geometric analysis
 	virtual double volume() const = 0;
 	//Serialize
@@ -42,8 +48,8 @@ public:
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) override;
 	// Boolean operations
-	virtual void bool_and(const Model& y) override;
-	virtual void bool_or(const Model& y) override;
+	virtual BooleanErrorCodes bool_and(const Model& y) override;
+	virtual BooleanErrorCodes bool_or(const Model& y) override;
 	// Geometric analysis
 	virtual double volume() const override;
 	//Serialize

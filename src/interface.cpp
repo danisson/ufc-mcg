@@ -73,12 +73,21 @@ void MainMenu::draw() {
 		if (ImGui::BeginPopupModal("Parâmetros de União", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			static int selected_or = -1;
 			ImGui::Combo("selecione a árvore com que operar", &selected_or, tree_names, model_names.size());
-			if (ImGui::Button("OK", ImVec2(120,0))) {
-				models[curr_item]->bool_or(*models[selected_or]);
-				ImGui::CloseCurrentPopup();
+			
+			
+			if (ImGui::Button("OK", ImVec2(120,0)) && (selected_or >= 0 && static_cast<unsigned int>(selected_or) < models.size())) {
+				tnw::BooleanErrorCodes result;
+
+				result = models[curr_item]->bool_or(*models[selected_or]);
+
+				if (result == tnw::BooleanErrorCodes::unimplementedType) { open_type_error_popup = true; }
+				if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
+				ImGui::CloseCurrentPopup();	
+
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+			
 			ImGui::EndPopup();
 		}
 
@@ -91,12 +100,42 @@ void MainMenu::draw() {
 			
 			static int selected_and = -1;
 			ImGui::Combo("selecione a árvore com que operar", &selected_and, tree_names, model_names.size());
-			if (ImGui::Button("OK", ImVec2(120,0))) {
-				models[curr_item]->bool_and(*models[selected_and]);
+
+			if (ImGui::Button("OK", ImVec2(120,0)) && (selected_and >= 0 && static_cast<unsigned int>(selected_and) < models.size())) {
+				tnw::BooleanErrorCodes result;
+
+				result = models[curr_item]->bool_and(*models[selected_and]);
+				
+				if (result == tnw::BooleanErrorCodes::unimplementedType) { open_type_error_popup = true; }
+				if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
+
 				ImGui::CloseCurrentPopup();
 			}
+
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
+		}
+
+		if (open_type_error_popup) {
+			// std::cout << "error popup should open!\n";
+			ImGui::OpenPopup("Erro de tipo");
+		}
+
+		if (ImGui::BeginPopupModal("Erro de tipo")) {
+			ImGui::Text("Os tipos dos objetos selecionados não são compatíveis");
+			if (ImGui::Button("OK")) { ImGui::CloseCurrentPopup(); open_type_error_popup = false;}
+			ImGui::EndPopup();
+		}
+
+		if (open_bb_mismatch_error_popup) {
+			// std::cout << "bb popup should open!\n";
+			ImGui::OpenPopup("Erro de bounding box");
+		}
+
+		if (ImGui::BeginPopupModal("Erro de bounding box")) {
+			ImGui::Text("Os objetos tem bounding boxes diferentes");
+			if (ImGui::Button("OK")) { ImGui::CloseCurrentPopup(); open_bb_mismatch_error_popup = false;}
 			ImGui::EndPopup();
 		}
 

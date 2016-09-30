@@ -3,6 +3,7 @@
 #include <typeindex>
 #include <typeinfo>
 #include <iostream>
+#include <GL/gl.h>
 
 using namespace tnw;
 using namespace tnw::octree;
@@ -18,7 +19,13 @@ tnw::Octree::Octree(Classifier c, const BoundingBox& _bb, unsigned int depth) : 
 //Octree a partir de um arquivo
 tnw::Octree::Octree(FILE *f) : bb(glm::vec3(), 1) {}
 
-void tnw::Octree::draw() const{
+void tnw::Octree::draw() const {
+	//Desenha a bounding box
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	glColor3f(0,0,0);
+	bb.draw();
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	//Desenha a árvore
 	if (tree) {
 		tree->draw(bb);
 	}
@@ -28,17 +35,19 @@ void tnw::Octree::translate(const glm::vec3& dv) {
 	bb.corner = bb.corner + dv;
 }
 // Boolean operations
-void tnw::Octree::bool_and(const Model& y) {
+tnw::BooleanErrorCodes tnw::Octree::bool_and(const Model& y) {
 	if (std::type_index(typeid(y)) == std::type_index(typeid(Octree))) {
 		auto&& y2 = static_cast<const Octree&>(y);
 		tree = std::unique_ptr<Tree>(octree::tree_and(tree.get(), y2.tree.get()));
-	} else throw 1;
+		return tnw::BooleanErrorCodes::success;
+	} else return tnw::BooleanErrorCodes::unimplementedType;
 }
-void tnw::Octree::bool_or(const Model& y) {
+tnw::BooleanErrorCodes tnw::Octree::bool_or(const Model& y) {
 	if (std::type_index(typeid(y)) == std::type_index(typeid(Octree))) {
 		auto&& y2 = static_cast<const Octree&>(y);
 		tree = std::unique_ptr<Tree>(octree::tree_or(tree.get(), y2.tree.get()));
-	} else throw 1;
+		return tnw::BooleanErrorCodes::success;
+	} else return tnw::BooleanErrorCodes::unimplementedType;
 }
 // Geometric analysis
 double tnw::Octree::volume() const{
