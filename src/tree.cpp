@@ -199,7 +199,7 @@ owner_ptr<Tree> tnw::octree::classify(Classifier c, BoundingBox bb, unsigned int
 	}
 
 	if (countB == 8) return new Tree();
-	assert(countW < 8);
+	if (countW == 8) return nullptr;
 
 	return r;
 }

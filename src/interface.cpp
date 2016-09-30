@@ -1,5 +1,6 @@
 #include "interface.h"
 #include <sstream>
+#include <iostream>
 
 MainMenu::MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera& c) : models(m), camera(c) {}
 
@@ -40,7 +41,7 @@ void MainMenu::draw() {
 			ImGui::InputFloat("z", &z);
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
-				if (curr_item > 0 && static_cast<unsigned int>(curr_item) < models.size()) {
+				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
 					models[curr_item]->translate(glm::vec3(x,y,z));
 				}
 				ImGui::CloseCurrentPopup(); 
@@ -61,7 +62,7 @@ void MainMenu::draw() {
 			ImGui::Combo("selecione a árvore com que operar", &selected_and, tree_names, model_names.size());
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
-				if (curr_item > 0 && static_cast<unsigned int>(curr_item) < models.size()) {
+				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
 					models[curr_item]->bool_and(*models[selected_and]);
 				}
 				ImGui::CloseCurrentPopup(); 
@@ -82,7 +83,7 @@ void MainMenu::draw() {
 			ImGui::Combo("selecione a árvore com que operar", &selected_or, tree_names, model_names.size());
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
-				if (curr_item > 0 && static_cast<unsigned int>(curr_item) < models.size()) {
+				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
 					models[curr_item]->bool_and(*models[selected_or]);
 				}
 				ImGui::CloseCurrentPopup(); 

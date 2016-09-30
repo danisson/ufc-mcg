@@ -18,7 +18,7 @@ class MainMenu {
 	IsometricCamera& camera;
 	uint8_t rot = 0;
 	const uint8_t rots[4] = {3,1,0,2};
-	int md = 4;
+	int md = 4;//, curr_item = -1, selected_and = -1, selected_or = -1;
 	float x=0.5, y=0, z=-.5, r=.5, bx=0, by=0, bz=0, bd=1, h=0, l=0, d=0;
 public:
 	MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera& c);
