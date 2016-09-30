@@ -39,6 +39,7 @@
 
 // //Classe da interface que representa uma cena com vários modelos
 void key_callback(GLFWwindow*, int, int, int, int);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int main(void) {
 	GLFWwindow* window;
@@ -75,6 +76,7 @@ int main(void) {
 
 	//Set callbacks
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	//Camera initalization
 	IsometricCamera camera;
@@ -127,5 +129,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 }
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	auto x = std::min(width,height);
+	if (x == width)
+		glViewport(0, (height-x)/2, x, x);
+	else
+		glViewport((width-x)/2, 0, x, x);
+}
 
 

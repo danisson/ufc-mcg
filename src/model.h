@@ -16,6 +16,7 @@ public:
 	virtual void translate(const glm::vec3& dv) = 0;
 	// Boolean operations
 	virtual void bool_and(const Model& y) = 0;
+	virtual void bool_or(const Model& y) = 0;
 	// Geometric analysis
 	virtual double volume() const = 0;
 	//Serialize
@@ -42,6 +43,7 @@ public:
 	virtual void translate(const glm::vec3& dv) override;
 	// Boolean operations
 	virtual void bool_and(const Model& y) override;
+	virtual void bool_or(const Model& y) override;
 	// Geometric analysis
 	virtual double volume() const override;
 	//Serialize

@@ -37,14 +37,14 @@ void MainMenu::draw() {
 
 		if (ImGui::BeginPopupModal("Parâmetros da Translação", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			ImGui::InputFloat("x", &x);
-			ImGui::InputFloat("y", &y); 
+			ImGui::InputFloat("y", &y);
 			ImGui::InputFloat("z", &z);
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
 				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
 					models[curr_item]->translate(glm::vec3(x,y,z));
 				}
-				ImGui::CloseCurrentPopup(); 
+				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
@@ -52,20 +52,25 @@ void MainMenu::draw() {
 		}
 
 		ImGui::SameLine();
-		if (ImGui::Button("União")) {
-			ImGui::OpenPopup("União");
+		if (ImGui::Button("Remover")) {
+			models.erase(models.begin() + curr_item);
+			model_names.erase(model_names.begin() + curr_item);
 		}
 
-		if (ImGui::BeginPopupModal("União", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			
+		ImGui::SameLine();
+		if (ImGui::Button("União")) {
+			ImGui::OpenPopup("Parâmetros de União");
+		}
+
+		if (ImGui::BeginPopupModal("Parâmetros de União", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			static int selected_or = -1;
-			ImGui::Combo("selecione a árvore com que operar", &selected_and, tree_names, model_names.size());
+			ImGui::Combo("selecione a árvore com que operar", &selected_or, tree_names, model_names.size());
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
 				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
-					models[curr_item]->bool_or(*models[selected_and]);
+					models[curr_item]->bool_or(*models[selected_or]);
 				}
-				ImGui::CloseCurrentPopup(); 
+				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
@@ -80,13 +85,13 @@ void MainMenu::draw() {
 		if (ImGui::BeginPopupModal("Parâmetros de Interseção", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			
 			static int selected_and = -1;
-			ImGui::Combo("selecione a árvore com que operar", &selected_or, tree_names, model_names.size());
+			ImGui::Combo("selecione a árvore com que operar", &selected_and, tree_names, model_names.size());
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
 				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
-					models[curr_item]->bool_and(*models[selected_or]);
+					models[curr_item]->bool_and(*models[selected_and]);
 				}
-				ImGui::CloseCurrentPopup(); 
+				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
