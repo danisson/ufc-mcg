@@ -1,5 +1,5 @@
 #include "model.h"
-#include "octree.h"
+#include "octree_internal.h"
 #include <typeindex>
 #include <typeinfo>
 #include <iostream>

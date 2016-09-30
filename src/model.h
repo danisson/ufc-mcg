@@ -5,7 +5,7 @@
 #include <string>
 #include <functional>
 #include <memory>
-#include "octree.h"
+#include "octree_internal.h"
 
 namespace tnw {
 

@@ -30,16 +30,16 @@ bin/imgui.a: lib/imgui/*.cpp
 bin/boundingbox.o: src/boundingbox.cpp src/model.h
 	$(CC) $(CFLAGS) -c src/boundingbox.cpp -o bin/boundingbox.o
 
-bin/tree.o: src/tree.cpp src/octree.h
+bin/tree.o: src/tree.cpp src/octree_internal.h
 	$(CC) $(CFLAGS) -c src/tree.cpp -o bin/tree.o
 
 bin/octree.o: src/octree.cpp src/model.h
 	$(CC) $(CFLAGS) -c src/octree.cpp -o bin/octree.o
 
-bin/shapes.o: src/shapes.cpp src/octree.h
+bin/shapes.o: src/shapes.cpp src/octree_internal.h
 		$(CC) $(CFLAGS) -c src/shapes.cpp -o bin/shapes.o
 
-bin/helper.o: src/helper.cpp src/helper.h
+bin/helper.o: src/helper.cpp src/helper.h src/octree_internal.h
 	$(CC) $(CFLAGS) -c src/helper.cpp -o bin/helper.o
 
 bin/interface.o: src/interface.cpp src/interface.h

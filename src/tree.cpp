@@ -1,5 +1,5 @@
 #include "model.h"
-#include "octree.h"
+#include "octree_internal.h"
 #include "helper.h"
 #include <vector>
 #include <GL/gl.h>
