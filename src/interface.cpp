@@ -14,7 +14,7 @@ MainMenu::MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera&
 
 void MainMenu::draw() {
 	ImGui::Begin("Menu");
-
+	
 	if (ImGui::CollapsingHeader("Arquivo")) {
 		if (ImGui::Button("Abrir")) {
 
@@ -81,7 +81,8 @@ void MainMenu::draw() {
 				result = models[curr_item]->bool_or(*models[selected_or]);
 
 				if (result == tnw::BooleanErrorCodes::unimplementedType) { open_type_error_popup = true; }
-				if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
+				else if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
+				else { model_names[curr_item] = model_names[curr_item].append(" OR ").append(model_names[selected_or]); }
 				ImGui::CloseCurrentPopup();	
 
 			}
@@ -105,9 +106,10 @@ void MainMenu::draw() {
 				tnw::BooleanErrorCodes result;
 
 				result = models[curr_item]->bool_and(*models[selected_and]);
-				
+
 				if (result == tnw::BooleanErrorCodes::unimplementedType) { open_type_error_popup = true; }
-				if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
+				else if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
+				else { model_names[curr_item] = model_names[curr_item].append(" AND ").append(model_names[selected_and]); }
 
 				ImGui::CloseCurrentPopup();
 			}
