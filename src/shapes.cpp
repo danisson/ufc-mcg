@@ -19,7 +19,7 @@ Color tnw::octree::Sphere::operator()(const BoundingBox& bb){
 			}
 		}
 		if (count >= 8) {
-			return tnw::octree::Color::black; 
+			return tnw::octree::Color::black;
 		}
 		else {
 			return tnw::octree::Color::gray;
@@ -42,7 +42,7 @@ Color tnw::octree::Box::operator()(const BoundingBox& bb){
 		for (int i = 0; i < 8; ++i){
 			unsigned int countcoords = 0;
 			p = bb.getVertice(i);
-			
+
 			if (p[0] >= center[0] - length/2.f && p[0] <= center[0] + length/2.f) {
 				countcoords++;
 			}
@@ -79,7 +79,7 @@ Color tnw::octree::Cilinder::operator()(const BoundingBox& bb){
 			count++;
 		}
 	}
-	
+
 	if (count >= 8){
 		return tnw::octree::Color::black;
 	} else {

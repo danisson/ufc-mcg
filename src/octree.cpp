@@ -11,7 +11,7 @@ using namespace tnw::octree;
 tnw::Octree::Octree(const BoundingBox& _bb) : bb(_bb) {}
 //Octree com raiz pronta
 tnw::Octree::Octree(std::unique_ptr<Tree> tree, const BoundingBox& _bb) : bb(_bb) {}
-//Octree a partir de um classificador e uma Bounding Box 
+//Octree a partir de um classificador e uma Bounding Box
 tnw::Octree::Octree(Classifier c, const BoundingBox& _bb, unsigned int depth) : bb(_bb) {
 	tree = std::unique_ptr<Tree>(octree::classify(c, _bb, depth, 0));
 }
@@ -19,7 +19,7 @@ tnw::Octree::Octree(Classifier c, const BoundingBox& _bb, unsigned int depth) : 
 tnw::Octree::Octree(FILE *f) : bb(glm::vec3(), 1) {}
 
 void tnw::Octree::draw() const{
-	if (tree) { 
+	if (tree) {
 		tree->draw(bb);
 	}
 }
