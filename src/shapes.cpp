@@ -1,5 +1,5 @@
 #include "model.h"
-#include "octree.h"
+#include "octree_internal.h"
 #include "helper.h"
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>

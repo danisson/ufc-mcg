@@ -127,8 +127,7 @@ tnw::owner_ptr<Tree> tnw::octree::make_from_file(FILE* f) {
 	root->color = Color::gray;
 
 	Tree* cursor = root;
-
-	while ((c = std::fgetc(f)) != '\n' && c != EOF) {
+	while (((c = fgetc(f)) != '\n') && (c != EOF)) {
 		switch(c) {
 			case '(': {
 				Tree* aux = cursor;
@@ -149,7 +148,7 @@ tnw::owner_ptr<Tree> tnw::octree::make_from_file(FILE* f) {
 			}
 		}
 
-		if (counter.back() == 8) {
+		while (counter.back() == 8) {
 			counter.pop_back();
 			cursor = cursor->parent;
 		}
@@ -160,7 +159,7 @@ tnw::owner_ptr<Tree> tnw::octree::make_from_file(FILE* f) {
 
 // Todo - Make recursive version using std::vector
 std::string tnw::octree::serialize(Tree* t) {
-	if(!t) return "w";double volume();
+	if(!t) return "w";
 
 	std::string o;
 	if (t->color == Color::gray) {

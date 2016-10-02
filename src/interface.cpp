@@ -14,14 +14,96 @@ MainMenu::MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera&
 
 void MainMenu::draw() {
 	ImGui::Begin("Menu");
-	
+
 	if (ImGui::CollapsingHeader("Arquivo")) {
-		if (ImGui::Button("Abrir")) {
-
-		}
+		if (ImGui::Button("Abrir"))
+			ImGui::OpenPopup("##abrir_arq");
 		ImGui::SameLine();
-		if (ImGui::Button("Salvar")) {
+		if (ImGui::Button("Salvar"))
+			ImGui::OpenPopup("##salvar_arq");
 
+		if (ImGui::BeginPopupModal("##abrir_arq")) {
+			ImGui::Text("Caminho para o arquivo");
+			ImGui::PushItemWidth(-1);
+			ImGui::InputText("path",buffer,1000);
+			ImGui::PopItemWidth();
+			ImVec2 buttonSize = ImVec2(0,0);
+			float halfWidth = ImGui::GetWindowContentRegionMax().x*.5f;
+			float margin = ImGui::GetStyle().ItemSpacing.x;
+			buttonSize.x = halfWidth-margin;
+			if (ImGui::Button("Carregar",buttonSize)) {
+				FILE* f = nullptr;
+				if (strcmp(buffer,"##stdin") == 0) f = stdin;
+				else f = fopen(buffer,"r");
+
+				if(!f) {
+					ImGui::OpenPopup("Falha Arquivo#1");
+				} else {
+					size_t size = 0;
+					size_t count = model_names.size();
+					std::stringstream ss;
+					fscanf(f,"%zu\n",&size);
+					for (size_t i = 0; i < size; ++i) {
+						models.push_back(std::make_unique<tnw::Octree>(f));
+						ss << "Árvore " << (count+i) << "[ARQUIVO]";
+						model_names.push_back(ss.str());
+						ss.str(std::string());ss.clear();
+					}
+					fclose(f);
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Cancelar",buttonSize)) {ImGui::CloseCurrentPopup();}
+
+			if (ImGui::BeginPopupModal("Falha Arquivo#1")) {
+				ImVec2 buttonSize = ImVec2(0,0);
+				float margin = ImGui::GetStyle().ItemSpacing.x;
+				buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
+				ImGui::Text("Arquivo não existente ou não pôde ser aberto.");
+				if (ImGui::Button("Okay",buttonSize)) ImGui::CloseCurrentPopup();
+				ImGui::EndPopup();
+			}
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::BeginPopupModal("##salvar_arq")) {
+			ImGui::Text("Caminho para o arquivo");
+			ImGui::PushItemWidth(-1);
+			ImGui::InputText("path",buffer,1000);
+			ImGui::PopItemWidth();
+			ImVec2 buttonSize = ImVec2(0,0);
+			float halfWidth = ImGui::GetWindowContentRegionMax().x*.5f;
+			float margin = ImGui::GetStyle().ItemSpacing.x;
+			buttonSize.x = halfWidth-margin;
+			if (ImGui::Button("Salvar",buttonSize)) {
+				FILE* f = nullptr;
+				if (strcmp(buffer,"##stdout") == 0) f = stdout;
+				else f = fopen(buffer,"w");
+
+				if(!f) {
+					ImGui::OpenPopup("Falha Arquivo#2");
+				} else {
+					fprintf(f,"%zu\n", models.size());
+					for (auto&& m : models) {
+						fprintf(f,"%s\n",m->serialize().c_str());
+					}
+					fclose(f);
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Cancelar",buttonSize)) {ImGui::CloseCurrentPopup();}
+
+			if (ImGui::BeginPopupModal("Falha Arquivo#2")) {
+				ImVec2 buttonSize = ImVec2(0,0);
+				float margin = ImGui::GetStyle().ItemSpacing.x;
+				buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
+				ImGui::Text("Arquivo não existente ou não pôde ser escrito.");
+				if (ImGui::Button("Okay",buttonSize)) ImGui::CloseCurrentPopup();
+				ImGui::EndPopup();
+			}
+			ImGui::EndPopup();
 		}
 	}
 
@@ -39,8 +121,18 @@ void MainMenu::draw() {
 		ImGui::ListBox("##cena", &curr_item, tree_names, models.size(), models.size());
 		ImGui::PopItemWidth();
 
-		if (ImGui::Button("Translação") && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
+
+		ImVec2 buttonSize = ImVec2(0,0);
+		float fullWidth = ImGui::GetWindowContentRegionMax().x;
+		float margin = ImGui::GetStyle().ItemSpacing.x;
+		buttonSize.x = fullWidth/2-margin;
+
+		if (ImGui::Button("Translação",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
 			ImGui::OpenPopup("Parâmetros da Translação");
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Escala",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
+			ImGui::OpenPopup("Parâmetros da Escala");
 		}
 
 		if (ImGui::BeginPopupModal("Parâmetros da Translação", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -49,7 +141,7 @@ void MainMenu::draw() {
 			ImGui::InputFloat("z", &z);
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
-				if (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size()) {
+				if (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size()) {
 					models[curr_item]->translate(glm::vec3(x,y,z));
 				}
 				ImGui::CloseCurrentPopup();
@@ -59,23 +151,32 @@ void MainMenu::draw() {
 			ImGui::EndPopup();
 		}
 
-		ImGui::SameLine();
-		if (ImGui::Button("Remover") && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
-			models.erase(models.begin() + curr_item);
-			model_names.erase(model_names.begin() + curr_item);
+		if (ImGui::BeginPopupModal("Parâmetros da Escala")) {
+			ImGui::InputFloat("r", &x);
+
+			if (ImGui::Button("OK", ImVec2(120,0))) {
+				if (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size()) {
+					models[curr_item]->scale(x);
+				}
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
 		}
 
-		ImGui::SameLine();
-		if (ImGui::Button("União") && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
+		// ImGui::SameLine();
+		buttonSize.x = fullWidth/3-margin;
+		if (ImGui::Button("União",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
 			ImGui::OpenPopup("Parâmetros de União");
 		}
 
 		if (ImGui::BeginPopupModal("Parâmetros de União", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			static int selected_or = -1;
 			ImGui::Combo("selecione a árvore com que operar", &selected_or, tree_names, model_names.size());
-			
-			
-			if (ImGui::Button("OK", ImVec2(120,0)) && (selected_or >= 0 && static_cast<unsigned int>(selected_or) < models.size())) {
+
+
+			if (ImGui::Button("OK", ImVec2(120,0)) && (selected_or >= 0 && static_cast<size_t>(selected_or) < models.size())) {
 				tnw::BooleanErrorCodes result;
 
 				result = models[curr_item]->bool_or(*models[selected_or]);
@@ -83,22 +184,22 @@ void MainMenu::draw() {
 				if (result == tnw::BooleanErrorCodes::unimplementedType) { open_type_error_popup = true; }
 				else if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
 				else { model_names[curr_item] = model_names[curr_item].append(" OR ").append(model_names[selected_or]); }
-				ImGui::CloseCurrentPopup();	
+				ImGui::CloseCurrentPopup();
 
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
-			
+
 			ImGui::EndPopup();
 		}
 
 		ImGui::SameLine();
-		if (ImGui::Button("Interseção") && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
+		if (ImGui::Button("Interseção",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
 			ImGui::OpenPopup("Parâmetros de Interseção");
 		}
 
 		if (ImGui::BeginPopupModal("Parâmetros de Interseção", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			
+
 			static int selected_and = -1;
 			ImGui::Combo("selecione a árvore com que operar", &selected_and, tree_names, model_names.size());
 
@@ -117,6 +218,11 @@ void MainMenu::draw() {
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
 			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Remover",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
+			models.erase(models.begin() + curr_item);
+			model_names.erase(model_names.begin() + curr_item);
 		}
 
 		if (open_type_error_popup) {
@@ -141,13 +247,17 @@ void MainMenu::draw() {
 			ImGui::EndPopup();
 		}
 
+		// ImGui::SameLine();
+		buttonSize.x = fullWidth/2-margin;
+		if (ImGui::Button("Volume",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
+			ImGui::OpenPopup("Volume#2");
+		}
 		ImGui::SameLine();
-		if (ImGui::Button("Cor") && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
+		if (ImGui::Button("Cor",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
 			ImGui::OpenPopup("Parâmetros de Cor");
 		}
 
 		if (ImGui::BeginPopupModal("Parâmetros de Cor", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			
 			ImGui::ColorEdit3("cor", color);
 			if (ImGui::Button("Cor aleatória")) {
 				std::random_device r;
@@ -162,12 +272,17 @@ void MainMenu::draw() {
 			}
 			if (ImGui::Button("OK", ImVec2(120,0))) {
 				models[curr_item]->setColor(color);
-				ImGui::CloseCurrentPopup(); 
+				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
 			ImGui::EndPopup();
-		}			
+		}
+
+		if (ImGui::BeginPopup("Volume#2")) {
+			ImGui::Text("%lf",models[curr_item]->volume());
+			ImGui::EndPopup();
+		}
 
 		if (ImGui::CollapsingHeader("Nova Primitiva")) {
 			if (ImGui::Button("Esfera")) {
@@ -195,8 +310,8 @@ void MainMenu::draw() {
 					tnw::octree::Sphere s({x,y,z}, r);
 					models.push_back(std::make_unique<tnw::Octree>(s,b,md));
 					std::stringstream ss;
-			    	ss << "Árvore " << model_names.size() << "[ESFERA]";
-			    	model_names.push_back(ss.str());
+					ss << "Árvore " << model_names.size() << "[ESFERA]";
+					model_names.push_back(ss.str());
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
@@ -233,8 +348,8 @@ void MainMenu::draw() {
 					tnw::octree::BoundingBox b({bx,by,bz},bd);
 					models.push_back(std::make_unique<tnw::Octree>(bb,b,md));
 					std::stringstream ss;
-			    	ss << "Árvore " << model_names.size() << "[CAIXA]";
-			    	model_names.push_back(ss.str());
+					ss << "Árvore " << model_names.size() << "[CAIXA]";
+					model_names.push_back(ss.str());
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
@@ -271,8 +386,8 @@ void MainMenu::draw() {
 					tnw::octree::BoundingBox b({bx,by,bz},bd);
 					models.push_back(std::make_unique<tnw::Octree>(cl,b,md));
 					std::stringstream ss;
-			    	ss << "Árvore " << model_names.size() << "[CILINDRO]";
-			    	model_names.push_back(ss.str());
+					ss << "Árvore " << model_names.size() << "[CILINDRO]";
+					model_names.push_back(ss.str());
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();
@@ -309,8 +424,8 @@ void MainMenu::draw() {
 					tnw::octree::BoundingBox b({bx,by,bz},bd);
 					models.push_back(std::make_unique<tnw::Octree>(sp,b,md));
 					std::stringstream ss;
-			    	ss << "Árvore " << model_names.size() << "[PIRÂMIDE]";
-			    	model_names.push_back(ss.str());
+					ss << "Árvore " << model_names.size() << "[PIRÂMIDE]";
+					model_names.push_back(ss.str());
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();

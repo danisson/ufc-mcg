@@ -20,24 +20,6 @@
 #undef far
 #endif
 
-// int main(int argc, char const *argv[]) {
-// 	using namespace tnw::octree;
-// 	// auto oct = std::make_unique<tnw::octree::Tree>();
-// 	BoundingBox bb({0,0,0}, 1);
-// 	// Box({.25,.25,-.25}, .5,.5,.5);
-// 	// Box({.75,.25,-.75}, .5,.5,.5);
-// 	// Sphere s(glm::vec3(0,0,0), 0.5);
-// 	// SquarePyramid sp(glm::vec3(0,-1,0), 2, 0.5);
-
-// 	auto oct  = classify(Box({.25,.25,-.25}, .5,.5,.5), bb, 4, 0);
-// 	auto oct2 = classify(Box({.75,.25,-.75}, .5,.5,.5), bb, 4, 0);
-// 	printf("%s\n", serialize(oct).c_str());
-// 	printf("%s\n", serialize(oct2).c_str());
-// 	printf("%s\n", serialize(tree_or(oct,oct2)).c_str());
-// 	return 0;
-// }
-
-// //Classe da interface que representa uma cena com vários modelos
 void key_callback(GLFWwindow*, int, int, int, int);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -50,12 +32,14 @@ int main(void) {
 		return 1;
 
 	// Create a windowed mode window and its OpenGL context
-	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(640, 480, "Sickle", NULL, NULL);
 
 	if (!window) {
 		glfwTerminate();
 		return 1;
 	}
+
+	// glfwSetWindowIcon(window,1,)
 
 	// Init ImGui
 	ImGui_ImplGlfw_Init(window, true);
@@ -63,9 +47,6 @@ int main(void) {
 	ImGui::GetIO().IniFilename = nullptr;
 	// Make the window's context current
 	glfwMakeContextCurrent(window);
-
-	int window_width, window_height;
-	glfwGetWindowSize(window, &window_width, &window_height);
 
 	//Opções de OpenGL
 	glClearColor(1.,1.,1.,1.);

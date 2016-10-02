@@ -3,6 +3,7 @@
 #include <typeindex>
 #include <typeinfo>
 #include <iostream>
+#include <sstream>
 #include <GL/gl.h>
 
 using namespace tnw;
@@ -17,7 +18,12 @@ tnw::Octree::Octree(Classifier c, const BoundingBox& _bb, unsigned int depth) : 
 	tree = std::unique_ptr<Tree>(octree::classify(c, _bb, depth, 0));
 }
 //Octree a partir de um arquivo
-tnw::Octree::Octree(FILE *f) : bb(glm::vec3(), 1) {}
+tnw::Octree::Octree(FILE *f) : bb(glm::vec3(), 1) {
+	float x,y,z,d;
+	fscanf(f,"%f,%f,%f,%f ",&x,&y,&z,&d);
+	bb = BoundingBox({x,y,z},d);
+	tree = unique_ptr<Tree>(make_from_file(f));
+}
 
 void tnw::Octree::draw() const {
 	//Desenha a bounding box
@@ -32,7 +38,10 @@ void tnw::Octree::draw() const {
 }
 // Geometric operations
 void tnw::Octree::translate(const glm::vec3& dv) {
-	bb.corner = bb.corner + dv;
+	bb.corner += dv;
+}
+void tnw::Octree::scale(const float dx) {
+	bb.depth *= dx;
 }
 // Boolean operations
 tnw::BooleanErrorCodes tnw::Octree::bool_and(const Model& y) {
@@ -62,7 +71,13 @@ double tnw::Octree::volume() const{
 
 //Serialize
 std::string tnw::Octree::serialize() const {
-	return octree::serialize(tree.get());
+	std::stringstream ss;
+	ss << bb.corner[0] << ',';
+	ss << bb.corner[1] << ',';
+	ss << bb.corner[2] << ',';
+	ss << bb.depth << ' ';
+	ss << octree::serialize(tree.get());
+	return ss.str();
 }
 
 //Set color

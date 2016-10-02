@@ -20,6 +20,7 @@ public:
 	virtual void draw() const = 0;
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
+	virtual void scale(const float dx) = 0;
 	// Boolean operations
 	virtual BooleanErrorCodes bool_and(const Model& y) = 0;
 	virtual BooleanErrorCodes bool_or(const Model& y) = 0;
@@ -47,6 +48,7 @@ public:
 	virtual void draw() const override;
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) override;
+	virtual void scale(const float dx) override;
 	// Boolean operations
 	virtual BooleanErrorCodes bool_and(const Model& y) override;
 	virtual BooleanErrorCodes bool_or(const Model& y) override;
