@@ -19,7 +19,7 @@ class MainMenu {
 	uint8_t rot = 0;
 	const uint8_t rots[4] = {3,1,0,2};
 	int md = 4, red = 0, green = 0, blue = 0;
-	float x=0.5, y=0, z=-.5, r=.5, bx=0, by=0, bz=0, bd=1, h=1, l=1, d=1, color[3] = {0,0,0.7};
+	float x=0.5, y=0, z=.5, r=.5, bx=0, by=0, bz=0, bd=1, h=1, l=1, d=1, color[3] = {0,0,0.7};
 	bool open_type_error_popup = false, open_bb_mismatch_error_popup = false;
 	char buffer[1000];
 public:

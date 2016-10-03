@@ -51,7 +51,7 @@ int main(void) {
 	//Opções de OpenGL
 	glClearColor(1.,1.,1.,1.);
 	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_CULL_FACE);
+	// glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glFrontFace(GL_CCW);
 

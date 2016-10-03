@@ -11,34 +11,38 @@ bool tnw::octree::BoundingBox::operator==(const tnw::octree::BoundingBox& y) con
 }
 
 bool tnw::octree::BoundingBox::operator!=(const tnw::octree::BoundingBox& y) const {
-	return (depth != y.depth) || (corner != y.corner); 
+	return (depth != y.depth) || (corner != y.corner);
 }
 
 // os Vértices são gerados pela seguinte ordem
-//    6-------7
-//   /|      /|
-//  / |     / |
-// 4--|----5  |
-// |  2----|--3
-// | /     | /
-// 0-------1
+//      y
+//      |                       v1
+//      4------5           .------.
+//     /|      |          /5555555|
+//    / |     /|         /5555555/|
+//   6--|----7 |        .-------.2|
+//   |  0----|-1---x  3>|4444444|2.
+//   | /     |/         |4444444|/
+//   2-------3          .-------.
+//  /                        ^0
+// z
 void tnw::octree::BoundingBox::draw() const{
-	glm::vec3 x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.),
+	glm::vec3 x = {1.,0.,0.}, y = {0.,1.,0.}, z = {0.,0.,1.},
 	          v0 = corner,
 	          v1 = v0 + depth*x,
-	          v2 = v0 - depth*z,
-	          v3 = v0 - depth*z + depth*x,
+	          v2 = v0 + depth*z,
+	          v3 = v0 + depth*z + depth*x,
 	          v4 = v0 + depth*y,
 	          v5 = v0 + depth*y + depth*x,
-	          v6 = v0 + depth*y - depth*z,
-	          v7 = v0 + depth*y - depth*z + depth*x;
+	          v6 = v0 + depth*y + depth*z,
+	          v7 = v0 + depth*y + depth*z + depth*x;
 
-	std::array<glm::vec3, 4> f0 = {v0, v2, v3, v1},
-	                         f1 = {v0, v4, v6, v2},
-	                         f2 = {v1, v3, v7, v5},
-	                         f3 = {v0, v1, v5, v4},
-	                         f4 = {v2, v6, v7, v3},
-	                         f5 = {v4, v5, v7, v6};
+	std::array<glm::vec3, 4> f0 = {v2, v0, v1, v3},
+	                         f1 = {v0, v4, v5, v1},
+	                         f2 = {v1, v5, v7, v3},
+	                         f3 = {v2, v6, v4, v0},
+	                         f4 = {v7, v6, v2, v3},
+	                         f5 = {v5, v4, v6, v7};
 
 	std::array<std::array<glm::vec3, 4>, 6> quads = {f0,f1,f2,f3,f4,f5};
 
@@ -46,8 +50,8 @@ void tnw::octree::BoundingBox::draw() const{
 
 	glBegin(GL_QUADS);
 
-		for (std::array<glm::vec3, 4>& face : quads) {
-			for (glm::vec3& vertice : face) {
+		for (auto&& face : quads) {
+			for (auto&& vertice : face) {
 				glVertex3f(vertice.x, vertice.y, vertice.z);
 			}
 		}
@@ -58,17 +62,17 @@ void tnw::octree::BoundingBox::draw() const{
 glm::vec3 tnw::octree::BoundingBox::getCenter() const {
 	glm::vec3 x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.);
 	float depth = this->depth/2;
-	return this->corner + depth*(x+y-z);
+	return this->corner + depth*(x+y+z);
 }
 
 //Retorna o menor ponto da box (vértice 2?)
 glm::vec3 tnw::octree::BoundingBox::minPoint() const {
-	return getVertice(2);
+	return getVertice(0);
 }
 
 //Retorna o maior ponto da box (vértice 5?)
 glm::vec3 tnw::octree::BoundingBox::maxPoint() const {
-	return getVertice(5);
+	return getVertice(7);
 }
 
 //Retorna cada canto da bouding box
@@ -86,12 +90,12 @@ glm::vec3 tnw::octree::BoundingBox::getVertice(unsigned int i) const {
 			break;
 		}
 		case 2: {
-			corner = this->corner - depth*z;
+			corner = this->corner + depth*z;
 			break;
 		}
 
 		case 3: {
-			corner = this->corner - depth*z + depth*x;
+			corner = this->corner + depth*z + depth*x;
 			break;
 		}
 
@@ -106,12 +110,12 @@ glm::vec3 tnw::octree::BoundingBox::getVertice(unsigned int i) const {
 		}
 
 		case 6: {
-			corner = this->corner + depth*y - depth*z;
+			corner = this->corner + depth*y + depth*z;
 			break;
 		}
 
 		case 7: {
-			corner = this->corner + depth*y - depth*z + depth*x;
+			corner = this->corner + depth*y + depth*z + depth*x;
 		}
 	}
 
@@ -132,12 +136,12 @@ tnw::octree::BoundingBox tnw::octree::BoundingBox::operator[](size_t position) c
 			break;
 		}
 		case 2: {
-			corner = this->corner - depth*z;
+			corner = this->corner + depth*z;
 			break;
 		}
 
 		case 3: {
-			corner = this->corner - depth*z + depth*x;
+			corner = this->corner + depth*z + depth*x;
 			break;
 		}
 
@@ -152,12 +156,12 @@ tnw::octree::BoundingBox tnw::octree::BoundingBox::operator[](size_t position) c
 		}
 
 		case 6: {
-			corner = this->corner + depth*y - depth*z;
+			corner = this->corner + depth*y + depth*z;
 			break;
 		}
 
 		case 7: {
-			corner = this->corner + depth*y - depth*z + depth*x;
+			corner = this->corner + depth*y + depth*z + depth*x;
 		}
 	}
 
