@@ -8,8 +8,9 @@
 /* Classes e funções relativas à interface */
 
 struct IsometricCamera {
-	float scale = 2.0, near = -10.0, far = 10.0;
+	float scale = 0.5, aspect = 1, near = -10.0, far = 10.0;
 	bool positive_hor = true, positive_ver = true;
+	glm::vec3 pos = {0,0,0};
 };
 
 class MainMenu {

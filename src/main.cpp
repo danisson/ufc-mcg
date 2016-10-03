@@ -23,6 +23,9 @@
 void key_callback(GLFWwindow*, int, int, int, int);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+//Camera initalization
+IsometricCamera camera;
+
 int main(void) {
 	GLFWwindow* window;
 	std::vector<std::unique_ptr<tnw::Model>> models;
@@ -59,9 +62,7 @@ int main(void) {
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	//Camera initalization
-	IsometricCamera camera;
-
+	camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
 
 	// Loop until the user closes the window
@@ -74,7 +75,10 @@ int main(void) {
 
 		glPushMatrix();
 
-		glm::mat4 view = tnw::isometric(camera.scale, camera.near, camera.far, camera.positive_hor, camera.positive_ver);
+		glm::mat4 view;
+		view = glm::scale(glm::mat4(),{camera.scale,camera.scale,camera.scale}) * view;
+		view = glm::translate(glm::mat4(),camera.pos) * view;
+		view = tnw::isometric(camera.aspect, camera.near, camera.far, camera.positive_hor, camera.positive_ver) * view;
 		glLoadMatrixf(glm::value_ptr(view));
 
 		tnw::draw_axis();
@@ -111,11 +115,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	auto x = std::min(width,height);
-	if (x == width)
-		glViewport(0,(height-x)/2, x, x);
-	else
-		glViewport((width-x)/2, 0, x, x);
+	camera.aspect = height/((float)width);
+	glViewport(0,0,width,height);
 }
 
 

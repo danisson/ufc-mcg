@@ -67,7 +67,7 @@ void tnw::draw_axis(){
 	glEnd();
 }
 
-glm::mat4 tnw::isometric(float scale, float near, float far, bool positive_hor, bool positive_ver) {
+glm::mat4 tnw::isometric(float aspect, float near, float far, bool positive_hor, bool positive_ver) {
 	float rot_y = glm::radians(45.0);
 	float rot_x = std::asin(std::tan(glm::radians(30.0f)));
 
@@ -82,7 +82,7 @@ glm::mat4 tnw::isometric(float scale, float near, float far, bool positive_hor, 
 	glm::mat4 a = glm::rotate(glm::mat4(), rot_y, glm::vec3(0.0,1.0,0.0));
 	glm::mat4 b = glm::rotate(glm::mat4(), rot_x, glm::vec3(1.0,0.0,0.0));
 
-	glm::mat4 o = glm::ortho(-scale, scale, -scale, scale, near, far);
+	glm::mat4 o = glm::ortho(-1.f, 1.f, -1*aspect, 1*aspect, near, far);
 
 	return o*b*a;
 }

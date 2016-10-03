@@ -15,7 +15,7 @@ namespace tnw
 	bool sphere_box_intersection(glm::vec3 s_center, double s_radius, glm::vec3 c, double l, double h, double d);
 
 	void draw_axis();
-	glm::mat4 isometric(float scale, float near, float far, bool positive_hor, bool positive_ver);
+	glm::mat4 isometric(float aspect, float near, float far, bool positive_hor, bool positive_ver);
 }
 
 #endif

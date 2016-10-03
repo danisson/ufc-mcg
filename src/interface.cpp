@@ -37,7 +37,7 @@ void MainMenu::draw() {
 				else f = fopen(buffer,"r");
 
 				if(!f) {
-					ImGui::OpenPopup("Falha Arquivo#1");
+					ImGui::OpenPopup("Falha Arquivo##1");
 				} else {
 					size_t size = 0;
 					size_t count = model_names.size();
@@ -56,7 +56,7 @@ void MainMenu::draw() {
 			ImGui::SameLine();
 			if (ImGui::Button("Cancelar",buttonSize)) {ImGui::CloseCurrentPopup();}
 
-			if (ImGui::BeginPopupModal("Falha Arquivo#1")) {
+			if (ImGui::BeginPopupModal("Falha Arquivo##1")) {
 				ImVec2 buttonSize = ImVec2(0,0);
 				float margin = ImGui::GetStyle().ItemSpacing.x;
 				buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
@@ -82,7 +82,7 @@ void MainMenu::draw() {
 				else f = fopen(buffer,"w");
 
 				if(!f) {
-					ImGui::OpenPopup("Falha Arquivo#2");
+					ImGui::OpenPopup("Falha Arquivo##2");
 				} else {
 					fprintf(f,"%zu\n", models.size());
 					for (auto&& m : models) {
@@ -95,7 +95,7 @@ void MainMenu::draw() {
 			ImGui::SameLine();
 			if (ImGui::Button("Cancelar",buttonSize)) {ImGui::CloseCurrentPopup();}
 
-			if (ImGui::BeginPopupModal("Falha Arquivo#2")) {
+			if (ImGui::BeginPopupModal("Falha Arquivo##2")) {
 				ImVec2 buttonSize = ImVec2(0,0);
 				float margin = ImGui::GetStyle().ItemSpacing.x;
 				buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
@@ -250,7 +250,7 @@ void MainMenu::draw() {
 		// ImGui::SameLine();
 		buttonSize.x = fullWidth/2-margin;
 		if (ImGui::Button("Volume",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
-			ImGui::OpenPopup("Volume#2");
+			ImGui::OpenPopup("Volume##2");
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Cor",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
@@ -279,7 +279,7 @@ void MainMenu::draw() {
 			ImGui::EndPopup();
 		}
 
-		if (ImGui::BeginPopup("Volume#2")) {
+		if (ImGui::BeginPopup("Volume##2")) {
 			ImGui::Text("%lf",models[curr_item]->volume());
 			ImGui::EndPopup();
 		}
@@ -436,7 +436,10 @@ void MainMenu::draw() {
 	}
 
 	if (ImGui::CollapsingHeader("Câmera")) {
-		ImGui::InputFloat("Zoom", &camera.scale,.5,1);
+		ImGui::InputFloat("Zoom", &camera.scale,camera.scale/2);
+		ImGui::DragFloat("x##cam", &camera.pos.x,1/camera.scale*.01);
+		ImGui::DragFloat("y##cam", &camera.pos.y,1/camera.scale*.01);
+		ImGui::DragFloat("z##cam", &camera.pos.z,1/camera.scale*.01);
 		if (ImGui::Button("CCW")) {
 			rot = (rot-1)&3;
 			camera.positive_hor = (rots[rot]>>0)&1;
