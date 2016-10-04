@@ -177,7 +177,7 @@ std::string tnw::octree::serialize(Tree* t) {
 // Todo - Make recursive version using std::vector
 owner_ptr<Tree> tnw::octree::classify(Classifier c, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth){
 	if (currDepth >= maxDepth) return nullptr;
-	
+
 	switch (c(bb)) {
 		case Color::white:
 			return nullptr;

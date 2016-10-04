@@ -12,8 +12,7 @@ tnw::octree::Sphere::Sphere(glm::vec3 center, float radius) : center(center), ra
 Color tnw::octree::Sphere::operator()(const BoundingBox& bb){
 	if (tnw::sphere_box_intersection(center, radius, bb.getCenter(), bb.depth, bb.depth, bb.depth)) {
 		unsigned int count = 0;
-		for (int i = 0; i < 8; ++i)
-		{
+		for (int i = 0; i < 8; ++i) {
 			if (glm::distance(center, bb.getVertice(i)) < radius) {
 				count++;
 			}
@@ -39,7 +38,7 @@ Color tnw::octree::Box::operator()(const BoundingBox& bb){
 
 	//Bounding box intercepta a caixa
 	if (tnw::box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, center, length, height, depth)){
-		for (int i = 0; i < 8; ++i){
+		for (int i = 0; i < 8; ++i) {
 			unsigned int countcoords = 0;
 			p = bb.getVertice(i);
 
@@ -72,8 +71,7 @@ tnw::octree::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float rad
 Color tnw::octree::Cilinder::operator()(const BoundingBox& bb){
 	unsigned int count = 0;
 	glm::vec3 p, y(0,1,0);
-	for (int i = 0; i < 8; ++i)
-	{
+	for (int i = 0; i < 8; ++i) {
 		p = bb.getVertice(i);
 		if ((p[1] >= inferiorPoint[1]) && (p[1] <= inferiorPoint[1]+height) && (glm::distance(p, inferiorPoint+(p[1]-inferiorPoint[1])*y) <= radius)){
 			count++;
@@ -95,8 +93,7 @@ Color tnw::octree::SquarePyramid::operator()(const BoundingBox& bb){
 	if (box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, pyramidCenter, basis, 2.0*height, basis)) {
 		glm::vec3 p;
 		double top_coord;
-		for (int i = 0; i < 8; ++i)
-		{
+		for (int i = 0; i < 8; ++i) {
 			bool xPos, yPos, zPos;
 			float proportionalBasis;
 
