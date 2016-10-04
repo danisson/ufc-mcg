@@ -91,16 +91,18 @@ tnw::octree::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height,
 Color tnw::octree::SquarePyramid::operator()(const BoundingBox& bb){
 	unsigned int count = 0;
 
-	glm::vec3 pyramidCenter(inferiorPoint[0], inferiorPoint[1]+(height/2), inferiorPoint[2]);
-	if (box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, pyramidCenter, basis, height, basis)) {
+	glm::vec3 pyramidCenter(inferiorPoint[0], inferiorPoint[1]+(height/2.0), inferiorPoint[2]);
+	if (box_intersection(bb.getCenter(), bb.depth, bb.depth, bb.depth, pyramidCenter, basis, 2.0*height, basis)) {
 		glm::vec3 p;
+		double top_coord;
 		for (int i = 0; i < 8; ++i)
 		{
 			bool xPos, yPos, zPos;
 			float proportionalBasis;
 
 			p = bb.getVertice(i);
-			proportionalBasis = basis*(height-p[1]) / height;
+			top_coord = inferiorPoint[1] + height;
+			proportionalBasis = basis*(top_coord-p[1]) / height;
 			xPos = (p[0] >= inferiorPoint[0]-proportionalBasis/2.0) && (p[0] <= inferiorPoint[0]+proportionalBasis/2.0);
 			yPos = (p[1] >= inferiorPoint[1]) && (p[1] <= inferiorPoint[1]+height);
 			zPos = (p[2] >= inferiorPoint[2]-proportionalBasis/2.0) && (p[2] <= inferiorPoint[2]+proportionalBasis/2.0);
