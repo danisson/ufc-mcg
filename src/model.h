@@ -16,8 +16,12 @@ enum class BooleanErrorCodes {
 };
 
 class Model {
+private:
+	virtual void rdraw() const = 0;
 public:
-	virtual void draw() const = 0;
+	bool visible = true;
+	void toggle() {visible = !visible;}
+	void draw() const {if(visible) this->rdraw();}
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
 	virtual void scale(const float dx) = 0;
@@ -45,7 +49,6 @@ public:
 
 	virtual void setColor(float c[3]) override;
 
-	virtual void draw() const override;
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) override;
 	virtual void scale(const float dx) override;
@@ -60,6 +63,7 @@ public:
 private:
 	std::unique_ptr<octree::Tree> tree;
 	octree::BoundingBox bb;
+	virtual void rdraw() const override;
 };
 
 } // namespace tnw

@@ -248,13 +248,23 @@ void MainMenu::draw() {
 		}
 
 		// ImGui::SameLine();
-		buttonSize.x = fullWidth/2-margin;
+		buttonSize.x = fullWidth/3-margin;
 		if (ImGui::Button("Volume",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
 			ImGui::OpenPopup("Volume##2");
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Cor",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
 			ImGui::OpenPopup("Parâmetros de Cor");
+		}
+		if ((curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
+			ImGui::SameLine();
+			const char* text;
+			if (models[curr_item]->visible) text = esconder_text;
+			else text = mostrar_text;
+
+			if (ImGui::Button(text,buttonSize)) {
+				models[curr_item]->toggle();
+			}
 		}
 
 		if (ImGui::BeginPopupModal("Parâmetros de Cor", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {

@@ -23,6 +23,8 @@ class MainMenu {
 	float x=0.5, y=0, z=.5, r=.5, bx=0, by=0, bz=0, bd=1, h=1, l=1, d=1, color[3] = {0,0,0.7};
 	bool open_type_error_popup = false, open_bb_mismatch_error_popup = false;
 	char buffer[1000];
+	const char *esconder_text = "Esconder##toggle";
+	const char *mostrar_text = "Mostrar##toggle";
 public:
 	MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera& c);
 	~MainMenu(){};

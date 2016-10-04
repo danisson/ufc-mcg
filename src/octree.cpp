@@ -25,7 +25,7 @@ tnw::Octree::Octree(FILE *f) : bb(glm::vec3(), 1) {
 	tree = unique_ptr<Tree>(make_from_file(f));
 }
 
-void tnw::Octree::draw() const {
+void tnw::Octree::rdraw() const {
 	//Desenha a bounding box
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	glColor3f(0,0,0);
