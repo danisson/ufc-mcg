@@ -230,12 +230,12 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 			bb.draw();
 
 			//Desenha wireframe cinza
-			// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			// glColor3f(.5,.5,.5);
-			// glLineWidth(0.5);
-			// bb.draw();
-			// glLineWidth(1.0);
-			// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			glColor3f(.5,.5,.5);
+			glLineWidth(0.5);
+			bb.draw();
+			glLineWidth(1.0);
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 			break;
 		}
