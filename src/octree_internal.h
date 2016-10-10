@@ -2,6 +2,7 @@
 #define _H_OCTREE
 #include "model.h"
 #include <memory>
+#include <tuple>
 
 namespace tnw {
 
@@ -54,7 +55,7 @@ namespace octree {
 		Tree* get(size_t);
 
 		double volume() const;
-		Color classify(const BoundingBox& root, const BoundingBox& test) const;
+		std::tuple<Color,bool> classify(const BoundingBox& root, const BoundingBox& test) const;
 	};
 
 	// Builds a tree from a file, stops reading until end of line

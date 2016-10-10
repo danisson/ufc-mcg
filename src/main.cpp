@@ -20,6 +20,23 @@
 #undef far
 #endif
 
+
+// using namespace tnw;
+// const char* s[] = {"white","black","gray"};
+// const char* sb[]= {"false","true"};
+// int main(int argc, char const *argv[]) {
+// 	octree::BoundingBox b1({0,0,0},1);
+// 	octree::BoundingBox b2({.125,0,.125},0.5);
+// 	// printf("%d %d\n", b1.intersect(b2),b2.intersect(b1));
+
+// 	octree::Tree* t = octree::make_from_file(stdin);
+// 	octree::Color c;
+// 	bool b;
+// 	std::tie(c,b) = t->classify(b1,b2);
+// 	printf("%s %s\n", s[(int)c],sb[(int)b]);
+// 	return 0;
+// }
+
 void key_callback(GLFWwindow*, int, int, int, int);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 

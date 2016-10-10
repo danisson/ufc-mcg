@@ -72,6 +72,66 @@ Tree* tnw::octree::Tree::get(size_t i) {
 	return children[i].get();
 }
 
+
+using std::tuple;
+using std::make_tuple;
+using std::tie;
+using std::get;
+
+// extern const char* s[];
+// extern const char* sb[];
+tuple<Color,bool> tnw::octree::Tree::classify(const BoundingBox& root, const BoundingBox& test) const {
+	if (root == test) return make_tuple(color,color != Color::black);
+	switch (root.intersect(test)) {
+		case Color::black: {
+			if (color == Color::black) return make_tuple(Color::black,false);
+
+			int count = 0;
+			bool whiteIn = false;
+
+			Color cC;
+			bool cB;
+
+			for (size_t i = 0; i < 8; ++i) {
+				if (children[i]) {
+					tie(cC,cB) = children[i]->classify(root[i],test);
+					switch(cC) {
+						case Color::black:
+						case Color::gray : count++;
+						case Color::white: break;
+					}
+					whiteIn |= cB;
+				}
+				else whiteIn |= (root[i].intersect(test) != Color::white);
+			}
+
+			if (count == 0) return make_tuple(Color::white,true);
+			if (count > 0 &&  whiteIn) return make_tuple(Color::gray,true);
+			if (count > 0 && !whiteIn) return make_tuple(Color::black,false);
+		}
+		case Color::gray: {
+			if (test.intersect(root) == Color::black) return make_tuple(color,color!=Color::black);
+			if (color == Color::black) return make_tuple(Color::gray,false);
+			int count = 0;
+			for (size_t i = 0; i < 8; ++i) {
+				if (children[i]) {
+					switch(std::get<0>(children[i]->classify(root[i],test))) {
+						case Color::black:
+						case Color::gray : count++;
+						case Color::white: break;
+					}
+				}
+			}
+
+			if (count == 0) return make_tuple(Color::white,true);
+			if (count > 0) return make_tuple(Color::gray,true);
+		}
+		case Color::white:
+			break;
+	}
+	return make_tuple(Color::white,false);
+}
+
 tnw::owner_ptr<Tree> tnw::octree::tree_and(Tree* t1, Tree* t2) {
 	if (!t1 || !t2) return nullptr;
 	if (t1->color == Color::black) return new Tree(*t2);

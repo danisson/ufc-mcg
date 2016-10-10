@@ -43,6 +43,13 @@ void tnw::Octree::translate(const glm::vec3& dv) {
 void tnw::Octree::scale(const float dx) {
 	bb.depth *= dx;
 }
+
+octree::Color tnw::Octree::operator()(const octree::BoundingBox& b2) {
+	if (tree)
+		return std::get<0>(tree->classify(bb,b2));
+	else
+		return octree::Color::white;
+}
 // Boolean operations
 tnw::BooleanErrorCodes tnw::Octree::bool_and(const Model& y) {
 	if (std::type_index(typeid(y)) == std::type_index(typeid(Octree))) {

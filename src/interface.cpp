@@ -121,17 +121,19 @@ void MainMenu::draw() {
 		ImGui::ListBox("##cena", &curr_item, tree_names, models.size(), models.size());
 		ImGui::PopItemWidth();
 
+		bool isSelected = curr_item >= 0 && static_cast<size_t>(curr_item) < models.size();
+
 
 		ImVec2 buttonSize = ImVec2(0,0);
 		float fullWidth = ImGui::GetWindowContentRegionMax().x;
 		float margin = ImGui::GetStyle().ItemSpacing.x;
 		buttonSize.x = fullWidth/2-margin;
 
-		if (ImGui::Button("Translação",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
+		if (ImGui::Button("Translação",buttonSize) && isSelected) {
 			ImGui::OpenPopup("Parâmetros da Translação");
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Escala",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
+		if (ImGui::Button("Escala",buttonSize) && isSelected) {
 			ImGui::OpenPopup("Parâmetros da Escala");
 		}
 
@@ -141,7 +143,7 @@ void MainMenu::draw() {
 			ImGui::InputFloat("z", &z);
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
-				if (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size()) {
+				if (isSelected) {
 					models[curr_item]->translate(glm::vec3(x,y,z));
 				}
 				ImGui::CloseCurrentPopup();
@@ -155,7 +157,7 @@ void MainMenu::draw() {
 			ImGui::InputFloat("r", &x);
 
 			if (ImGui::Button("OK", ImVec2(120,0))) {
-				if (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size()) {
+				if (isSelected) {
 					models[curr_item]->scale(x);
 				}
 				ImGui::CloseCurrentPopup();
@@ -166,8 +168,8 @@ void MainMenu::draw() {
 		}
 
 		// ImGui::SameLine();
-		buttonSize.x = fullWidth/3-margin;
-		if (ImGui::Button("União",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
+		buttonSize.x = fullWidth/2-margin;
+		if (ImGui::Button("União",buttonSize) && isSelected) {
 			ImGui::OpenPopup("Parâmetros de União");
 		}
 
@@ -194,7 +196,7 @@ void MainMenu::draw() {
 		}
 
 		ImGui::SameLine();
-		if (ImGui::Button("Interseção",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
+		if (ImGui::Button("Interseção",buttonSize) && isSelected) {
 			ImGui::OpenPopup("Parâmetros de Interseção");
 		}
 
@@ -218,11 +220,6 @@ void MainMenu::draw() {
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
 			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Remover",buttonSize) && (curr_item >= 0 && static_cast<size_t>(curr_item) < models.size())) {
-			models.erase(models.begin() + curr_item);
-			model_names.erase(model_names.begin() + curr_item);
 		}
 
 		if (open_type_error_popup) {
@@ -248,23 +245,19 @@ void MainMenu::draw() {
 		}
 
 		// ImGui::SameLine();
-		buttonSize.x = fullWidth/3-margin;
+		buttonSize.x = fullWidth/1-margin;
 		if (ImGui::Button("Volume",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
 			ImGui::OpenPopup("Volume##2");
 		}
-		ImGui::SameLine();
+		if (ImGui::BeginPopup("Volume##2")) {
+			ImGui::Text("%lf",models[curr_item]->volume());
+			ImGui::EndPopup();
+		}
+
+
+		buttonSize.x = fullWidth/3-margin;
 		if (ImGui::Button("Cor",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
 			ImGui::OpenPopup("Parâmetros de Cor");
-		}
-		if ((curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
-			ImGui::SameLine();
-			const char* text;
-			if (models[curr_item]->visible) text = esconder_text;
-			else text = mostrar_text;
-
-			if (ImGui::Button(text,buttonSize)) {
-				models[curr_item]->toggle();
-			}
 		}
 
 		if (ImGui::BeginPopupModal("Parâmetros de Cor", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -288,10 +281,18 @@ void MainMenu::draw() {
 			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
 			ImGui::EndPopup();
 		}
+		ImGui::SameLine();
+		const char* text;
+		if (isSelected && models[curr_item]->visible) text = esconder_text;
+		else text = mostrar_text;
 
-		if (ImGui::BeginPopup("Volume##2")) {
-			ImGui::Text("%lf",models[curr_item]->volume());
-			ImGui::EndPopup();
+		if (ImGui::Button(text,buttonSize) && isSelected) {
+			models[curr_item]->toggle();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Remover",buttonSize) && isSelected) {
+			models.erase(models.begin() + curr_item);
+			model_names.erase(model_names.begin() + curr_item);
 		}
 
 		if (ImGui::CollapsingHeader("Nova Primitiva")) {
@@ -440,6 +441,44 @@ void MainMenu::draw() {
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			if (ImGui::Button("Octree")) {
+				if (isSelected)
+					ImGui::OpenPopup("Parâmetros da Classificação");
+				else
+					ImGui::OpenPopup("Erro de seleção");
+			}
+			if (ImGui::BeginPopupModal("Parâmetros da Classificação")) {
+				ImGui::Text("Bounding Box:");
+				ImGui::InputFloat("bx", &bx);
+				ImGui::InputFloat("by", &by);
+				ImGui::InputFloat("bz", &bz);
+				ImGui::InputFloat("bd", &bd);
+				ImGui::Separator();
+				ImGui::Text("Maximum depth:");
+				ImGui::InputInt("md", &md,1,2);
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					tnw::octree::BoundingBox b({bx,by,bz},bd);
+					tnw::octree::Classifier c(std::ref(*models[curr_item]));
+					models.push_back(std::make_unique<tnw::Octree>(c,b,md));
+					std::stringstream ss;
+					ss << "Árvore " << model_names.size() << "[TREE]";
+					model_names.push_back(ss.str());
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+			if (ImGui::BeginPopupModal("Erro de seleção")) {
+				ImVec2 buttonSize = ImVec2(0,0);
+				float margin = ImGui::GetStyle().ItemSpacing.x;
+				buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
+				ImGui::Text("Selecione um objeto.");
+				if (ImGui::Button("Okay",buttonSize)) ImGui::CloseCurrentPopup();
 				ImGui::EndPopup();
 			}
 		}
