@@ -12,6 +12,28 @@ MainMenu::MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera&
 	}
 }
 
+void MainMenu::errorDialog(const char* name,const char* msg) {
+	if (ImGui::BeginPopupModal(name)) {
+		ImVec2 buttonSize = ImVec2(0,0);
+		float margin = ImGui::GetStyle().ItemSpacing.x;
+		buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
+		ImGui::Text(msg);
+		if (ImGui::Button("Okay",buttonSize)) ImGui::CloseCurrentPopup();
+		ImGui::EndPopup();
+	}
+}
+
+void MainMenu::errorDialog(char* name, char* msg) {
+	if (ImGui::BeginPopupModal(name)) {
+		ImVec2 buttonSize = ImVec2(0,0);
+		float margin = ImGui::GetStyle().ItemSpacing.x;
+		buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
+		ImGui::Text(msg);
+		if (ImGui::Button("Okay",buttonSize)) ImGui::CloseCurrentPopup();
+		ImGui::EndPopup();
+	}
+}
+
 void MainMenu::draw() {
 	ImGui::Begin("Menu");
 
@@ -56,14 +78,7 @@ void MainMenu::draw() {
 			ImGui::SameLine();
 			if (ImGui::Button("Cancelar",buttonSize)) {ImGui::CloseCurrentPopup();}
 
-			if (ImGui::BeginPopupModal("Falha Arquivo##1")) {
-				ImVec2 buttonSize = ImVec2(0,0);
-				float margin = ImGui::GetStyle().ItemSpacing.x;
-				buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
-				ImGui::Text("Arquivo não existente ou não pôde ser aberto.");
-				if (ImGui::Button("Okay",buttonSize)) ImGui::CloseCurrentPopup();
-				ImGui::EndPopup();
-			}
+			errorDialog("Falha Arquivo##1","Arquivo não existente ou não pôde ser aberto.");
 			ImGui::EndPopup();
 		}
 
@@ -95,14 +110,7 @@ void MainMenu::draw() {
 			ImGui::SameLine();
 			if (ImGui::Button("Cancelar",buttonSize)) {ImGui::CloseCurrentPopup();}
 
-			if (ImGui::BeginPopupModal("Falha Arquivo##2")) {
-				ImVec2 buttonSize = ImVec2(0,0);
-				float margin = ImGui::GetStyle().ItemSpacing.x;
-				buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
-				ImGui::Text("Arquivo não existente ou não pôde ser escrito.");
-				if (ImGui::Button("Okay",buttonSize)) ImGui::CloseCurrentPopup();
-				ImGui::EndPopup();
-			}
+			errorDialog("Falha Arquivo##2","Arquivo não existente ou não pôde ser escrito.");
 			ImGui::EndPopup();
 		}
 	}
@@ -408,7 +416,7 @@ void MainMenu::draw() {
 
 			ImGui::SameLine();
 			if (ImGui::Button("Pirâmide Base Quadrada")) {
-					ImGui::OpenPopup("Parâmetros da Pirâmide");
+				ImGui::OpenPopup("Parâmetros da Pirâmide");
 			}
 			if (ImGui::BeginPopupModal("Parâmetros da Pirâmide", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 			{
@@ -473,14 +481,7 @@ void MainMenu::draw() {
 				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
 				ImGui::EndPopup();
 			}
-			if (ImGui::BeginPopupModal("Erro de seleção")) {
-				ImVec2 buttonSize = ImVec2(0,0);
-				float margin = ImGui::GetStyle().ItemSpacing.x;
-				buttonSize.x = ImGui::GetWindowContentRegionMax().x - margin;
-				ImGui::Text("Selecione um objeto.");
-				if (ImGui::Button("Okay",buttonSize)) ImGui::CloseCurrentPopup();
-				ImGui::EndPopup();
-			}
+			errorDialog("Erro de seleção","Selecione um objeto.");
 		}
 	}
 

@@ -25,6 +25,9 @@ class MainMenu {
 	char buffer[1000];
 	const char *esconder_text = "Esconder##toggle";
 	const char *mostrar_text = "Mostrar##toggle";
+
+	void errorDialog(char* name, char* msg);
+	void errorDialog(const char* name, const char* msg);
 public:
 	MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera& c);
 	~MainMenu(){};
