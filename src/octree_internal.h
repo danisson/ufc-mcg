@@ -26,6 +26,7 @@ namespace octree {
 		glm::vec3 maxPoint() const;
 		double volume() const;
 		Color intersect(const BoundingBox& bb) const;
+		BoundingBox least_boundingbox(const BoundingBox& bb) const;
 		bool operator==(const BoundingBox& s) const;
 		bool operator!=(const BoundingBox& s) const;
 	};
@@ -63,7 +64,7 @@ namespace octree {
 	tnw::owner_ptr<Tree> tree_and(Tree* t1, Tree* t2);
 	tnw::owner_ptr<Tree> tree_or(Tree* t1, Tree* t2);
 	std::string serialize(Tree* t);
-	tnw::owner_ptr<Tree> classify(Classifier function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth);
+	tnw::owner_ptr<Tree> classify(const Classifier& function, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth);
 
 	class Sphere {
 	public:

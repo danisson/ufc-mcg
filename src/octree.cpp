@@ -44,7 +44,7 @@ void tnw::Octree::scale(const float dx) {
 	bb.depth *= dx;
 }
 
-octree::Color tnw::Octree::operator()(const octree::BoundingBox& b2) {
+octree::Color tnw::Octree::operator()(const octree::BoundingBox& b2) const {
 	if (tree)
 		return std::get<0>(tree->classify(bb,b2));
 	else

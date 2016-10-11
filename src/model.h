@@ -25,7 +25,7 @@ public:
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
 	virtual void scale(const float dx) = 0;
-	virtual octree::Color operator()(const octree::BoundingBox&) = 0;
+	virtual octree::Color operator()(const octree::BoundingBox&) const = 0;
 	// Boolean operations
 	virtual BooleanErrorCodes bool_and(const Model& y) = 0;
 	virtual BooleanErrorCodes bool_or(const Model& y) = 0;
@@ -53,7 +53,7 @@ public:
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) override;
 	virtual void scale(const float dx) override;
-	virtual octree::Color operator()(const octree::BoundingBox&) override;
+	virtual octree::Color operator()(const octree::BoundingBox&) const override;
 	// Boolean operations
 	virtual BooleanErrorCodes bool_and(const Model& y) override;
 	virtual BooleanErrorCodes bool_or(const Model& y) override;

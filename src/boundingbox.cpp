@@ -65,12 +65,12 @@ glm::vec3 tnw::octree::BoundingBox::getCenter() const {
 	return this->corner + depth*(x+y+z);
 }
 
-//Retorna o menor ponto da box (vértice 2?)
+//Retorna o menor ponto da box (vértice 0?)
 glm::vec3 tnw::octree::BoundingBox::minPoint() const {
 	return getVertice(0);
 }
 
-//Retorna o maior ponto da box (vértice 5?)
+//Retorna o maior ponto da box (vértice 7?)
 glm::vec3 tnw::octree::BoundingBox::maxPoint() const {
 	return getVertice(7);
 }
@@ -196,4 +196,26 @@ tnw::octree::Color tnw::octree::BoundingBox::intersect(const BoundingBox& bb) co
 
 	}
 	else return tnw::octree::Color::white;
+}
+
+tnw::octree::BoundingBox tnw::octree::BoundingBox::least_boundingbox(const tnw::octree::BoundingBox& bb) const {
+
+	using std::min;
+	glm::vec3 mn = minPoint();
+	glm::vec3 mnb = bb.minPoint();
+
+	mn = {min(mn[0],mnb[0]),min(mn[1],mnb[1]),min(mn[2],mnb[2])};
+
+	using std::max;
+	glm::vec3 mx = maxPoint();
+	glm::vec3 mxb = bb.maxPoint();
+	mx = {max(mx[0],mxb[0]),max(mx[1],mxb[1]),max(mx[2],mxb[2])};
+
+	glm::vec3 dp = mx-mn;
+	float d = 0;
+	d = std::max(d,dp[0]);
+	d = std::max(d,dp[1]);
+	d = std::max(d,dp[2]);
+
+	return tnw::octree::BoundingBox(mn,d);
 }
