@@ -32,7 +32,7 @@
 		"rulers": [80],
 		"show_encoding": true,
 		"word_wrap": true,
-		"wrap_width": 0,
+		"wrap_width": 80,
 		"translate_tabs_to_spaces": false,
 		"use_tab_stops": true
 	}
