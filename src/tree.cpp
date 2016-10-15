@@ -268,40 +268,43 @@ owner_ptr<Tree> tnw::octree::classify(const Classifier& c, BoundingBox bb, unsig
  * Preto - Desenha a própria bounding box como preenchida
  */
 void tnw::octree::Tree::draw(const BoundingBox& bb){
-	switch (color) {
-		case Color::white: {
-			//Não é pra acontecer!
-			break;
-		}
+	std::vector<std::tuple<Tree*,BoundingBox>> stack = {make_tuple(this,bb)};
+	while (!stack.empty()) {
+		const Tree* t = std::get<0>(stack.back());
+		const BoundingBox b = std::get<1>(stack.back());
+		stack.pop_back();
 
-		case Color::gray: {
-			for (int i = 0; i < 8; ++i) {
-				if (children[i]) {
-					children[i]->draw(bb[i]);
+		switch (t->color) {
+			case Color::white: break;
+			case Color::gray: {
+				for (int i = 0; i < 8; ++i) {
+					if(t->children[i])
+						stack.push_back(make_tuple(t->children[i].get(),b[i]));
 				}
+				break;
 			}
-			break;
+
+			case Color::black: {
+				// Desenha sólido em Cor aleatória
+				glColor3f(t->drawColor[0],
+				          t->drawColor[1],
+				          t->drawColor[2]);
+				b.draw();
+
+				//Desenha wireframe cinza
+				// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+				// glColor3f(.5,.5,.5);
+				// glLineWidth(0.5);
+				// b.draw();
+				// glLineWidth(1.0);
+				// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+				break;
+			}
 		}
-
-		case Color::black: {
-			// Desenha sólido em Cor aleatória
-			glColor3f(drawColor[0], drawColor[1], drawColor[2]);
-			// glColor3f(0,0,0.8);
-			bb.draw();
-
-			//Desenha wireframe cinza
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			glColor3f(.5,.5,.5);
-			glLineWidth(0.5);
-			bb.draw();
-			glLineWidth(1.0);
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
-			break;
-		}
-
 	}
 }
+
 
 void tnw::octree::Tree::setColor(float c[3]) {
 	drawColor[0] = c[0];
