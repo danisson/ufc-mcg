@@ -2,6 +2,8 @@
 #define _H_HELPER
 #include <glm/glm.hpp>
 #include <cmath>
+#include <vector>
+#include <tuple>
 
 //Algumas funções de apoio
 namespace tnw
@@ -16,6 +18,20 @@ namespace tnw
 
 	void draw_axis();
 	glm::mat4 isometric(float aspect, float near, float far, bool positive_hor, bool positive_ver);
+
+	using std::tuple;
+	class Image {
+	private:
+		std::vector<float> data;
+		size_t h,w;
+	public:
+		operator float*();
+		float& operator()(size_t i, size_t j, size_t k);
+		tuple<float&,float&,float&> operator()(size_t i, size_t j);
+		float  operator()(size_t i, size_t j, size_t k) const;
+		tuple<float,float,float> operator()(size_t i, size_t j) const;
+		Image(size_t height, size_t width);
+	};
 }
 
 #endif
