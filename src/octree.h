@@ -81,36 +81,36 @@ namespace octree {
 	tnw::owner_ptr<Tree> make_from_file(FILE* f);
 } // namespace tnw::octree
 
-class Octree : public Model {
-public:
-	//Octree com raiz vazia
-	Octree(const BoundingBox& _bb);
-	//Octree com raiz pronta
-	Octree(std::unique_ptr<octree::Tree> tree, const BoundingBox& _bb);
-	//Octree a partir de um classificador e uma Bounding Box
-	Octree(octree::Classifier c, const BoundingBox& _bb, unsigned int depth);
-	//Octree a partir de um arquivo
-	Octree(FILE *f);
+	class Octree : public Model {
+	public:
+		//Octree com raiz vazia
+		Octree(const BoundingBox& _bb);
+		//Octree com raiz pronta
+		Octree(std::unique_ptr<octree::Tree> tree, const BoundingBox& _bb);
+		//Octree a partir de um classificador e uma Bounding Box
+		Octree(octree::Classifier c, const BoundingBox& _bb, unsigned int depth);
+		//Octree a partir de um arquivo
+		Octree(FILE *f);
 
-	virtual void setColor(float c[3]) override;
+		virtual void setColor(float c[3]) override;
 
-	// Geometric operations
-	virtual void translate(const glm::vec3& dv) override;
-	virtual void scale(const float dx) override;
-	virtual Color operator()(const BoundingBox&) const override;
-	// Boolean operations
-	virtual BooleanErrorCodes bool_and(const Model& y) override;
-	virtual BooleanErrorCodes bool_or(const Model& y) override;
-	// Geometric analysis
-	virtual double volume() const override;
-	//Serialize
-	virtual std::string serialize() const override;
+		// Geometric operations
+		virtual void translate(const glm::vec3& dv) override;
+		virtual void scale(const float dx) override;
+		virtual Color operator()(const BoundingBox&) const override;
+		// Boolean operations
+		virtual BooleanErrorCodes bool_and(const Model& y) override;
+		virtual BooleanErrorCodes bool_or(const Model& y) override;
+		// Geometric analysis
+		virtual double volume() const override;
+		//Serialize
+		virtual std::string serialize() const override;
 
-private:
-	std::unique_ptr<octree::Tree> tree;
-	BoundingBox bb;
-	virtual void rdraw() const override;
-};
+	private:
+		std::unique_ptr<octree::Tree> tree;
+		BoundingBox bb;
+		virtual void rdraw() const override;
+	};
 
 }
 #endif
