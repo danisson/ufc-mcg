@@ -1,5 +1,5 @@
 #include "model.h"
-#include "octree_internal.h"
+#include "octree.h"
 #include "helper.h"
 #include <vector>
 #include <GL/gl.h>
@@ -9,6 +9,7 @@
 
 //Implementação da classe tree!
 
+using tnw::Color;
 using namespace tnw::octree;
 using tnw::owner_ptr;
 using std::make_unique;

@@ -1,9 +1,10 @@
 #include "model.h"
-#include "octree_internal.h"
+#include "octree.h"
 #include "helper.h"
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>
 
+using tnw::Color;
 using namespace tnw::octree;
 
 //SHAPE IMPLEMENTATIONS
@@ -18,13 +19,13 @@ Color tnw::octree::Sphere::operator()(const BoundingBox& bb){
 			}
 		}
 		if (count >= 8) {
-			return tnw::octree::Color::black;
+			return tnw::Color::black;
 		}
 		else {
-			return tnw::octree::Color::gray;
+			return tnw::Color::gray;
 		}
 	} else {
-		return tnw::octree::Color::white;
+		return tnw::Color::white;
 	}
 }
 
@@ -56,12 +57,12 @@ Color tnw::octree::Box::operator()(const BoundingBox& bb){
 			}
 		}
 		if (count >= 8){
-			return tnw::octree::Color::black;
+			return tnw::Color::black;
 		} else {
-			return tnw::octree::Color::gray;
+			return tnw::Color::gray;
 		}
 	} else {
-		return tnw::octree::Color::white;
+		return tnw::Color::white;
 	}
 
 }
@@ -79,9 +80,9 @@ Color tnw::octree::Cilinder::operator()(const BoundingBox& bb){
 	}
 
 	if (count >= 8){
-		return tnw::octree::Color::black;
+		return tnw::Color::black;
 	} else {
-		return tnw::octree::Color::gray;
+		return tnw::Color::gray;
 	}
 }
 
@@ -108,10 +109,10 @@ Color tnw::octree::SquarePyramid::operator()(const BoundingBox& bb){
 			}
 		}
 		if (count >= 8){
-			return tnw::octree::Color::black;
+			return tnw::Color::black;
 		} else {
-			return tnw::octree::Color::gray;
+			return tnw::Color::gray;
 		}
 	}
-	return tnw::octree::Color::white;
+	return tnw::Color::white;
 }

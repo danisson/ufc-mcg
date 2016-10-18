@@ -5,14 +5,37 @@
 #include <string>
 #include <functional>
 #include <memory>
-#include "octree_internal.h"
 
 namespace tnw {
+
+template <typename T>
+using owner_ptr = T*;
 
 enum class BooleanErrorCodes {
 	success,
 	unimplementedType,
 	boundingboxMismatch
+};
+
+enum class Color {
+	white, black, gray
+};
+
+struct BoundingBox {
+	glm::vec3 corner;
+	float depth;
+	BoundingBox(glm::vec3 _corner, float _depth);
+	void draw() const;
+	BoundingBox operator[](size_t position) const;
+	glm::vec3 getVertice(unsigned int i) const;
+	glm::vec3 getCenter() const;
+	glm::vec3 minPoint() const;
+	glm::vec3 maxPoint() const;
+	double volume() const;
+	Color intersect(const BoundingBox& bb) const;
+	BoundingBox least_boundingbox(const BoundingBox& bb) const;
+	bool operator==(const BoundingBox& s) const;
+	bool operator!=(const BoundingBox& s) const;
 };
 
 class Model {
@@ -25,7 +48,7 @@ public:
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
 	virtual void scale(const float dx) = 0;
-	virtual octree::Color operator()(const octree::BoundingBox&) const = 0;
+	virtual Color operator()(const BoundingBox&) const = 0;
 	// Boolean operations
 	virtual BooleanErrorCodes bool_and(const Model& y) = 0;
 	virtual BooleanErrorCodes bool_or(const Model& y) = 0;
@@ -35,37 +58,6 @@ public:
 	virtual std::string serialize() const = 0;
 	//Set color
 	virtual void setColor(float c[3]) = 0;
-};
-
-class Octree : public Model {
-public:
-	//Octree com raiz vazia
-	Octree(const octree::BoundingBox& _bb);
-	//Octree com raiz pronta
-	Octree(std::unique_ptr<octree::Tree> tree, const octree::BoundingBox& _bb);
-	//Octree a partir de um classificador e uma Bounding Box
-	Octree(octree::Classifier c, const octree::BoundingBox& _bb, unsigned int depth);
-	//Octree a partir de um arquivo
-	Octree(FILE *f);
-
-	virtual void setColor(float c[3]) override;
-
-	// Geometric operations
-	virtual void translate(const glm::vec3& dv) override;
-	virtual void scale(const float dx) override;
-	virtual octree::Color operator()(const octree::BoundingBox&) const override;
-	// Boolean operations
-	virtual BooleanErrorCodes bool_and(const Model& y) override;
-	virtual BooleanErrorCodes bool_or(const Model& y) override;
-	// Geometric analysis
-	virtual double volume() const override;
-	//Serialize
-	virtual std::string serialize() const override;
-
-private:
-	std::unique_ptr<octree::Tree> tree;
-	octree::BoundingBox bb;
-	virtual void rdraw() const override;
 };
 
 } // namespace tnw
