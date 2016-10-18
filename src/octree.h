@@ -5,32 +5,7 @@
 #include <tuple>
 
 namespace tnw {
-
-	template <typename T>
-	using owner_ptr = T*;
-
 namespace octree {
-	enum class Color {
-		white, black, gray
-	};
-
-	struct BoundingBox {
-		glm::vec3 corner;
-		float depth;
-		BoundingBox(glm::vec3 _corner, float _depth);
-		void draw() const;
-		BoundingBox operator[](size_t position) const;
-		glm::vec3 getVertice(unsigned int i) const;
-		glm::vec3 getCenter() const;
-		glm::vec3 minPoint() const;
-		glm::vec3 maxPoint() const;
-		double volume() const;
-		Color intersect(const BoundingBox& bb) const;
-		BoundingBox least_boundingbox(const BoundingBox& bb) const;
-		bool operator==(const BoundingBox& s) const;
-		bool operator!=(const BoundingBox& s) const;
-	};
-
 	using Classifier = std::function<Color(const BoundingBox&)>;
 	using std::unique_ptr;
 	using std::array;
@@ -104,5 +79,38 @@ namespace octree {
 
 	// Builds a tree from a file, stops reading until end of line
 	tnw::owner_ptr<Tree> make_from_file(FILE* f);
-}} // namespace tnw::octree
+} // namespace tnw::octree
+
+	class Octree : public Model {
+	public:
+		//Octree com raiz vazia
+		Octree(const BoundingBox& _bb);
+		//Octree com raiz pronta
+		Octree(std::unique_ptr<octree::Tree> tree, const BoundingBox& _bb);
+		//Octree a partir de um classificador e uma Bounding Box
+		Octree(octree::Classifier c, const BoundingBox& _bb, unsigned int depth);
+		//Octree a partir de um arquivo
+		Octree(FILE *f);
+
+		virtual void setColor(float c[3]) override;
+
+		// Geometric operations
+		virtual void translate(const glm::vec3& dv) override;
+		virtual void scale(const float dx) override;
+		virtual Color operator()(const BoundingBox&) const override;
+		// Boolean operations
+		virtual BooleanErrorCodes bool_and(const Model& y) override;
+		virtual BooleanErrorCodes bool_or(const Model& y) override;
+		// Geometric analysis
+		virtual double volume() const override;
+		//Serialize
+		virtual std::string serialize() const override;
+
+	private:
+		std::unique_ptr<octree::Tree> tree;
+		BoundingBox bb;
+		virtual void rdraw() const override;
+	};
+
+}
 #endif

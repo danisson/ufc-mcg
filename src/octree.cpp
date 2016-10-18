@@ -1,5 +1,5 @@
 #include "model.h"
-#include "octree_internal.h"
+#include "octree.h"
 #include <typeindex>
 #include <typeinfo>
 #include <iostream>
@@ -44,11 +44,11 @@ void tnw::Octree::scale(const float dx) {
 	bb.depth *= dx;
 }
 
-octree::Color tnw::Octree::operator()(const octree::BoundingBox& b2) const {
+Color tnw::Octree::operator()(const BoundingBox& b2) const {
 	if (tree)
 		return std::get<0>(tree->classify(bb,b2));
 	else
-		return octree::Color::white;
+		return Color::white;
 }
 // Boolean operations
 tnw::BooleanErrorCodes tnw::Octree::bool_and(const Model& y) {

@@ -1,4 +1,5 @@
 #include "interface.h"
+#include "octree.h"
 #include <sstream>
 #include <iostream>
 #include <random>
@@ -325,7 +326,7 @@ void MainMenu::draw() {
 				ImGui::InputFloat("raio", &r);
 
 				if (ImGui::Button("OK", ImVec2(120,0))) {
-					tnw::octree::BoundingBox b({bx,by,bz},bd);
+					tnw::BoundingBox b({bx,by,bz},bd);
 					tnw::octree::Sphere s({x,y,z}, r);
 					models.push_back(std::make_unique<tnw::Octree>(s,b,md));
 					std::stringstream ss;
@@ -364,7 +365,7 @@ void MainMenu::draw() {
 
 				if (ImGui::Button("OK", ImVec2(120,0))) {
 					tnw::octree::Box bb({x,y,z}, l, h, d);
-					tnw::octree::BoundingBox b({bx,by,bz},bd);
+					tnw::BoundingBox b({bx,by,bz},bd);
 					models.push_back(std::make_unique<tnw::Octree>(bb,b,md));
 					std::stringstream ss;
 					ss << "Árvore " << model_names.size() << "[CAIXA]";
@@ -402,7 +403,7 @@ void MainMenu::draw() {
 
 				if (ImGui::Button("OK", ImVec2(120,0))) {
 					tnw::octree::Cilinder cl(glm::vec3(x,y,z), h, r);
-					tnw::octree::BoundingBox b({bx,by,bz},bd);
+					tnw::BoundingBox b({bx,by,bz},bd);
 					models.push_back(std::make_unique<tnw::Octree>(cl,b,md));
 					std::stringstream ss;
 					ss << "Árvore " << model_names.size() << "[CILINDRO]";
@@ -440,7 +441,7 @@ void MainMenu::draw() {
 
 				if (ImGui::Button("OK", ImVec2(120,0))) {
 					tnw::octree::SquarePyramid sp({x,y,z}, h, l);
-					tnw::octree::BoundingBox b({bx,by,bz},bd);
+					tnw::BoundingBox b({bx,by,bz},bd);
 					models.push_back(std::make_unique<tnw::Octree>(sp,b,md));
 					std::stringstream ss;
 					ss << "Árvore " << model_names.size() << "[PIRÂMIDE]";
@@ -469,7 +470,7 @@ void MainMenu::draw() {
 				ImGui::InputInt("md", &md,1,2);
 
 				if (ImGui::Button("OK", ImVec2(120,0))) {
-					tnw::octree::BoundingBox b({bx,by,bz},bd);
+					tnw::BoundingBox b({bx,by,bz},bd);
 					tnw::octree::Classifier c(std::ref(*models[curr_item]));
 					models.push_back(std::make_unique<tnw::Octree>(c,b,md));
 					std::stringstream ss;
