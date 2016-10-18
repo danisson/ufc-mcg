@@ -64,11 +64,22 @@ int main(void) {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	tnw::Image img(2,2);
+	auto w = 6;
+	auto h = 6;
+	tnw::Image img(w,h);
 
-	img(0,0) = img(1,1) = std::make_tuple(0,0,1);
-	img(1,0) = img(0,1) = std::make_tuple(0,1,0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, img);
+	for (int i = 0; i < w; ++i) {
+		for (int j = 0; j < h; ++j) {
+			if (i%2 == 0)
+				img(i,j) = std::make_tuple(1,1,1);
+		}
+	}
+
+	// img(0,0) = std::make_tuple(0,0,0);
+	// img(1,1) = std::make_tuple(0,1,1);
+	// img(1,0) = std::make_tuple(0,1,0);
+	// img(0,1) = std::make_tuple(0,0,1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_FLOAT, img);
 
 	//Set callbacks
 	glfwSetKeyCallback(window, key_callback);
@@ -112,7 +123,8 @@ int main(void) {
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
-	}
+	} else
+		ImGui_ImplGlFw_KeyCallback(window, key, scancode, action, mods);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
