@@ -13,9 +13,9 @@ using namespace tnw::octree;
 tnw::Octree::Octree(const BoundingBox& _bb) : bb(_bb) {}
 //Octree com raiz pronta
 tnw::Octree::Octree(std::unique_ptr<Tree> tree, const BoundingBox& _bb) : bb(_bb) {}
-//Octree a partir de um classificador e uma Bounding Box
-tnw::Octree::Octree(Classifier c, const BoundingBox& _bb, unsigned int depth) : bb(_bb) {
-	tree = std::unique_ptr<Tree>(octree::classify(c, _bb, depth, 0));
+//Octree a partir de um forma e uma Bounding Box
+tnw::Octree::Octree(const Shape& s, const BoundingBox& _bb, unsigned int depth) : bb(_bb) {
+	tree = std::unique_ptr<Tree>(octree::classify(s, _bb, depth, 0));
 }
 //Octree a partir de um arquivo
 tnw::Octree::Octree(FILE *f) : bb(glm::vec3(), 1) {
@@ -44,11 +44,10 @@ void tnw::Octree::scale(const float dx) {
 	bb.depth *= dx;
 }
 
-Color tnw::Octree::operator()(const BoundingBox& b2) const {
+Color tnw::Octree::intersect_box(const BoundingBox& b2) const {
 	if (tree)
-		return std::get<0>(tree->classify(bb,b2));
-	else
-		return Color::white;
+		return std::get<0>(tree->intersect_box(bb,b2));
+	else return Color::white;
 }
 // Boolean operations
 tnw::BooleanErrorCodes tnw::Octree::bool_and(const Model& y) {

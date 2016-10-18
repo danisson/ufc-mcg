@@ -38,7 +38,15 @@ struct BoundingBox {
 	bool operator!=(const BoundingBox& s) const;
 };
 
-class Model {
+class Shape {
+public:
+	// Geometric operations
+	virtual Color intersect_box(const BoundingBox&) const = 0;
+	// Geometric analysis
+	virtual double volume() const = 0;
+};
+
+class Model : public Shape {
 private:
 	virtual void rdraw() const = 0;
 public:
@@ -48,12 +56,9 @@ public:
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
 	virtual void scale(const float dx) = 0;
-	virtual Color operator()(const BoundingBox&) const = 0;
 	// Boolean operations
 	virtual BooleanErrorCodes bool_and(const Model& y) = 0;
 	virtual BooleanErrorCodes bool_or(const Model& y) = 0;
-	// Geometric analysis
-	virtual double volume() const = 0;
 	//Serialize
 	virtual std::string serialize() const = 0;
 	//Set color

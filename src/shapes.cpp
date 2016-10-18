@@ -1,4 +1,4 @@
-#include "model.h"
+#include "shapes.h"
 #include "octree.h"
 #include "helper.h"
 #include <iostream>
@@ -8,9 +8,13 @@ using tnw::Color;
 using namespace tnw::octree;
 
 //SHAPE IMPLEMENTATIONS
-tnw::octree::Sphere::Sphere(glm::vec3 center, float radius) : center(center), radius(radius) {}
+tnw::Sphere::Sphere(glm::vec3 center, float radius) : center(center), radius(radius) {}
 
-Color tnw::octree::Sphere::operator()(const BoundingBox& bb){
+double tnw::Sphere::volume() const{
+	return 4*radius*tnw::pi*tnw::pi;
+}
+
+Color tnw::Sphere::intersect_box(const BoundingBox& bb) const{
 	if (tnw::sphere_box_intersection(center, radius, bb.getCenter(), bb.depth, bb.depth, bb.depth)) {
 		unsigned int count = 0;
 		for (int i = 0; i < 8; ++i) {
@@ -29,11 +33,13 @@ Color tnw::octree::Sphere::operator()(const BoundingBox& bb){
 	}
 }
 
-tnw::octree::Box::Box(glm::vec3 center, float length, float depth, float height) : center(center), length(length), depth(depth), height(height){
+tnw::Box::Box(glm::vec3 center, float length, float depth, float height) : center(center), length(length), depth(depth), height(height){}
 
+double tnw::Box::volume() const{
+	return length*depth*height;
 }
 
-Color tnw::octree::Box::operator()(const BoundingBox& bb){
+Color tnw::Box::intersect_box(const BoundingBox& bb) const{
 	unsigned int count = 0;
 	glm::vec3 p;
 
@@ -67,9 +73,13 @@ Color tnw::octree::Box::operator()(const BoundingBox& bb){
 
 }
 
-tnw::octree::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
+tnw::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
 
-Color tnw::octree::Cilinder::operator()(const BoundingBox& bb){
+double tnw::Cilinder::volume() const{
+	return tnw::pi*radius*radius*height;
+}
+
+Color tnw::Cilinder::intersect_box(const BoundingBox& bb) const{
 	unsigned int count = 0;
 	glm::vec3 p, y(0,1,0);
 	for (int i = 0; i < 8; ++i) {
@@ -86,8 +96,13 @@ Color tnw::octree::Cilinder::operator()(const BoundingBox& bb){
 	}
 }
 
-tnw::octree::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height, float basis) : inferiorPoint(inferiorPoint), height(height), basis(basis) {}
-Color tnw::octree::SquarePyramid::operator()(const BoundingBox& bb){
+tnw::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height, float basis) : inferiorPoint(inferiorPoint), height(height), basis(basis) {}
+
+double tnw::SquarePyramid::volume() const{
+	return basis*basis*height*1/2;
+}
+
+Color tnw::SquarePyramid::intersect_box(const BoundingBox& bb) const{
 	unsigned int count = 0;
 
 	glm::vec3 pyramidCenter(inferiorPoint[0], inferiorPoint[1]+(height/2.0), inferiorPoint[2]);
