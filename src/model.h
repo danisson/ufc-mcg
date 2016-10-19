@@ -41,6 +41,7 @@ struct BoundingBox {
 class Shape {
 public:
 	// Geometric operations
+	virtual Color intersect_point(const glm::vec3&) const = 0;
 	virtual Color intersect_box(const BoundingBox&) const = 0;
 	// Geometric analysis
 	virtual double volume() const = 0;

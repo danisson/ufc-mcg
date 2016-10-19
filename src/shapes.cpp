@@ -7,11 +7,19 @@
 using tnw::Color;
 using namespace tnw::octree;
 
-//SHAPE IMPLEMENTATIONS
+// ------------------------------------------------------------------------- //
 tnw::Sphere::Sphere(glm::vec3 center, float radius) : center(center), radius(radius) {}
 
 double tnw::Sphere::volume() const{
 	return 4*radius*tnw::pi*tnw::pi;
+}
+
+Color tnw::Sphere::intersect_point(const glm::vec3& x) const {
+	auto dis = glm::distance(x,center);
+
+	if (dis  > radius) return tnw::Color::white;
+	if (dis == radius) return tnw::Color::gray;
+	return tnw::Color::black;
 }
 
 Color tnw::Sphere::intersect_box(const BoundingBox& bb) const{
@@ -33,10 +41,32 @@ Color tnw::Sphere::intersect_box(const BoundingBox& bb) const{
 	}
 }
 
+// ------------------------------------------------------------------------- //
 tnw::Box::Box(glm::vec3 center, float length, float depth, float height) : center(center), length(length), depth(depth), height(height){}
 
 double tnw::Box::volume() const{
 	return length*depth*height;
+}
+
+Color tnw::Box::intersect_point(const glm::vec3& x) const {
+	auto minX = center[0] - length/2.f,
+	     minY = center[1] - height/2.f,
+	     minZ = center[2] -  depth/2.f,
+	     maxX = center[0] + length/2.f,
+	     maxY = center[1] + height/2.f,
+	     maxZ = center[2] +  depth/2.f;
+
+	bool in = (minX < x[0]) && (minY < x[1]) && (minZ < x[2]) &&
+	          (maxX > x[0]) && (maxY > x[1]) && (maxZ > x[2]);
+
+	bool out= (minX > x[0]) || (minY > x[1]) || (minZ > x[2]) ||
+	          (maxX < x[0]) || (maxY < x[1]) || (maxZ < x[2]);
+
+	bool on = !in && !out;
+
+	if (in ) return tnw::Color::black;
+	if (on ) return tnw::Color::gray;
+	return tnw::Color::white;
 }
 
 Color tnw::Box::intersect_box(const BoundingBox& bb) const{
@@ -73,10 +103,27 @@ Color tnw::Box::intersect_box(const BoundingBox& bb) const{
 
 }
 
+// ------------------------------------------------------------------------- //
 tnw::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
 
 double tnw::Cilinder::volume() const{
 	return tnw::pi*radius*radius*height;
+}
+
+Color tnw::Cilinder::intersect_point(const glm::vec3& x) const{
+	auto v = x - inferiorPoint;
+
+	bool in = (v[1] < height) && (v[1] > 0) &&
+	          ((v[0]*v[0]+v[2]*v[2]) < radius*radius);
+
+	bool out= (v[1] > height) || (v[1] < 0) ||
+	          ((v[0]*v[0]+v[2]*v[2]) > radius*radius);
+
+	bool on = !in && !out;
+
+	if (in ) return tnw::Color::black;
+	if (on ) return tnw::Color::gray;
+	return tnw::Color::white;
 }
 
 Color tnw::Cilinder::intersect_box(const BoundingBox& bb) const{
@@ -96,10 +143,39 @@ Color tnw::Cilinder::intersect_box(const BoundingBox& bb) const{
 	}
 }
 
+// ------------------------------------------------------------------------- //
 tnw::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height, float basis) : inferiorPoint(inferiorPoint), height(height), basis(basis) {}
 
 double tnw::SquarePyramid::volume() const{
 	return basis*basis*height*1/2;
+}
+
+Color tnw::SquarePyramid::intersect_point(const glm::vec3& x) const{
+	auto v = x - inferiorPoint;
+	auto top_coord = inferiorPoint[1] + height;
+	auto proportionalBasis = basis*(top_coord-x[1]) / height;
+
+	bool in = (v[1] < height) && (v[1] > 0);
+
+	bool out= (v[1] > height) || (v[1] < 0);
+
+
+	auto minX = inferiorPoint[0] - proportionalBasis/2.f,
+	     minZ = inferiorPoint[2] - proportionalBasis/2.f,
+	     maxX = inferiorPoint[0] + proportionalBasis/2.f,
+	     maxZ = inferiorPoint[2] + proportionalBasis/2.f;
+
+	in = in  && (minX < x[0]) && (minZ < x[2]) &&
+	            (maxX > x[0]) && (maxZ > x[2]);
+
+	out= out || (minX > x[0]) || (minZ > x[2]) ||
+	            (maxX < x[0]) || (maxZ < x[2]);
+
+	bool on = !in && !out;
+
+	if (in ) return tnw::Color::black;
+	if (on ) return tnw::Color::gray;
+	return tnw::Color::white;
 }
 
 Color tnw::SquarePyramid::intersect_box(const BoundingBox& bb) const{
@@ -131,3 +207,4 @@ Color tnw::SquarePyramid::intersect_box(const BoundingBox& bb) const{
 	}
 	return tnw::Color::white;
 }
+// ------------------------------------------------------------------------- //
