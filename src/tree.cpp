@@ -79,11 +79,32 @@ using std::make_tuple;
 using std::tie;
 using std::get;
 
-// extern const char* s[];
-// extern const char* sb[];
+Color tnw::octree::Tree::intersect_point(const BoundingBox& root, const glm::vec3& x) const {
+	if (color == Color::black) return root.intersect_point(x);
+
+	size_t count = 0;
+	for (size_t i = 0; i < 8; ++i) {
+		if (children[i]) {
+			auto cC = children[i]->intersect_point(root[i],x);
+			switch(cC) {
+				case Color::black: return cC;
+				case Color::gray :
+					count++;
+					if (count > 1)
+						return Color::black;
+					else break;
+				case Color::white: break;
+			}
+		}
+	}
+
+	if (count == 1) return Color::gray;
+	return Color::white;
+}
+
 tuple<Color,bool> tnw::octree::Tree::intersect_box(const BoundingBox& root, const BoundingBox& test) const {
 	if (root == test) return make_tuple(color,color != Color::black);
-	switch (root.intersect(test)) {
+	switch (root.intersect_box(test)) {
 		case Color::black: {
 			if (color == Color::black) return make_tuple(Color::black,false);
 
@@ -103,7 +124,7 @@ tuple<Color,bool> tnw::octree::Tree::intersect_box(const BoundingBox& root, cons
 					}
 					whiteIn |= cB;
 				}
-				else whiteIn |= (root[i].intersect(test) != Color::white);
+				else whiteIn |= (root[i].intersect_box(test) != Color::white);
 			}
 
 			if (count == 0) return make_tuple(Color::white,true);
@@ -111,7 +132,7 @@ tuple<Color,bool> tnw::octree::Tree::intersect_box(const BoundingBox& root, cons
 			if (count > 0 && !whiteIn) return make_tuple(Color::black,false);
 		}
 		case Color::gray: {
-			if (test.intersect(root) == Color::black) return make_tuple(color,color!=Color::black);
+			if (test.intersect_box(root) == Color::black) return make_tuple(color,color!=Color::black);
 			if (color == Color::black) return make_tuple(Color::gray,false);
 			int count = 0;
 			for (size_t i = 0; i < 8; ++i) {

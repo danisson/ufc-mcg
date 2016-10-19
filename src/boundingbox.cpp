@@ -172,7 +172,7 @@ double tnw::BoundingBox::volume() const {
 	return depth*depth*depth;
 }
 
-tnw::Color tnw::BoundingBox::intersect(const BoundingBox& bb) const {
+tnw::Color tnw::BoundingBox::intersect_box(const BoundingBox& bb) const {
 	size_t count = 0;
 	auto center = getCenter();
 	glm::vec3 p;
@@ -196,6 +196,28 @@ tnw::Color tnw::BoundingBox::intersect(const BoundingBox& bb) const {
 
 	}
 	else return tnw::Color::white;
+}
+
+tnw::Color tnw::BoundingBox::intersect_point(const glm::vec3& x) const {
+	auto center = getCenter();
+	auto minX = center[0] - depth/2.f,
+	     minY = center[1] - depth/2.f,
+	     minZ = center[2] - depth/2.f,
+	     maxX = center[0] + depth/2.f,
+	     maxY = center[1] + depth/2.f,
+	     maxZ = center[2] + depth/2.f;
+
+	bool in = (minX < x[0]) && (minY < x[1]) && (minZ < x[2]) &&
+	          (maxX > x[0]) && (maxY > x[1]) && (maxZ > x[2]);
+
+	bool out= (minX > x[0]) || (minY > x[1]) || (minZ > x[2]) ||
+	          (maxX < x[0]) || (maxY < x[1]) || (maxZ < x[2]);
+
+	bool on = !in && !out;
+
+	if (in ) return tnw::Color::black;
+	if (on ) return tnw::Color::gray;
+	return tnw::Color::white;
 }
 
 tnw::BoundingBox tnw::BoundingBox::least_boundingbox(const tnw::BoundingBox& bb) const {

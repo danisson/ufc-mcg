@@ -21,7 +21,17 @@ enum class Color {
 	white, black, gray
 };
 
-struct BoundingBox {
+struct BoundingBox;
+class Shape {
+public:
+	// Geometric operations
+	virtual Color intersect_point(const glm::vec3&) const = 0;
+	virtual Color intersect_box(const BoundingBox&) const = 0;
+	// Geometric analysis
+	virtual double volume() const = 0;
+};
+
+struct BoundingBox : public Shape {
 	glm::vec3 corner;
 	float depth;
 	BoundingBox(glm::vec3 _corner, float _depth);
@@ -31,20 +41,12 @@ struct BoundingBox {
 	glm::vec3 getCenter() const;
 	glm::vec3 minPoint() const;
 	glm::vec3 maxPoint() const;
-	double volume() const;
-	Color intersect(const BoundingBox& bb) const;
+	double volume() const override;
+	Color intersect_point(const glm::vec3&) const override;
+	Color intersect_box(const BoundingBox&) const override;
 	BoundingBox least_boundingbox(const BoundingBox& bb) const;
 	bool operator==(const BoundingBox& s) const;
 	bool operator!=(const BoundingBox& s) const;
-};
-
-class Shape {
-public:
-	// Geometric operations
-	virtual Color intersect_point(const glm::vec3&) const = 0;
-	virtual Color intersect_box(const BoundingBox&) const = 0;
-	// Geometric analysis
-	virtual double volume() const = 0;
 };
 
 class Model : public Shape {

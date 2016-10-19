@@ -32,6 +32,7 @@ namespace octree {
 
 		double volume() const;
 		std::tuple<Color,bool> intersect_box(const BoundingBox& root, const BoundingBox& test) const;
+		Color intersect_point(const BoundingBox& root, const glm::vec3& x) const;
 	};
 
 	// Builds a tree from a file, stops reading until end of line
@@ -56,24 +57,25 @@ namespace octree {
 		//Octree a partir de um arquivo
 		Octree(FILE *f);
 
-		virtual void setColor(float c[3]) override;
+		void setColor(float c[3]) override;
 
 		// Geometric operations
-		virtual void translate(const glm::vec3& dv) override;
-		virtual void scale(const float dx) override;
-		virtual Color intersect_box(const BoundingBox&) const override;
+		void translate(const glm::vec3& dv) override;
+		void scale(const float dx) override;
+		Color intersect_box(const BoundingBox&) const override;
+		Color intersect_point(const glm::vec3&) const override;
 		// Boolean operations
-		virtual BooleanErrorCodes bool_and(const Model& y) override;
-		virtual BooleanErrorCodes bool_or(const Model& y) override;
+		BooleanErrorCodes bool_and(const Model& y) override;
+		BooleanErrorCodes bool_or(const Model& y) override;
 		// Geometric analysis
-		virtual double volume() const override;
+		double volume() const override;
 		//Serialize
-		virtual std::string serialize() const override;
+		std::string serialize() const override;
 
 	private:
 		std::unique_ptr<octree::Tree> tree;
 		BoundingBox bb;
-		virtual void rdraw() const override;
+		void rdraw() const override;
 	};
 
 }

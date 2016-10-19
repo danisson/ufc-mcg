@@ -49,6 +49,13 @@ Color tnw::Octree::intersect_box(const BoundingBox& b2) const {
 		return std::get<0>(tree->intersect_box(bb,b2));
 	else return Color::white;
 }
+
+Color tnw::Octree::intersect_point(const glm::vec3& x) const {
+	if (tree)
+		return tree->intersect_point(bb,x);
+	else return Color::white;
+}
+
 // Boolean operations
 tnw::BooleanErrorCodes tnw::Octree::bool_and(const Model& y) {
 	if (std::type_index(typeid(y)) == std::type_index(typeid(Octree))) {
