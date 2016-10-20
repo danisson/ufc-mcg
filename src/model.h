@@ -21,12 +21,22 @@ enum class Color {
 	white, black, gray
 };
 
+class Ray {
+public:
+	Ray(glm::vec3 _a, glm::vec3 _b);
+private:
+	//Um raio começa no a e termina no b
+	glm::vec3 a, b;
+	glm::vec3 dir, invdir;
+};
+
 struct BoundingBox;
 class Shape {
 public:
 	// Geometric operations
 	virtual Color intersect_point(const glm::vec3&) const = 0;
 	virtual Color intersect_box(const BoundingBox&) const = 0;
+	virtual Color intersect_ray(const Ray&) const = 0;
 	// Geometric analysis
 	virtual double volume() const = 0;
 };
