@@ -42,7 +42,7 @@ Color tnw::Sphere::intersect_box(const BoundingBox& bb) const{
 }
 
 IntersectionList tnw::Sphere::intersect_ray(const Ray& ray) const {
-
+	return IntersectionList();
 }
 
 // ------------------------------------------------------------------------- //
@@ -107,54 +107,70 @@ Color tnw::Box::intersect_box(const BoundingBox& bb) const{
 
 }
 
-IntersectionList tnw::Box::intersect_ray(const Ray& ray) const{
-	float tmin, tmax, txmin, txmax tymin, tzmin, tzmax;
+bool tnw::Box::clip_line(int, const Ray&, float& f_low, float& f_high);
+
+IntersectionList tnw::Box::intersect_ray(const Ray& ray) {
 	glm::vec3 bounds[2];
-	int sign[3];
 	IntersectionList ilist();
 
 	bounds[0] = center - {width/2.f, height/2.f, depth/2.f};
 	bounds[1] = center + {width/2.f, height/2.f, depth/2.f};
-	
-	sign[0] = (ray.invdir.x < 0);
-	sign[1] = (ray.invdir.y < 0);
-	sign[2] = (ray.invdir.z < 0);
 
-	tmin = txmin = (bounds[sign[0]].x - ray.a.x) * ray.invdir.x;
-	tmax = txmax = (bounds[1-sign[0]].x - ray.a.x) * ray.invdir.x;
-	tymin = (bounds[sign[1]].y - ray.a.y) * ray.invdir.y;
-	tymax = (bounds[1-sign[1]].y - ray.a.y) * ray.invdir.y;
 
-	if ((tmin > tymax) || (tymin > tmax)) {
-		//Não interseciona, logo o comprimento é o raio todo
-		float length = (ray.b-ray.a).length();
-		ilist.push_back(std::make_tuple(tnw::Color::white, length));
-		return ilist;
-	}
-	if (tymin > tmin) {
-		tmin = tymin;
-	}
-	if (tymax < tmax) {
-		tmax = tymax;
-	}
-
-	tzmin = (bounds[sign[2]].z - ray.a.z) * ray.invdir.z;
-	tzmax = (bounds[1-sign[2]].z - ray.a.z) * ray.invdir.z;
-
-	if ((tmin > tzmax) || (tzmin > tmax)) {
-		//Não interseciona, logo o comprimento é o raio todo
-		float length = (ray.b-ray.a).length();
-		ilist.push_back(std::make_tuple(tnw::Color::white, length));
-		return ilist;	
-	}
-	if (tzmin > tmin) {
-		tmin = tzmin;
-	}
-	if (tzmax < tmax) {
-		tmax = tzmax;
-	}
 }
 
+// IntersectionList tnw::Box::intersect_ray(const Ray& ray) const{
+// 	float tmin, tmax, txmin, txmax tymin, tzmin, tzmax;
+// 	glm::vec3 bounds[2];
+// 	int sign[3];
+// 	IntersectionList ilist();
+
+// 	bounds[0] = center - {width/2.f, height/2.f, depth/2.f};
+// 	bounds[1] = center + {width/2.f, height/2.f, depth/2.f};
+	
+// 	sign[0] = (ray.invdir.x < 0);
+// 	sign[1] = (ray.invdir.y < 0);
+// 	sign[2] = (ray.invdir.z < 0);
+
+// 	tmin = txmin = (bounds[sign[0]].x - ray.a.x) * ray.invdir.x;
+// 	tmax = txmax = (bounds[1-sign[0]].x - ray.a.x) * ray.invdir.x;
+// 	tymin = (bounds[sign[1]].y - ray.a.y) * ray.invdir.y;
+// 	tymax = (bounds[1-sign[1]].y - ray.a.y) * ray.invdir.y;
+
+// 	if ((tmin > tymax) || (tymin > tmax)) {
+// 		//Não interseciona, logo o comprimento é o raio todo
+// 		float length = (ray.b-ray.a).length();
+// 		ilist.push_back(std::make_tuple(tnw::Color::white, length));
+// 		return ilist;
+// 	}
+// 	if (tymin > tmin) {
+// 		tmin = tymin;
+// 	}
+// 	if (tymax < tmax) {
+// 		tmax = tymax;
+// 	}
+
+// 	tzmin = (bounds[sign[2]].z - ray.a.z) * ray.invdir.z;
+// 	tzmax = (bounds[1-sign[2]].z - ray.a.z) * ray.invdir.z;
+
+// 	if ((tmin > tzmax) || (tzmin > tmax)) {
+// 		//Não interseciona, logo o comprimento é o raio todo
+// 		float length = (ray.b-ray.a).length();
+// 		ilist.push_back(std::make_tuple(tnw::Color::white, length));
+// 		return ilist;	
+// 	}
+// 	if (tzmin > tmin) {
+// 		tmin = tzmin;
+// 	}
+// 	if (tzmax < tmax) {
+// 		tmax = tzmax;
+// 	}
+
+// 	std::cout << "txmin: " << txmin << "txmax: " << txmax << "tymin: " << tymin << "tymax: " << tymax << "tzmin: " << tzmin << "tzmax: " << tzmax << std::endl << "tmin: " << tmin << "tmax: " << tmax << std::endl;
+
+// 	//Tem interseção
+// 	return IntersectionList();
+// }
 // ------------------------------------------------------------------------- //
 tnw::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
 
@@ -196,7 +212,7 @@ Color tnw::Cilinder::intersect_box(const BoundingBox& bb) const{
 }
 
 IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
-
+	return IntersectionList();
 }
 // ------------------------------------------------------------------------- //
 tnw::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height, float basis) : inferiorPoint(inferiorPoint), height(height), basis(basis) {}
@@ -263,6 +279,6 @@ Color tnw::SquarePyramid::intersect_box(const BoundingBox& bb) const {
 	return tnw::Color::white;
 }
 IntersectionList tnw::SquarePyramid::intersect_ray(const Ray& ray) const {
-
+	return IntersectionList();
 }
 // ------------------------------------------------------------------------- //
