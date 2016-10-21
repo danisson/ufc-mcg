@@ -1,5 +1,5 @@
 #include "model.h"
-#include "octree_internal.h"
+#include "octree.h"
 #include "helper.h"
 #include <vector>
 #include <GL/gl.h>
@@ -9,6 +9,7 @@
 
 //Implementação da classe tree!
 
+using tnw::Color;
 using namespace tnw::octree;
 using tnw::owner_ptr;
 using std::make_unique;
@@ -78,11 +79,32 @@ using std::make_tuple;
 using std::tie;
 using std::get;
 
-// extern const char* s[];
-// extern const char* sb[];
-tuple<Color,bool> tnw::octree::Tree::classify(const BoundingBox& root, const BoundingBox& test) const {
+Color tnw::octree::Tree::intersect_point(const BoundingBox& root, const glm::vec3& x) const {
+	if (color == Color::black) return root.intersect_point(x);
+
+	size_t count = 0;
+	for (size_t i = 0; i < 8; ++i) {
+		if (children[i]) {
+			auto cC = children[i]->intersect_point(root[i],x);
+			switch(cC) {
+				case Color::black: return cC;
+				case Color::gray :
+					count++;
+					if (count > 1)
+						return Color::black;
+					else break;
+				case Color::white: break;
+			}
+		}
+	}
+
+	if (count == 1) return Color::gray;
+	return Color::white;
+}
+
+tuple<Color,bool> tnw::octree::Tree::intersect_box(const BoundingBox& root, const BoundingBox& test) const {
 	if (root == test) return make_tuple(color,color != Color::black);
-	switch (root.intersect(test)) {
+	switch (root.intersect_box(test)) {
 		case Color::black: {
 			if (color == Color::black) return make_tuple(Color::black,false);
 
@@ -94,7 +116,7 @@ tuple<Color,bool> tnw::octree::Tree::classify(const BoundingBox& root, const Bou
 
 			for (size_t i = 0; i < 8; ++i) {
 				if (children[i]) {
-					tie(cC,cB) = children[i]->classify(root[i],test);
+					tie(cC,cB) = children[i]->intersect_box(root[i],test);
 					switch(cC) {
 						case Color::black:
 						case Color::gray : count++;
@@ -102,7 +124,7 @@ tuple<Color,bool> tnw::octree::Tree::classify(const BoundingBox& root, const Bou
 					}
 					whiteIn |= cB;
 				}
-				else whiteIn |= (root[i].intersect(test) != Color::white);
+				else whiteIn |= (root[i].intersect_box(test) != Color::white);
 			}
 
 			if (count == 0) return make_tuple(Color::white,true);
@@ -110,12 +132,12 @@ tuple<Color,bool> tnw::octree::Tree::classify(const BoundingBox& root, const Bou
 			if (count > 0 && !whiteIn) return make_tuple(Color::black,false);
 		}
 		case Color::gray: {
-			if (test.intersect(root) == Color::black) return make_tuple(color,color!=Color::black);
+			if (test.intersect_box(root) == Color::black) return make_tuple(color,color!=Color::black);
 			if (color == Color::black) return make_tuple(Color::gray,false);
 			int count = 0;
 			for (size_t i = 0; i < 8; ++i) {
 				if (children[i]) {
-					switch(std::get<0>(children[i]->classify(root[i],test))) {
+					switch(std::get<0>(children[i]->intersect_box(root[i],test))) {
 						case Color::black:
 						case Color::gray : count++;
 						case Color::white: break;
@@ -235,10 +257,10 @@ std::string tnw::octree::serialize(Tree* t) {
 }
 
 // Todo - Make recursive version using std::vector
-owner_ptr<Tree> tnw::octree::classify(const Classifier& c, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth){
+owner_ptr<Tree> tnw::octree::classify(const Shape& s, BoundingBox bb, unsigned int maxDepth, unsigned int currDepth){
 	if (currDepth >= maxDepth) return nullptr;
 
-	switch (c(bb)) {
+	switch (s.intersect_box(bb)) {
 		case Color::white:
 			return nullptr;
 		case Color::black:
@@ -252,7 +274,7 @@ owner_ptr<Tree> tnw::octree::classify(const Classifier& c, BoundingBox bb, unsig
 	size_t countW = 0;
 
 	for (size_t i = 0; i < 8; ++i) {
-		r->children[i].reset(classify(c, bb[i], maxDepth, currDepth+1));
+		r->children[i].reset(classify(s, bb[i], maxDepth, currDepth+1));
 		if(r->children[i] && r->children[i]->color == Color::black) countB++;
 		if(!r->children[i]) countW++;
 	}

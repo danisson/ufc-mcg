@@ -5,9 +5,12 @@
 #include <string>
 #include <functional>
 #include <memory>
-#include "octree_internal.h"
+#include <vector>
 
 namespace tnw {
+
+template <typename T>
+using owner_ptr = T*;
 
 enum class BooleanErrorCodes {
 	success,
@@ -15,7 +18,53 @@ enum class BooleanErrorCodes {
 	boundingboxMismatch
 };
 
-class Model {
+enum class Color {
+	white, black, gray
+};
+
+class Ray {
+public:
+	Ray(glm::vec3 _a, glm::vec3 _b);
+private:
+	//Um raio começa no a e termina no b
+	glm::vec3 a, b;
+	glm::vec3 dir, invdir;
+};
+
+//Lista de interseções é representada como um par <Cor>, <Comprimento dessa cor no raio>
+typedef std::vector<std::tuple<Color, float>> IntersectionList;
+
+struct BoundingBox;
+class Shape {
+public:
+	// Geometric operations
+	virtual Color intersect_point(const glm::vec3&) const = 0;
+	virtual Color intersect_box(const BoundingBox&) const = 0;
+	virtual IntersectionList intersect_ray(const Ray&) const = 0;
+	// Geometric analysis
+	virtual double volume() const = 0;
+};
+
+struct BoundingBox : public Shape {
+	glm::vec3 corner;
+	float depth;
+	BoundingBox(glm::vec3 _corner, float _depth);
+	void draw() const;
+	BoundingBox operator[](size_t position) const;
+	glm::vec3 getVertice(unsigned int i) const;
+	glm::vec3 getCenter() const;
+	glm::vec3 minPoint() const;
+	glm::vec3 maxPoint() const;
+	double volume() const override;
+	Color intersect_point(const glm::vec3&) const override;
+	Color intersect_box(const BoundingBox&) const override;
+	IntersectionList intersect_ray(const Ray&) const override;
+	BoundingBox least_boundingbox(const BoundingBox& bb) const;
+	bool operator==(const BoundingBox& s) const;
+	bool operator!=(const BoundingBox& s) const;
+};
+
+class Model : public Shape {
 private:
 	virtual void rdraw() const = 0;
 public:
@@ -25,47 +74,13 @@ public:
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
 	virtual void scale(const float dx) = 0;
-	virtual octree::Color operator()(const octree::BoundingBox&) const = 0;
 	// Boolean operations
 	virtual BooleanErrorCodes bool_and(const Model& y) = 0;
 	virtual BooleanErrorCodes bool_or(const Model& y) = 0;
-	// Geometric analysis
-	virtual double volume() const = 0;
 	//Serialize
 	virtual std::string serialize() const = 0;
 	//Set color
 	virtual void setColor(float c[3]) = 0;
-};
-
-class Octree : public Model {
-public:
-	//Octree com raiz vazia
-	Octree(const octree::BoundingBox& _bb);
-	//Octree com raiz pronta
-	Octree(std::unique_ptr<octree::Tree> tree, const octree::BoundingBox& _bb);
-	//Octree a partir de um classificador e uma Bounding Box
-	Octree(octree::Classifier c, const octree::BoundingBox& _bb, unsigned int depth);
-	//Octree a partir de um arquivo
-	Octree(FILE *f);
-
-	virtual void setColor(float c[3]) override;
-
-	// Geometric operations
-	virtual void translate(const glm::vec3& dv) override;
-	virtual void scale(const float dx) override;
-	virtual octree::Color operator()(const octree::BoundingBox&) const override;
-	// Boolean operations
-	virtual BooleanErrorCodes bool_and(const Model& y) override;
-	virtual BooleanErrorCodes bool_or(const Model& y) override;
-	// Geometric analysis
-	virtual double volume() const override;
-	//Serialize
-	virtual std::string serialize() const override;
-
-private:
-	std::unique_ptr<octree::Tree> tree;
-	octree::BoundingBox bb;
-	virtual void rdraw() const override;
 };
 
 } // namespace tnw

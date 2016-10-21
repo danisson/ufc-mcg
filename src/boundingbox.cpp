@@ -4,13 +4,13 @@
 #include <glm/glm.hpp>
 #include <array>
 
-tnw::octree::BoundingBox::BoundingBox(glm::vec3 _corner, float _depth) : corner(_corner), depth(_depth){}
+tnw::BoundingBox::BoundingBox(glm::vec3 _corner, float _depth) : corner(_corner), depth(_depth){}
 
-bool tnw::octree::BoundingBox::operator==(const tnw::octree::BoundingBox& y) const{
+bool tnw::BoundingBox::operator==(const tnw::BoundingBox& y) const{
 	return (depth == y.depth) && (corner == y.corner);
 }
 
-bool tnw::octree::BoundingBox::operator!=(const tnw::octree::BoundingBox& y) const {
+bool tnw::BoundingBox::operator!=(const tnw::BoundingBox& y) const {
 	return (depth != y.depth) || (corner != y.corner);
 }
 
@@ -26,7 +26,7 @@ bool tnw::octree::BoundingBox::operator!=(const tnw::octree::BoundingBox& y) con
 //   2-------3          .-------.
 //  /                        ^0
 // z
-void tnw::octree::BoundingBox::draw() const{
+void tnw::BoundingBox::draw() const{
 	glm::vec3 x = {1.,0.,0.}, y = {0.,1.,0.}, z = {0.,0.,1.},
 	          v0 = corner,
 	          v1 = v0 + depth*x,
@@ -59,24 +59,24 @@ void tnw::octree::BoundingBox::draw() const{
 	glEnd();
 }
 //Retorna o centro da bounding box
-glm::vec3 tnw::octree::BoundingBox::getCenter() const {
+glm::vec3 tnw::BoundingBox::getCenter() const {
 	glm::vec3 x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.);
 	float depth = this->depth/2;
 	return this->corner + depth*(x+y+z);
 }
 
 //Retorna o menor ponto da box (vértice 0?)
-glm::vec3 tnw::octree::BoundingBox::minPoint() const {
+glm::vec3 tnw::BoundingBox::minPoint() const {
 	return getVertice(0);
 }
 
 //Retorna o maior ponto da box (vértice 7?)
-glm::vec3 tnw::octree::BoundingBox::maxPoint() const {
+glm::vec3 tnw::BoundingBox::maxPoint() const {
 	return getVertice(7);
 }
 
 //Retorna cada canto da bouding box
-glm::vec3 tnw::octree::BoundingBox::getVertice(unsigned int i) const {
+glm::vec3 tnw::BoundingBox::getVertice(unsigned int i) const {
 	glm::vec3 corner, x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.);
 	float depth = this->depth;
 
@@ -122,7 +122,7 @@ glm::vec3 tnw::octree::BoundingBox::getVertice(unsigned int i) const {
 	return corner;
 }
 // A posição das sub-bounding boxes é de acordo com a ordem definida em sala
-tnw::octree::BoundingBox tnw::octree::BoundingBox::operator[](size_t position) const{
+tnw::BoundingBox tnw::BoundingBox::operator[](size_t position) const{
 	glm::vec3 corner, x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.);
 	float depth = this->depth/2;
 
@@ -165,14 +165,14 @@ tnw::octree::BoundingBox tnw::octree::BoundingBox::operator[](size_t position) c
 		}
 	}
 
-	return tnw::octree::BoundingBox(corner, depth);
+	return tnw::BoundingBox(corner, depth);
 }
 
-double tnw::octree::BoundingBox::volume() const {
+double tnw::BoundingBox::volume() const {
 	return depth*depth*depth;
 }
 
-tnw::octree::Color tnw::octree::BoundingBox::intersect(const BoundingBox& bb) const {
+tnw::Color tnw::BoundingBox::intersect_box(const BoundingBox& bb) const {
 	size_t count = 0;
 	auto center = getCenter();
 	glm::vec3 p;
@@ -191,14 +191,40 @@ tnw::octree::Color tnw::octree::BoundingBox::intersect(const BoundingBox& bb) co
 
 			if (countcoords >= 3) count++;
 		}
-		if (count >= 8) return tnw::octree::Color::black;
-		else return tnw::octree::Color::gray;
+		if (count >= 8) return tnw::Color::black;
+		else return tnw::Color::gray;
 
 	}
-	else return tnw::octree::Color::white;
+	else return tnw::Color::white;
 }
 
-tnw::octree::BoundingBox tnw::octree::BoundingBox::least_boundingbox(const tnw::octree::BoundingBox& bb) const {
+tnw::Color tnw::BoundingBox::intersect_point(const glm::vec3& x) const {
+	auto center = getCenter();
+	auto minX = center[0] - depth/2.f,
+	     minY = center[1] - depth/2.f,
+	     minZ = center[2] - depth/2.f,
+	     maxX = center[0] + depth/2.f,
+	     maxY = center[1] + depth/2.f,
+	     maxZ = center[2] + depth/2.f;
+
+	bool in = (minX < x[0]) && (minY < x[1]) && (minZ < x[2]) &&
+	          (maxX > x[0]) && (maxY > x[1]) && (maxZ > x[2]);
+
+	bool out= (minX > x[0]) || (minY > x[1]) || (minZ > x[2]) ||
+	          (maxX < x[0]) || (maxY < x[1]) || (maxZ < x[2]);
+
+	bool on = !in && !out;
+
+	if (in ) return tnw::Color::black;
+	if (on ) return tnw::Color::gray;
+	return tnw::Color::white;
+}
+
+tnw::IntersectionList tnw::BoundingBox::intersect_ray(const tnw::Ray&) const {
+	return tnw::IntersectionList();
+}
+
+tnw::BoundingBox tnw::BoundingBox::least_boundingbox(const tnw::BoundingBox& bb) const {
 
 	using std::min;
 	glm::vec3 mn = minPoint();
@@ -217,5 +243,5 @@ tnw::octree::BoundingBox tnw::octree::BoundingBox::least_boundingbox(const tnw::
 	d = std::max(d,dp[1]);
 	d = std::max(d,dp[2]);
 
-	return tnw::octree::BoundingBox(mn,d);
+	return tnw::BoundingBox(mn,d);
 }
