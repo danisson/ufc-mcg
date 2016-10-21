@@ -119,7 +119,6 @@ IntersectionList tnw::Box::intersect_ray(const Ray& ray) const {
 	bounds[0] = center - glm::vec3(length/2.f, height/2.f, depth/2.f);
 	bounds[1] = center + glm::vec3(length/2.f, height/2.f, depth/2.f);
 
-
 }
 
 // IntersectionList tnw::Box::intersect_ray(const Ray& ray) const{
