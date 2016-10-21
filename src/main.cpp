@@ -203,11 +203,11 @@ int main(void) {
 
 	camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
-	tnw::Box b(glm::vec3(2.5,3.5,0), 3, 2, 5);
+	tnw::Box b(glm::vec3(2.5,2.5,0), 3, 2, 5);
 	tnw::Box b2(glm::vec3(-5,5,-5), 10, 10, 10);
-	tnw::Ray r(glm::vec3(0,3,0), glm::vec3(5,3,0));
+	tnw::Ray r(glm::vec3(1,-1,0), glm::vec3(1,6,0));
 	tnw::Ray r2(glm::vec3(1,-1,1), glm::vec3(-11,11,-11));
-	tnw::Ray r3(glm::vec3(0,1,0), glm::vec3(6,1,0));
+	tnw::Ray r3(glm::vec3(0,0,0), glm::vec3(6,0,0));
 	tnw::IntersectionList il = b.intersect_ray(r);
 	tnw::IntersectionList il2 = b2.intersect_ray(r2);
 	tnw::IntersectionList il3 = b.intersect_ray(r3);
