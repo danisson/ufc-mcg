@@ -1,6 +1,7 @@
 #include "model.h"
 #include "helper.h"
 #include "interface.h"
+#include "shapes.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -21,117 +22,117 @@
 #undef far
 #endif
 
-struct Ray {
-    glm::vec3 o, dir, invdir;
+// struct Ray {
+//     glm::vec3 o, dir, invdir;
 
-    Ray(glm::vec3 _o, glm::vec3 _dir){
-        o = _o;
-        dir = _dir;
-        invdir = glm::vec3(1,1,1)/_dir;
-    }
-    static Ray computePrimRay(glm::vec3 pixel, glm::vec3 eye) {
-        return Ray(pixel, pixel - eye);
-    }
-};
+//     Ray(glm::vec3 _o, glm::vec3 _dir){
+//         o = _o;
+//         dir = _dir;
+//         invdir = glm::vec3(1,1,1)/_dir;
+//     }
+//     static Ray computePrimRay(glm::vec3 pixel, glm::vec3 eye) {
+//         return Ray(pixel, pixel - eye);
+//     }
+// };
 
-class Sphere 
-{ 
-public: 
-    glm::vec3 center;                           /// position of the sphere 
-    float radius, radius2;                  /// sphere radius and radius^2 
-    glm::vec3 surfaceColor, emissionColor;      /// surface color and emission (light) 
-    float transparency, reflection;         /// surface transparency and reflectivity 
-    Sphere( 
-        const glm::vec3 &c, 
-        const float &r, 
-        const glm::vec3 &sc) : 
-        center(c), radius(r), radius2(r * r), surfaceColor(sc)
-    { /* empty */ } 
-    bool intersect(const glm::vec3 &rayorig, const glm::vec3 &raydir) const 
-    { 
-        glm::vec3 l = center - rayorig; 
-        float tca = glm::dot(l, raydir); 
-        if (tca < 0) return false; 
-        float d2 = glm::dot(l,l) - tca * tca; 
-        if (d2 > radius2) return false; 
-        float thc = sqrt(radius2 - d2);  
-        return true; 
-    } 
-}; 
+// class Sphere 
+// { 
+// public: 
+//     glm::vec3 center;                           /// position of the sphere 
+//     float radius, radius2;                  /// sphere radius and radius^2 
+//     glm::vec3 surfaceColor, emissionColor;      /// surface color and emission (light) 
+//     float transparency, reflection;         /// surface transparency and reflectivity 
+//     Sphere( 
+//         const glm::vec3 &c, 
+//         const float &r, 
+//         const glm::vec3 &sc) : 
+//         center(c), radius(r), radius2(r * r), surfaceColor(sc)
+//     { /* empty */ } 
+//     bool intersect(const glm::vec3 &rayorig, const glm::vec3 &raydir) const 
+//     { 
+//         glm::vec3 l = center - rayorig; 
+//         float tca = glm::dot(l, raydir); 
+//         if (tca < 0) return false; 
+//         float d2 = glm::dot(l,l) - tca * tca; 
+//         if (d2 > radius2) return false; 
+//         float thc = sqrt(radius2 - d2);  
+//         return true; 
+//     } 
+// }; 
 
-struct BoxS {
-    //Ponto máximo e mínimo da caixa
-    glm::vec3 min, max;
-    float color[3];
+// struct BoxS {
+//     //Ponto máximo e mínimo da caixa
+//     glm::vec3 min, max;
+//     float color[3];
 
-    BoxS(glm::vec3 _min, glm::vec3 _max){
-        min = _min;
-        max = _max;
-        color[0] = 0.0f; color[1] = 0.0f; color[2] = 1.0f;
-    }
+//     BoxS(glm::vec3 _min, glm::vec3 _max){
+//         min = _min;
+//         max = _max;
+//         color[0] = 0.0f; color[1] = 0.0f; color[2] = 1.0f;
+//     }
 
-    BoxS(glm::vec3 _min, glm::vec3 _max, float _color[3]){
-        min = _min;
-        max = _max;
-        color[0] = _color[0];
-        color[1] = _color[1];
-        color[2] = _color[2];
-    }
+//     BoxS(glm::vec3 _min, glm::vec3 _max, float _color[3]){
+//         min = _min;
+//         max = _max;
+//         color[0] = _color[0];
+//         color[1] = _color[1];
+//         color[2] = _color[2];
+//     }
 
-    bool intersect(Ray &r) {
-        float tmin , tmax,
-              tymin, tymax,
-              tzmin, tzmax;
+//     bool intersect(Ray &r) {
+//         float tmin , tmax,
+//               tymin, tymax,
+//               tzmin, tzmax;
 
-        //Plano x
-        if (r.invdir.x > 0) {
-            tmin = (min.x - r.o.x) * r.invdir.x;
-            tmax = (max.x - r.o.x) * r.invdir.x;
-        } else {
-            tmin = (max.x - r.o.x) * r.invdir.x;
-            tmax = (min.x - r.o.x) * r.invdir.x;
-        }
-        //Plano y
-        if (r.invdir.y > 0) {
-            tymin = (min.y - r.o.y) * r.invdir.y;
-            tymax = (max.y - r.o.y) * r.invdir.y;
-        } else {
-            tymin = (max.y - r.o.y) * r.invdir.y;
-            tymax = (min.y - r.o.y) * r.invdir.y;
-        }
+//         //Plano x
+//         if (r.invdir.x > 0) {
+//             tmin = (min.x - r.o.x) * r.invdir.x;
+//             tmax = (max.x - r.o.x) * r.invdir.x;
+//         } else {
+//             tmin = (max.x - r.o.x) * r.invdir.x;
+//             tmax = (min.x - r.o.x) * r.invdir.x;
+//         }
+//         //Plano y
+//         if (r.invdir.y > 0) {
+//             tymin = (min.y - r.o.y) * r.invdir.y;
+//             tymax = (max.y - r.o.y) * r.invdir.y;
+//         } else {
+//             tymin = (max.y - r.o.y) * r.invdir.y;
+//             tymax = (min.y - r.o.y) * r.invdir.y;
+//         }
 
-        if (tmin > tymax || tymin > tmax) {
-            return false;
-        }
-        if (tymin > tmin) {
-            tmin = tymin;
-        }
-        if (tymax < tmax) {
-            tmax = tymax;
-        }
+//         if (tmin > tymax || tymin > tmax) {
+//             return false;
+//         }
+//         if (tymin > tmin) {
+//             tmin = tymin;
+//         }
+//         if (tymax < tmax) {
+//             tmax = tymax;
+//         }
 
-        //Plano z
-        if (r.invdir.z > 0) {
-            tzmin = (min.z - r.o.z) * r.invdir.z;
-            tzmax = (max.z - r.o.z) * r.invdir.z;
-        } else {
-            tzmin = (max.z - r.o.z) * r.invdir.z;
-            tzmax = (min.z - r.o.z) * r.invdir.z;
-        }
+//         //Plano z
+//         if (r.invdir.z > 0) {
+//             tzmin = (min.z - r.o.z) * r.invdir.z;
+//             tzmax = (max.z - r.o.z) * r.invdir.z;
+//         } else {
+//             tzmin = (max.z - r.o.z) * r.invdir.z;
+//             tzmax = (min.z - r.o.z) * r.invdir.z;
+//         }
 
-        if (tmin > tzmax || tzmin > tmax) {
-            return false;
-        }
-        if (tzmin > tmin) {
-            tmin = tzmin;
-        }
-        if (tzmax < tmax) {
-            tmax = tzmax;
-        }
+//         if (tmin > tzmax || tzmin > tmax) {
+//             return false;
+//         }
+//         if (tzmin > tmin) {
+//             tmin = tzmin;
+//         }
+//         if (tzmax < tmax) {
+//             tmax = tzmax;
+//         }
 
-        return true;
-    }
-};
+//         return true;
+//     }
+// };
 
 void key_callback(GLFWwindow*, int, int, int, int);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -141,8 +142,8 @@ IsometricCamera camera;
 double xpos, ypos;
 unsigned int swidth, sheight;
 bool imgChanged = false, genImg = true;
-std::vector<BoxS> boxes;
-std::vector<Sphere> spheres = {Sphere(glm::vec3(0,0,-3), 0.5, glm::vec3(0,1,0))};
+// std::vector<BoxS> boxes;
+// std::vector<Sphere> spheres = {Sphere(glm::vec3(0,0,-3), 0.5, glm::vec3(0,1,0))};
 int main(void) {
 	GLFWwindow* window;
 	std::vector<std::unique_ptr<tnw::Model>> models;
@@ -202,7 +203,35 @@ int main(void) {
 
 	camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
+	tnw::Box b(glm::vec3(2.5,3.5,0), 3, 2, 5);
+	tnw::Box b2(glm::vec3(-5,5,-5), 10, 10, 10);
+	tnw::Ray r(glm::vec3(0,3,0), glm::vec3(5,3,0));
+	tnw::Ray r2(glm::vec3(1,-1,1), glm::vec3(-11,11,-11));
+	tnw::Ray r3(glm::vec3(0,1,0), glm::vec3(6,1,0));
+	tnw::IntersectionList il = b.intersect_ray(r);
+	tnw::IntersectionList il2 = b2.intersect_ray(r2);
+	tnw::IntersectionList il3 = b.intersect_ray(r3);
 
+	for (std::tuple<tnw::Color, float> ilel : il) {
+		tnw::Color c;
+		float f;
+		std::tie(c,f) = ilel;
+		std::cout << "color: " << (int)c << " length: " << f << std::endl;
+	}
+	std::cout << "=======\n";
+	for (std::tuple<tnw::Color, float> ilel : il2) {
+		tnw::Color c;
+		float f;
+		std::tie(c,f) = ilel;
+		std::cout << "color: " << (int)c << " length: " << f << std::endl;
+	}
+	std::cout << "=======\n";
+	for (std::tuple<tnw::Color, float> ilel : il3) {
+		tnw::Color c;
+		float f;
+		std::tie(c,f) = ilel;
+		std::cout << "color: " << (int)c << " length: " << f << std::endl;
+	}
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
@@ -213,31 +242,31 @@ int main(void) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (genImg) {
-			std::cout << "Generating image...";
-			std::flush(std::cout);
-			genImg = false;
+			// std::cout << "Generating image...";
+			// std::flush(std::cout);
+			// genImg = false;
 
-			for (unsigned i = 0; i < swidth; i++) {
-				for (unsigned j = 0; j < sheight; j++) {
-					glm::vec3 unprojectedCoords = glm::unProject(glm::vec3(i,j,0), glm::mat4(1.0f), glm::mat4(1.0f), glm::vec4(0,0,swidth,sheight));
-					Ray primRay = Ray::computePrimRay(unprojectedCoords, glm::vec3(0,0,0));
+			// for (unsigned i = 0; i < swidth; i++) {
+			// 	for (unsigned j = 0; j < sheight; j++) {
+			// 		glm::vec3 unprojectedCoords = glm::unProject(glm::vec3(i,j,0), glm::mat4(1.0f), glm::mat4(1.0f), glm::vec4(0,0,swidth,sheight));
+			// 		Ray primRay = Ray::computePrimRay(unprojectedCoords, glm::vec3(0,0,0));
 					
-					for (BoxS& box : boxes) {
-						if (box.intersect(primRay)) {
-							std::cout << "box intersect\n";
-							std::cout << "unproject: " << unprojectedCoords[0] << " " << unprojectedCoords[1] << " " << unprojectedCoords[2] << "\n";
-							std::cout << "primary ray:\n \torigin: " << primRay.o.x << " " << primRay.o.y << " " << primRay.o.z << "\n\t direction: " << primRay.dir.x << " " << primRay.dir.y << " " << primRay.dir.z << "\n";
-							std::flush(std::cout);
-							img(i,j) = std::make_tuple(box.color[0], box.color[1], box.color[2]);
-						} else {
-							img(i,j) = std::make_tuple(1,0,0); 
-						}
-					}
-				}
-			}
-			glTexSubImage2D(GL_TEXTURE_2D, 0 ,0, 0, sheight, swidth, GL_RGB, GL_FLOAT, img);
-			std::cout << " generated image\n";
-			std::flush(std::cout);
+			// 		for (BoxS& box : boxes) {
+			// 			if (box.intersect(primRay)) {
+			// 				std::cout << "box intersect\n";
+			// 				std::cout << "unproject: " << unprojectedCoords[0] << " " << unprojectedCoords[1] << " " << unprojectedCoords[2] << "\n";
+			// 				std::cout << "primary ray:\n \torigin: " << primRay.o.x << " " << primRay.o.y << " " << primRay.o.z << "\n\t direction: " << primRay.dir.x << " " << primRay.dir.y << " " << primRay.dir.z << "\n";
+			// 				std::flush(std::cout);
+			// 				img(i,j) = std::make_tuple(box.color[0], box.color[1], box.color[2]);
+			// 			} else {
+			// 				img(i,j) = std::make_tuple(1,0,0); 
+			// 			}
+			// 		}
+			// 	}
+			// }
+			// glTexSubImage2D(GL_TEXTURE_2D, 0 ,0, 0, sheight, swidth, GL_RGB, GL_FLOAT, img);
+			// std::cout << " generated image\n";
+			// std::flush(std::cout);
 		}
 		
 		glBegin(GL_QUADS);

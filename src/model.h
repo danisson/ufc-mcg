@@ -5,6 +5,7 @@
 #include <string>
 #include <functional>
 #include <memory>
+#include <tuple>
 #include <vector>
 
 namespace tnw {
@@ -25,7 +26,8 @@ enum class Color {
 class Ray {
 public:
 	Ray(glm::vec3 _a, glm::vec3 _b);
-private:
+	float length() const;
+	
 	//Um raio começa no a e termina no b
 	glm::vec3 a, b;
 	glm::vec3 dir, invdir;

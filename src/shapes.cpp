@@ -2,6 +2,7 @@
 #include "octree.h"
 #include "helper.h"
 #include <iostream>
+#include <cmath>
 #include <glm/gtx/string_cast.hpp>
 
 using tnw::Color;
@@ -108,17 +109,90 @@ Color tnw::Box::intersect_box(const BoundingBox& bb) const{
 
 }
 
-bool tnw::Box::clip_line(int, const Ray&, float& f_low, float& f_high) {
+bool tnw::Box::clip_line(int d, const Ray& ray, float& f_low, float& f_high) const {
+	float f_dim_low, f_dim_high, f_aux;
 
+	glm::vec3 minPoint = center - glm::vec3(length/2.f, height/2.f, depth/2.f);
+	std::cout << "minPoint: " << glm::to_string(minPoint) << "\n";
+	glm::vec3 maxPoint = center + glm::vec3(length/2.f, height/2.f, depth/2.f);
+	std::cout << "maxPoint: " << glm::to_string(maxPoint) << "\n";
+	
+	f_dim_low = (minPoint[d] - ray.a[d])/(ray.b[d]-ray.a[d]);
+	f_dim_high = (maxPoint[d] - ray.a[d])/(ray.b[d]-ray.a[d]);
+
+	std::cout << "f_dim_low: " << f_dim_low << " f_dim_high: " << f_dim_high << std::endl;
+	
+	if (f_dim_high < f_dim_low) {
+		f_aux = f_dim_high;
+		f_dim_high = f_dim_low;
+		f_dim_low = f_aux;
+	}
+
+	if (f_dim_high < f_low) {
+		return false;
+	}
+
+	if (f_dim_low > f_high) {
+		return false;
+	}
+
+	f_low = (f_low > f_dim_low) ? f_low : f_dim_low;
+	f_high = (f_high < f_dim_high) ? f_high : f_dim_high;
+
+	if (f_low > f_high) {
+		return false;
+	}
+
+	return true;
 }
 
 IntersectionList tnw::Box::intersect_ray(const Ray& ray) const {
-	glm::vec3 bounds[2];
-	IntersectionList ilist();
+	
+	IntersectionList ilist;
 
-	bounds[0] = center - glm::vec3(length/2.f, height/2.f, depth/2.f);
-	bounds[1] = center + glm::vec3(length/2.f, height/2.f, depth/2.f);
+	float f_low = 0,
+		  f_high = 1;
 
+	float tot_length = ray.length();
+	std::cout << "tot_length: " << tot_length << std::endl;
+	if (!clip_line(0, ray, f_low, f_high)) {
+		std::cout << "Clip line 0\n";
+		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
+		return ilist;
+	}
+	std::cout << "f_low: " << f_low << " f_high: " << f_high << std::endl;
+	if (!clip_line(1, ray, f_low, f_high)) {
+		std::cout << "Clip line 1\n";
+		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
+		return ilist;
+	}
+	std::cout << "f_low: " << f_low << " f_high: " << f_high << std::endl;
+	if (!clip_line(2, ray, f_low, f_high)) {
+		std::cout << "Clip line 2\n";
+		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
+		return ilist;
+	}
+	std::cout << "f_low: " << f_low << " f_high: " << f_high << std::endl;
+
+	float inter_min_length = f_low * tot_length;
+	float inter_max_length = f_high * tot_length;
+	std::cout << "inter_min_length: " << inter_min_length << " inter_max_length: " << inter_max_length << std::endl;
+	//Primeiro pedaço tem o comprimento de 0 até o ponto da primeira interseção
+	ilist.push_back(std::make_tuple(tnw::Color::white, inter_min_length));
+	//Pedaço de dentro tem o comprimeiro do começo da interseção até o final dela
+	//Para sabermos se o pedaço de dentro é cinza/on ou preto/in, temos que ver se ele está perpendicular a 2 eixos de coordenada. Para isso, é só calcularmos a direção do vetor contra eles
+	tnw::Color mid_color = tnw::Color::black;
+	unsigned perp_axis_count = 0;
+	if (!glm::dot(ray.dir, glm::vec3(1,0,0))) { perp_axis_count++; }
+	if (!glm::dot(ray.dir, glm::vec3(0,1,0))) { perp_axis_count++; }
+	if (!glm::dot(ray.dir, glm::vec3(0,0,1))) { perp_axis_count++; }
+	if (perp_axis_count >= 2) { mid_color = tnw::Color::gray; }
+
+	ilist.push_back(std::make_tuple(mid_color, inter_max_length - inter_min_length));
+	//Terceiro pedaço começa no comp máximo da interseção e vai até o final
+	ilist.push_back(std::make_tuple(tnw::Color::white, tot_length - inter_max_length));
+
+	return ilist;
 }
 
 // IntersectionList tnw::Box::intersect_ray(const Ray& ray) const{
