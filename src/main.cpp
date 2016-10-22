@@ -183,14 +183,13 @@ int main(void) {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	auto w = 6;
-	auto h = 6;
+	auto w = 640;
+	auto h = 480;
 	tnw::Image img(w,h);
 
 	for (int i = 0; i < w; ++i) {
 		for (int j = 0; j < h; ++j) {
-			if (i%2 == 0)
-				img(i,j) = std::make_tuple(1,1,1);
+			img(i,j) = std::make_tuple(1,1,1);
 		}
 	}
 
@@ -203,43 +202,7 @@ int main(void) {
 
 	camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
-	tnw::Box b(glm::vec3(2.5,2.5,0), 3, 2, 5);
-	tnw::Box b2(glm::vec3(-5,5,-5), 10, 10, 10);
-	tnw::Ray r(glm::vec3(1,-1,0), glm::vec3(1,6,0));
-	tnw::Ray r2(glm::vec3(1,-1,1), glm::vec3(-11,11,-11));
-	tnw::Ray r3(glm::vec3(0,0,0), glm::vec3(6,0,0));
-	tnw::Ray r4(glm::vec3(1,0,5), glm::vec3(1,0,-2));
-	tnw::IntersectionList il = b.intersect_ray(r);
-	tnw::IntersectionList il2 = b2.intersect_ray(r2);
-	tnw::IntersectionList il3 = b.intersect_ray(r3);
-	tnw::IntersectionList il4 = b.intersect_ray(r4);
-	for (std::tuple<tnw::Color, float> ilel : il) {
-		tnw::Color c;
-		float f;
-		std::tie(c,f) = ilel;
-		std::cout << "color: " << (int)c << " length: " << f << std::endl;
-	}
-	std::cout << "=======\n";
-	for (std::tuple<tnw::Color, float> ilel : il2) {
-		tnw::Color c;
-		float f;
-		std::tie(c,f) = ilel;
-		std::cout << "color: " << (int)c << " length: " << f << std::endl;
-	}
-	std::cout << "=======\n";
-	for (std::tuple<tnw::Color, float> ilel : il3) {
-		tnw::Color c;
-		float f;
-		std::tie(c,f) = ilel;
-		std::cout << "color: " << (int)c << " length: " << f << std::endl;
-	}
-		std::cout << "=======\n";
-	for (std::tuple<tnw::Color, float> ilel : il4) {
-		tnw::Color c;
-		float f;
-		std::tie(c,f) = ilel;
-		std::cout << "color: " << (int)c << " length: " << f << std::endl;
-	}
+
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
@@ -250,9 +213,19 @@ int main(void) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (genImg) {
+			std::cout << "Generating image...\n";
+			std::flush(std::cout);
 			// std::cout << "Generating image...";
 			// std::flush(std::cout);
-			// genImg = false;
+			genImg = false;
+
+			for (int i = 0; i < w; ++i)
+			{
+				for (int i = 0; i < count; ++i)
+				{
+					/* code */
+				}
+			}
 
 			// for (unsigned i = 0; i < swidth; i++) {
 			// 	for (unsigned j = 0; j < sheight; j++) {

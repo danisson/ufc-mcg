@@ -44,7 +44,47 @@ Color tnw::Sphere::intersect_box(const BoundingBox& bb) const{
 }
 
 IntersectionList tnw::Sphere::intersect_ray(const Ray& ray) const {
-	return IntersectionList();
+	glm::vec3 normDir = glm::normalize(ray.dir);
+	std::cout << "normDir: " << glm::to_string(normDir) << "\n";
+	float length = ray.length();
+	IntersectionList ilist;
+
+	glm::vec3 distCenter = ray.a-center;
+	float sqrRadius = radius*radius;
+
+	std::cout << "DistCenter: " << glm::to_string(distCenter) << "\n";
+
+	float normDotCenter = glm::dot(normDir, distCenter);
+	float normDotCenterSqr = normDotCenter*normDotCenter; 
+	float termDir = normDotCenterSqr - glm::dot(distCenter, distCenter) + sqrRadius;
+
+	std::cout << "termDir: " << termDir << "\n";
+	float d0 = -glm::dot(normDir, distCenter);
+	std::cout << "d0: " << d0 << "\n"; 
+	float dmin, dmax;
+
+	if (termDir < 0) {
+		//Não interseciona
+		ilist.push_back(std::make_tuple(tnw::Color::white, length));
+	} else if (termDir == 0 && d0 <= length) {
+		//Interseciona 1 ponto
+		dmin = d0;
+		ilist.push_back(std::make_tuple(tnw::Color::white, d0));
+		ilist.push_back(std::make_tuple(tnw::Color::white, length-d0));
+	} else if (termDir > 0 && d0 <= length) {
+		//Interseciona 2 pontos
+		dmin = d0 - std::sqrt(termDir);
+		dmax = d0 + std::sqrt(termDir);
+		dmax = std::fmin(dmax, length);
+
+		ilist.push_back(std::make_tuple(tnw::Color::white, dmin));
+		ilist.push_back(std::make_tuple(tnw::Color::black, dmax-dmin));
+		ilist.push_back(std::make_tuple(tnw::Color::white, length-dmax));
+	} else {
+		ilist.push_back(std::make_tuple(tnw::Color::white, length));
+	}
+
+	return ilist;
 }
 
 // ------------------------------------------------------------------------- //
