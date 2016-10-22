@@ -136,10 +136,8 @@ bool tnw::Box::clip_line(int d, const Ray& ray, float& f_low, float& f_high) con
 		return false;
 	}
 
-	// f_low = (f_low > f_dim_low) ? f_low : f_dim_low;
-	f_low = std::fmin(f_low, f_dim_low);
-	// f_high = (f_high < f_dim_high) ? f_high : f_dim_high;
-	f_high = std::fmax(f_high, f_dim_high);
+	f_low = std::fmax(f_low, f_dim_low);
+	f_high = std::fmin(f_high, f_dim_high);
 	if (f_low > f_high) {
 		return false;
 	}
@@ -153,132 +151,44 @@ IntersectionList tnw::Box::intersect_ray(const Ray& ray) const {
 
 	float f_low = 0,
 		  f_high = 1;
-
-	bool xperp= false, yperp = false, zperp = false;
-
 	float tot_length = ray.length();
-	std::cout << "tot_length: " << tot_length << std::endl;
-
-	unsigned perp_axis_count = 0;
-	if (!glm::dot(ray.dir, glm::vec3(1,0,0))) { perp_axis_count++; xperp = true}
-	if (!glm::dot(ray.dir, glm::vec3(0,1,0))) { perp_axis_count++; yperp = true}
-	if (!glm::dot(ray.dir, glm::vec3(0,0,1))) { perp_axis_count++; zperp = true}
-	if (perp_axis_count >= 2) {
-		
-		//Paralelo ao eixo x
-		if (!xperp) {
-
-		}
-
-		//Paralelo ao eixo y
-		if (!yperp) {
-
-		}	
-
-		//Paralelo ao eixo z
-		if (!zperp) {
-
-		}		
-	}
 
 	if (!clip_line(0, ray, f_low, f_high)) {
-		std::cout << "Clip line 0\n";
 		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
 		return ilist;
 	}
-	std::cout << "f_low: " << f_low << " f_high: " << f_high << std::endl;
 	if (!clip_line(1, ray, f_low, f_high)) {
-		std::cout << "Clip line 1\n";
 		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
 		return ilist;
 	}
-	std::cout << "f_low: " << f_low << " f_high: " << f_high << std::endl;
 	if (!clip_line(2, ray, f_low, f_high)) {
-		std::cout << "Clip line 2\n";
 		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
 		return ilist;
 	}
-	std::cout << "f_low: " << f_low << " f_high: " << f_high << std::endl;
 
 	float inter_min_length = f_low * tot_length;
 	float inter_max_length = f_high * tot_length;
-	
-	if (std::isinf(inter_min_length)) {
 
-	}
-	if (std::isinf(inter_max_length)) {
-
-	}
-
-
-	std::cout << "inter_min_length: " << inter_min_length << " inter_max_length: " << inter_max_length << std::endl;
 	//Primeiro pedaço tem o comprimento de 0 até o ponto da primeira interseção
 	ilist.push_back(std::make_tuple(tnw::Color::white, inter_min_length));
 	//Pedaço de dentro tem o comprimeiro do começo da interseção até o final dela
 	//Para sabermos se o pedaço de dentro é cinza/on ou preto/in, temos que ver se ele está perpendicular a 2 eixos de coordenada. Para isso, é só calcularmos a direção do vetor contra eles
 	tnw::Color mid_color = tnw::Color::black;
 
-	if (perp_axis_count >= 2) { mid_color = tnw::Color::gray; }
+	unsigned perp_axis_count = 0;
+	if (!glm::dot(ray.dir, glm::vec3(1,0,0))) { perp_axis_count++; }
+	if (!glm::dot(ray.dir, glm::vec3(0,1,0))) { perp_axis_count++; }
+	if (!glm::dot(ray.dir, glm::vec3(0,0,1))) { perp_axis_count++; }
 
+	if (perp_axis_count >= 2) { mid_color = tnw::Color::gray; }
 	ilist.push_back(std::make_tuple(mid_color, inter_max_length - inter_min_length));
+
 	//Terceiro pedaço começa no comp máximo da interseção e vai até o final
 	ilist.push_back(std::make_tuple(tnw::Color::white, tot_length - inter_max_length));
 
 	return ilist;
 }
 
-// IntersectionList tnw::Box::intersect_ray(const Ray& ray) const{
-// 	float tmin, tmax, txmin, txmax tymin, tzmin, tzmax;
-// 	glm::vec3 bounds[2];
-// 	int sign[3];
-// 	IntersectionList ilist();
-
-// 	bounds[0] = center - {width/2.f, height/2.f, depth/2.f};
-// 	bounds[1] = center + {width/2.f, height/2.f, depth/2.f};
-	
-// 	sign[0] = (ray.invdir.x < 0);
-// 	sign[1] = (ray.invdir.y < 0);
-// 	sign[2] = (ray.invdir.z < 0);
-
-// 	tmin = txmin = (bounds[sign[0]].x - ray.a.x) * ray.invdir.x;
-// 	tmax = txmax = (bounds[1-sign[0]].x - ray.a.x) * ray.invdir.x;
-// 	tymin = (bounds[sign[1]].y - ray.a.y) * ray.invdir.y;
-// 	tymax = (bounds[1-sign[1]].y - ray.a.y) * ray.invdir.y;
-
-// 	if ((tmin > tymax) || (tymin > tmax)) {
-// 		//Não interseciona, logo o comprimento é o raio todo
-// 		float length = (ray.b-ray.a).length();
-// 		ilist.push_back(std::make_tuple(tnw::Color::white, length));
-// 		return ilist;
-// 	}
-// 	if (tymin > tmin) {
-// 		tmin = tymin;
-// 	}
-// 	if (tymax < tmax) {
-// 		tmax = tymax;
-// 	}
-
-// 	tzmin = (bounds[sign[2]].z - ray.a.z) * ray.invdir.z;
-// 	tzmax = (bounds[1-sign[2]].z - ray.a.z) * ray.invdir.z;
-
-// 	if ((tmin > tzmax) || (tzmin > tmax)) {
-// 		//Não interseciona, logo o comprimento é o raio todo
-// 		float length = (ray.b-ray.a).length();
-// 		ilist.push_back(std::make_tuple(tnw::Color::white, length));
-// 		return ilist;	
-// 	}
-// 	if (tzmin > tmin) {
-// 		tmin = tzmin;
-// 	}
-// 	if (tzmax < tmax) {
-// 		tmax = tzmax;
-// 	}
-
-// 	std::cout << "txmin: " << txmin << "txmax: " << txmax << "tymin: " << tymin << "tymax: " << tymax << "tzmin: " << tzmin << "tzmax: " << tzmax << std::endl << "tmin: " << tmin << "tmax: " << tmax << std::endl;
-
-// 	//Tem interseção
-// 	return IntersectionList();
-// }
 // ------------------------------------------------------------------------- //
 tnw::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
 

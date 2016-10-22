@@ -208,10 +208,11 @@ int main(void) {
 	tnw::Ray r(glm::vec3(1,-1,0), glm::vec3(1,6,0));
 	tnw::Ray r2(glm::vec3(1,-1,1), glm::vec3(-11,11,-11));
 	tnw::Ray r3(glm::vec3(0,0,0), glm::vec3(6,0,0));
+	tnw::Ray r4(glm::vec3(1,0,5), glm::vec3(1,0,-2));
 	tnw::IntersectionList il = b.intersect_ray(r);
 	tnw::IntersectionList il2 = b2.intersect_ray(r2);
 	tnw::IntersectionList il3 = b.intersect_ray(r3);
-
+	tnw::IntersectionList il4 = b.intersect_ray(r4);
 	for (std::tuple<tnw::Color, float> ilel : il) {
 		tnw::Color c;
 		float f;
@@ -227,6 +228,13 @@ int main(void) {
 	}
 	std::cout << "=======\n";
 	for (std::tuple<tnw::Color, float> ilel : il3) {
+		tnw::Color c;
+		float f;
+		std::tie(c,f) = ilel;
+		std::cout << "color: " << (int)c << " length: " << f << std::endl;
+	}
+		std::cout << "=======\n";
+	for (std::tuple<tnw::Color, float> ilel : il4) {
 		tnw::Color c;
 		float f;
 		std::tie(c,f) = ilel;
