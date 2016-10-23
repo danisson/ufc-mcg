@@ -1,5 +1,6 @@
 #include "model.h"
 #include "helper.h"
+#include "csgtree.h"
 #include "interface.h"
 
 #include <GLFW/glfw3.h>

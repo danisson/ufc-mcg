@@ -36,6 +36,8 @@ struct BoundingBox : public Shape {
 	float depth;
 	BoundingBox(glm::vec3 _corner, float _depth);
 	void draw() const;
+	void translate(const glm::vec3& dv);
+	void scale(const float dx);
 	BoundingBox operator[](size_t position) const;
 	glm::vec3 getVertice(unsigned int i) const;
 	glm::vec3 getCenter() const;
@@ -56,6 +58,7 @@ public:
 	bool visible = true;
 	void toggle() {visible = !visible;}
 	void draw() const {if(visible) this->rdraw();}
+	virtual owner_ptr<Model> clone() const;
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
 	virtual void scale(const float dx) = 0;

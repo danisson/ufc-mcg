@@ -39,6 +39,9 @@ bin/octree.o: src/octree.cpp src/model.h
 bin/shapes.o: src/shapes.cpp src/shapes.h src/model.h
 		$(CC) $(CFLAGS) -c src/shapes.cpp -o bin/shapes.o
 
+bin/csgtree.o: src/csgtree.cpp src/csgtree.h src/shapes.h src/model.h
+		$(CC) $(CFLAGS) -c src/csgtree.cpp -o bin/csgtree.o
+
 bin/helper.o: src/helper.cpp src/helper.h src/octree.h
 	$(CC) $(CFLAGS) -c src/helper.cpp -o bin/helper.o
 
