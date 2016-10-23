@@ -23,11 +23,9 @@ tnw::octree::Tree::Tree(Tree* parent) {
 
 	std::uniform_real_distribution<> dis(0,1);
 
-	for (int i = 0; i < 3; ++i)
-	{
+	for (int i = 0; i < 3; ++i) {
 		drawColor[i] = dis(gen);
 	}
-
 }
 
 tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
@@ -48,7 +46,6 @@ tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
 	for (int i = 0; i < 3; ++i) {
 		drawColor[i] = dis(gen);
 	}
-
 }
 
 tnw::octree::Tree::Tree(const Tree& o) {

@@ -60,12 +60,11 @@ void tnw::BoundingBox::draw() const{
 }
 
 void tnw::BoundingBox::translate(const glm::vec3& dv) {
-	center += dv;
+	corner += dv;
 }
 
 void tnw::BoundingBox::scale(const float dx) {
-	for (auto&& i : center)
-		i += (depth*dx-depth)/2;
+	corner += (depth*dx-depth)/2;
 	depth *= dx;
 }
 

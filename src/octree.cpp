@@ -12,7 +12,7 @@ using namespace tnw::octree;
 //Octree com raiz vazia
 tnw::Octree::Octree(const BoundingBox& _bb) : bb(_bb) {}
 //Octree com raiz pronta
-tnw::Octree::Octree(std::unique_ptr<Tree> tree, const BoundingBox& _bb) : bb(_bb) {}
+tnw::Octree::Octree(std::unique_ptr<Tree>&& tree, const BoundingBox& _bb) : tree(std::move(tree)), bb(_bb) {}
 //Octree a partir de um forma e uma Bounding Box
 tnw::Octree::Octree(const Shape& s, const BoundingBox& _bb, unsigned int depth) : bb(_bb) {
 	tree = std::unique_ptr<Tree>(octree::classify(s, _bb, depth, 0));
@@ -23,6 +23,12 @@ tnw::Octree::Octree(FILE *f) : bb(glm::vec3(), 1) {
 	fscanf(f,"%f,%f,%f,%f ",&x,&y,&z,&d);
 	bb = BoundingBox({x,y,z},d);
 	tree = unique_ptr<Tree>(make_from_file(f));
+}
+
+owner_ptr<Model> tnw::Octree::clone() const {
+	auto c = new Octree(bb);
+	c->tree.reset(new Tree(*tree));
+	return c;
 }
 
 void tnw::Octree::rdraw() const {

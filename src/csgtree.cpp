@@ -104,6 +104,7 @@ void tnw::CSGTree::rdraw() const {throw 0;}
 Color tnw::CSGTree::intersect_point(const glm::vec3& x) const {
 	return root->intersect_point(x);
 }
+
 Color tnw::CSGTree::intersect_box(const BoundingBox& x) const {
 	return root->intersect_box(x);
 }

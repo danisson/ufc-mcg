@@ -58,7 +58,7 @@ public:
 	bool visible = true;
 	void toggle() {visible = !visible;}
 	void draw() const {if(visible) this->rdraw();}
-	virtual owner_ptr<Model> clone() const;
+	virtual owner_ptr<Model> clone() const = 0;
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
 	virtual void scale(const float dx) = 0;

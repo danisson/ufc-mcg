@@ -51,11 +51,13 @@ namespace octree {
 		//Octree com raiz vazia
 		Octree(const BoundingBox& _bb);
 		//Octree com raiz pronta
-		Octree(std::unique_ptr<octree::Tree> tree, const BoundingBox& _bb);
+		Octree(std::unique_ptr<octree::Tree>&& tree, const BoundingBox& _bb);
 		//Octree a partir de um forma e uma Bounding Box
 		Octree(const Shape& c, const BoundingBox& _bb, unsigned int depth);
 		//Octree a partir de um arquivo
 		Octree(FILE *f);
+
+		owner_ptr<Model> clone() const override;
 
 		void setColor(float c[3]) override;
 

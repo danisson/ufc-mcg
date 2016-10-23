@@ -69,6 +69,7 @@ public:
 	// Geometric analysis
 	double volume() const override;
 	// Model
+	virtual owner_ptr<Model> clone() const;
 	// Geometric operations
 	void translate(const glm::vec3& dv) override;
 	void scale(const float dx) override;
