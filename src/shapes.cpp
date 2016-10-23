@@ -55,12 +55,12 @@ IntersectionList tnw::Sphere::intersect_ray(const Ray& ray) const {
 	std::cout << "DistCenter: " << glm::to_string(distCenter) << "\n";
 
 	float normDotCenter = glm::dot(normDir, distCenter);
-	float normDotCenterSqr = normDotCenter*normDotCenter; 
+	float normDotCenterSqr = normDotCenter*normDotCenter;
 	float termDir = normDotCenterSqr - glm::dot(distCenter, distCenter) + sqrRadius;
 
 	std::cout << "termDir: " << termDir << "\n";
 	float d0 = -glm::dot(normDir, distCenter);
-	std::cout << "d0: " << d0 << "\n"; 
+	std::cout << "d0: " << d0 << "\n";
 	float dmin, dmax;
 
 	if (termDir < 0) {
@@ -156,12 +156,12 @@ bool tnw::Box::clip_line(int d, const Ray& ray, float& f_low, float& f_high) con
 	std::cout << "minPoint: " << glm::to_string(minPoint) << "\n";
 	glm::vec3 maxPoint = center + glm::vec3(length/2.f, height/2.f, depth/2.f);
 	std::cout << "maxPoint: " << glm::to_string(maxPoint) << "\n";
-	
+
 	f_dim_low = (minPoint[d] - ray.a[d])/(ray.b[d]-ray.a[d]);
 	f_dim_high = (maxPoint[d] - ray.a[d])/(ray.b[d]-ray.a[d]);
 
 	std::cout << "f_dim_low: " << f_dim_low << " f_dim_high: " << f_dim_high << std::endl;
-	
+
 	if (f_dim_high < f_dim_low) {
 		f_aux = f_dim_high;
 		f_dim_high = f_dim_low;
@@ -186,7 +186,7 @@ bool tnw::Box::clip_line(int d, const Ray& ray, float& f_low, float& f_high) con
 }
 
 IntersectionList tnw::Box::intersect_ray(const Ray& ray) const {
-	
+
 	IntersectionList ilist;
 
 	float f_low = 0,
