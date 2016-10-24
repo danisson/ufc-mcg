@@ -16,6 +16,8 @@
 #include <math.h>
 #include <vector>
 #include <sstream>
+#include <limits>
+#include <glm/gtx/string_cast.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #undef near
@@ -141,17 +143,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 IsometricCamera camera;
 double xpos, ypos;
 unsigned int swidth, sheight;
-bool imgChanged = false, genImg = true;
+bool imgChanged = false, genImg = false;
 
-struct RayCast
+struct Raycast
 {
-	float width, height;
-	int npixels_w, npixels_h;
-	float dx, dy;
+	int width, height;
+	float dx, dy, near, far;
 
-	RayCast(float _width, float _height, int _npixels_w, int _npixels_h) : width(_width), height(_height), npixels_w(_npixels_w), npixels_h(_npixels_h) {
-		dx = width/npixels_w;
-		dy = height/_npixels_h; 
+	Raycast(int _width, int _height, float _near, float _far) : width(_width), height(_height), near(_near), far(_far) {
+		dx = 1/_width;
+		dy = 1/_height; 
 	}
 };
 
@@ -198,15 +199,23 @@ int main(void) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	auto w = 640;
 	auto h = 480;
-	tnw::Image img(w,h);
+	Raycast rc(2,2,1,-100);
+	tnw::Image img(rc.width,rc.height);
 
-	for (int i = 0; i < w; ++i) {
-		for (int j = 0; j < h; ++j) {
-			img(i,j) = std::make_tuple(1,1,1);
-		}
-	}
+	// for (int i = 0; i < rc.width; ++i) {
+	// 	for (int j = 0; j < rc.height; ++j) {
+	// 		if (j%5==0) 
+	// 			img(i,j) = std::make_tuple(0,1,1);
+	// 		else 
+	// 			img(i,j) = std::make_tuple(1,0,1);
+	// 	}
+	// }
+	img(0,0) = std::make_tuple(1,0,0);
+	img(0,1) = std::make_tuple(0,1,0);
+	img(1,0) = std::make_tuple(0,0,1);
+	img(1,1) = std::make_tuple(1,0,1);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_FLOAT, img);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, rc.width, rc.height, 0, GL_RGB, GL_FLOAT, img);
 
 	//Set callbacks
 	glfwSetKeyCallback(window, key_callback);
@@ -215,6 +224,23 @@ int main(void) {
 
 	camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
+
+	std::vector<tnw::Shape*> scene;
+	tnw::Shape *obj1 = new tnw::Sphere(glm::vec3(0,0,-1),0.5); 
+	scene.push_back(obj1);
+	scene.push_back(new tnw::Box(glm::vec3(4,1,-3),1,1,1));
+
+	std::cout << "SPHERE TEST\n";
+	tnw::Ray r(glm::vec3(0,0,1), glm::vec3(0,0,-100));
+	tnw::IntersectionList il5 = obj1->intersect_ray(r);
+	for (std::tuple<tnw::Color, float> ilel : il5) {
+		tnw::Color c;
+		float f;
+		std::tie(c,f) = ilel;
+		std::cout << "color: " << (int)c << " length: " << f << std::endl;
+	}
+	std::cout << "==================\n";
+
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
@@ -232,13 +258,39 @@ int main(void) {
 			// std::flush(std::cout);
 			genImg = false;
 
-			for (int i = 0; i < w; ++i)
+			for (int i = 0; i < rc.width; ++i)
 			{
-				for (int j = 0; j < h; ++j)
+				for (int j = 0; j < rc.height; ++j)
 				{
+					float pospixx, pospixy;
+					pospixx = -2.f*(1.f/2.f - ((float)i)/rc.width);
+					pospixy = 2.f*(1.f/2.f - ((float)j)/rc.height);
+					glm::vec3 a(pospixx, pospixy, rc.near);
+					glm::vec3 b(pospixx, pospixy, rc.far);
+					
+					tnw::Ray r = tnw::Ray(a,b);
 
-					glm::vec3 unprojectedCoords = glm::unProject(glm::vec3(i,j,0), glm::mat4(1.0f), glm::mat4(1.0f), glm::vec4(0,0,w,h));
-					tnw::Ray r = tnw::Ray()
+					float minInter = rc.far;
+					int drawIndice = -1;
+					for (int k = 0; k < scene.size(); k++) {
+						tnw::IntersectionList ilist = scene[k]->intersect_ray(r);
+						if (ilist.size() >= 2) {
+							if (minInter < std::abs(std::get<1>(ilist[0]))) {
+								minInter = std::abs(std::get<1>(ilist[0]));
+								drawIndice = k;
+							}
+						} 
+					}
+
+					if (drawIndice >= 0) {
+
+						std::cout << "\ni: " << i << " j: " << j << " drawIndice: " << drawIndice;
+						tnw::IntersectionList ilist = scene[0]->intersect_ray(r);
+						std::cout << "\nilist size: " << ilist.size();
+						std::cout << "\na: " << glm::to_string(a) << "\nb: " << glm::to_string(b) << "\n";
+
+						img(i,j) = std::make_tuple(0,0,0);
+					}
 				}
 			}
 
@@ -260,9 +312,9 @@ int main(void) {
 			// 		}
 			// 	}
 			// }
-			// glTexSubImage2D(GL_TEXTURE_2D, 0 ,0, 0, sheight, swidth, GL_RGB, GL_FLOAT, img);
-			// std::cout << " generated image\n";
-			// std::flush(std::cout);
+			glTexSubImage2D(GL_TEXTURE_2D, 0 ,0, 0, rc.width, rc.height, GL_RGB, GL_FLOAT, img);
+			std::cout << " generated image\n";
+			std::flush(std::cout);
 		}
 
 		glBegin(GL_QUADS);

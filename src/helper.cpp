@@ -103,13 +103,13 @@ float  tnw::Image::operator()(size_t i, size_t j, size_t k) const{
 }
 
 std::tuple<float&,float&,float&> tnw::Image::operator()(size_t i, size_t j) {
-	return std::tie(data[  i*3+j*w*3],
-	                data[1+i*3+j*w*3],
-	                data[2+i*3+j*w*3]);
+	return std::tie(data[  j*3+i*w*3],
+	                data[1+j*3+i*w*3],
+	                data[2+j*3+i*w*3]);
 }
 
 std::tuple<float,float,float> tnw::Image::operator()(size_t i, size_t j) const {
-	return std::make_tuple(data[  i*3+j*w*3],
-	                       data[1+i*3+j*w*3],
-	                       data[2+i*3+j*w*3]);
+	return std::make_tuple(data[  j*3+i*w*3],
+	                       data[1+j*3+i*w*3],
+	                       data[2+j*3+i*w*3]);
 }
