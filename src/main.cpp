@@ -35,30 +35,30 @@
 //     }
 // };
 
-// class Sphere 
-// { 
-// public: 
-//     glm::vec3 center;                           /// position of the sphere 
-//     float radius, radius2;                  /// sphere radius and radius^2 
-//     glm::vec3 surfaceColor, emissionColor;      /// surface color and emission (light) 
-//     float transparency, reflection;         /// surface transparency and reflectivity 
-//     Sphere( 
-//         const glm::vec3 &c, 
-//         const float &r, 
-//         const glm::vec3 &sc) : 
+// class Sphere
+// {
+// public:
+//     glm::vec3 center;                           /// position of the sphere
+//     float radius, radius2;                  /// sphere radius and radius^2
+//     glm::vec3 surfaceColor, emissionColor;      /// surface color and emission (light)
+//     float transparency, reflection;         /// surface transparency and reflectivity
+//     Sphere(
+//         const glm::vec3 &c,
+//         const float &r,
+//         const glm::vec3 &sc) :
 //         center(c), radius(r), radius2(r * r), surfaceColor(sc)
-//     { /* empty */ } 
-//     bool intersect(const glm::vec3 &rayorig, const glm::vec3 &raydir) const 
-//     { 
-//         glm::vec3 l = center - rayorig; 
-//         float tca = glm::dot(l, raydir); 
-//         if (tca < 0) return false; 
-//         float d2 = glm::dot(l,l) - tca * tca; 
-//         if (d2 > radius2) return false; 
-//         float thc = sqrt(radius2 - d2);  
-//         return true; 
-//     } 
-// }; 
+//     { /* empty */ }
+//     bool intersect(const glm::vec3 &rayorig, const glm::vec3 &raydir) const
+//     {
+//         glm::vec3 l = center - rayorig;
+//         float tca = glm::dot(l, raydir);
+//         if (tca < 0) return false;
+//         float d2 = glm::dot(l,l) - tca * tca;
+//         if (d2 > radius2) return false;
+//         float thc = sqrt(radius2 - d2);
+//         return true;
+//     }
+// };
 
 // struct BoxS {
 //     //Ponto máximo e mínimo da caixa
@@ -246,7 +246,7 @@ int main(void) {
 			// 	for (unsigned j = 0; j < sheight; j++) {
 			// 		glm::vec3 unprojectedCoords = glm::unProject(glm::vec3(i,j,0), glm::mat4(1.0f), glm::mat4(1.0f), glm::vec4(0,0,swidth,sheight));
 			// 		Ray primRay = Ray::computePrimRay(unprojectedCoords, glm::vec3(0,0,0));
-					
+
 			// 		for (BoxS& box : boxes) {
 			// 			if (box.intersect(primRay)) {
 			// 				std::cout << "box intersect\n";
@@ -255,7 +255,7 @@ int main(void) {
 			// 				std::flush(std::cout);
 			// 				img(i,j) = std::make_tuple(box.color[0], box.color[1], box.color[2]);
 			// 			} else {
-			// 				img(i,j) = std::make_tuple(1,0,0); 
+			// 				img(i,j) = std::make_tuple(1,0,0);
 			// 			}
 			// 		}
 			// 	}
@@ -264,7 +264,7 @@ int main(void) {
 			// std::cout << " generated image\n";
 			// std::flush(std::cout);
 		}
-		
+
 		glBegin(GL_QUADS);
 		glTexCoord2d(0, 1);
 		glVertex2f(-1.,-1.);
@@ -304,6 +304,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		
+
 	}
 }
