@@ -142,6 +142,19 @@ IsometricCamera camera;
 double xpos, ypos;
 unsigned int swidth, sheight;
 bool imgChanged = false, genImg = true;
+
+struct RayCast
+{
+	float width, height;
+	int npixels_w, npixels_h;
+	float dx, dy;
+
+	RayCast(float _width, float _height, int _npixels_w, int _npixels_h) : width(_width), height(_height), npixels_w(_npixels_w), npixels_h(_npixels_h) {
+		dx = width/npixels_w;
+		dy = height/_npixels_h; 
+	}
+};
+
 // std::vector<BoxS> boxes;
 // std::vector<Sphere> spheres = {Sphere(glm::vec3(0,0,-3), 0.5, glm::vec3(0,1,0))};
 int main(void) {
@@ -221,9 +234,11 @@ int main(void) {
 
 			for (int i = 0; i < w; ++i)
 			{
-				for (int i = 0; i < count; ++i)
+				for (int j = 0; j < h; ++j)
 				{
-					/* code */
+
+					glm::vec3 unprojectedCoords = glm::unProject(glm::vec3(i,j,0), glm::mat4(1.0f), glm::mat4(1.0f), glm::vec4(0,0,w,h));
+					tnw::Ray r = tnw::Ray()
 				}
 			}
 
