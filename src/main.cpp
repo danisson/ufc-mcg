@@ -143,7 +143,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 IsometricCamera camera;
 double xpos, ypos;
 unsigned int swidth, sheight;
-bool imgChanged = false, genImg = false;
+bool imgChanged = false, genImg = true;
 
 struct Raycast
 {
@@ -199,21 +199,26 @@ int main(void) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	auto w = 640;
 	auto h = 480;
-	Raycast rc(2,2,1,-100);
+	Raycast rc(100,200,1,-100);
 	tnw::Image img(rc.width,rc.height);
 
-	// for (int i = 0; i < rc.width; ++i) {
-	// 	for (int j = 0; j < rc.height; ++j) {
-	// 		if (j%5==0) 
-	// 			img(i,j) = std::make_tuple(0,1,1);
-	// 		else 
-	// 			img(i,j) = std::make_tuple(1,0,1);
-	// 	}
-	// }
-	img(0,0) = std::make_tuple(1,0,0);
-	img(0,1) = std::make_tuple(0,1,0);
-	img(1,0) = std::make_tuple(0,0,1);
-	img(1,1) = std::make_tuple(1,0,1);
+	for (int i = 0; i < rc.width; ++i) {
+		for (int j = 0; j < rc.height; ++j) {
+			std::cout << "i: " << i << "j: " <<  j << "\n";
+			if (j%5==0) {
+				img(i,j) = std::make_tuple(0,1,1);
+			}
+			else {
+				img(i,j) = std::make_tuple(1,0,1);
+			}
+
+		}
+	}
+	genImg = true;
+	// img(0,0) = std::make_tuple(1,0,0);
+	// img(0,1) = std::make_tuple(0,1,0);
+	// img(1,0) = std::make_tuple(0,0,1);
+	// img(1,1) = std::make_tuple(1,0,1);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, rc.width, rc.height, 0, GL_RGB, GL_FLOAT, img);
 
@@ -285,9 +290,9 @@ int main(void) {
 					if (drawIndice >= 0) {
 
 						std::cout << "\ni: " << i << " j: " << j << " drawIndice: " << drawIndice;
-						tnw::IntersectionList ilist = scene[0]->intersect_ray(r);
-						std::cout << "\nilist size: " << ilist.size();
-						std::cout << "\na: " << glm::to_string(a) << "\nb: " << glm::to_string(b) << "\n";
+						// tnw::IntersectionList ilist = scene[0]->intersect_ray(r);
+						// std::cout << "\nilist size: " << ilist.size();
+						// std::cout << "\na: " << glm::to_string(a) << "\nb: " << glm::to_string(b) << "\n";
 
 						img(i,j) = std::make_tuple(0,0,0);
 					}
