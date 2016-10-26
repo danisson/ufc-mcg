@@ -24,118 +24,6 @@
 #undef far
 #endif
 
-// struct Ray {
-//     glm::vec3 o, dir, invdir;
-
-//     Ray(glm::vec3 _o, glm::vec3 _dir){
-//         o = _o;
-//         dir = _dir;
-//         invdir = glm::vec3(1,1,1)/_dir;
-//     }
-//     static Ray computePrimRay(glm::vec3 pixel, glm::vec3 eye) {
-//         return Ray(pixel, pixel - eye);
-//     }
-// };
-
-// class Sphere
-// {
-// public:
-//     glm::vec3 center;                           /// position of the sphere
-//     float radius, radius2;                  /// sphere radius and radius^2
-//     glm::vec3 surfaceColor, emissionColor;      /// surface color and emission (light)
-//     float transparency, reflection;         /// surface transparency and reflectivity
-//     Sphere(
-//         const glm::vec3 &c,
-//         const float &r,
-//         const glm::vec3 &sc) :
-//         center(c), radius(r), radius2(r * r), surfaceColor(sc)
-//     { /* empty */ }
-//     bool intersect(const glm::vec3 &rayorig, const glm::vec3 &raydir) const
-//     {
-//         glm::vec3 l = center - rayorig;
-//         float tca = glm::dot(l, raydir);
-//         if (tca < 0) return false;
-//         float d2 = glm::dot(l,l) - tca * tca;
-//         if (d2 > radius2) return false;
-//         float thc = sqrt(radius2 - d2);
-//         return true;
-//     }
-// };
-
-// struct BoxS {
-//     //Ponto máximo e mínimo da caixa
-//     glm::vec3 min, max;
-//     float color[3];
-
-//     BoxS(glm::vec3 _min, glm::vec3 _max){
-//         min = _min;
-//         max = _max;
-//         color[0] = 0.0f; color[1] = 0.0f; color[2] = 1.0f;
-//     }
-
-//     BoxS(glm::vec3 _min, glm::vec3 _max, float _color[3]){
-//         min = _min;
-//         max = _max;
-//         color[0] = _color[0];
-//         color[1] = _color[1];
-//         color[2] = _color[2];
-//     }
-
-//     bool intersect(Ray &r) {
-//         float tmin , tmax,
-//               tymin, tymax,
-//               tzmin, tzmax;
-
-//         //Plano x
-//         if (r.invdir.x > 0) {
-//             tmin = (min.x - r.o.x) * r.invdir.x;
-//             tmax = (max.x - r.o.x) * r.invdir.x;
-//         } else {
-//             tmin = (max.x - r.o.x) * r.invdir.x;
-//             tmax = (min.x - r.o.x) * r.invdir.x;
-//         }
-//         //Plano y
-//         if (r.invdir.y > 0) {
-//             tymin = (min.y - r.o.y) * r.invdir.y;
-//             tymax = (max.y - r.o.y) * r.invdir.y;
-//         } else {
-//             tymin = (max.y - r.o.y) * r.invdir.y;
-//             tymax = (min.y - r.o.y) * r.invdir.y;
-//         }
-
-//         if (tmin > tymax || tymin > tmax) {
-//             return false;
-//         }
-//         if (tymin > tmin) {
-//             tmin = tymin;
-//         }
-//         if (tymax < tmax) {
-//             tmax = tymax;
-//         }
-
-//         //Plano z
-//         if (r.invdir.z > 0) {
-//             tzmin = (min.z - r.o.z) * r.invdir.z;
-//             tzmax = (max.z - r.o.z) * r.invdir.z;
-//         } else {
-//             tzmin = (max.z - r.o.z) * r.invdir.z;
-//             tzmax = (min.z - r.o.z) * r.invdir.z;
-//         }
-
-//         if (tmin > tzmax || tzmin > tmax) {
-//             return false;
-//         }
-//         if (tzmin > tmin) {
-//             tmin = tzmin;
-//         }
-//         if (tzmax < tmax) {
-//             tmax = tzmax;
-//         }
-
-//         return true;
-//     }
-// };
-
 void key_callback(GLFWwindow*, int, int, int, int);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
@@ -147,12 +35,12 @@ bool imgChanged = false, genImg = true;
 
 struct Raycast
 {
-	int width, height;
+	size_t width, height;
 	float dx, dy, near, far;
 
-	Raycast(int _width, int _height, float _near, float _far) : width(_width), height(_height), near(_near), far(_far) {
+	Raycast(size_t _width, size_t _height, float _near, float _far) : width(_width), height(_height), near(_near), far(_far) {
 		dx = 1/_width;
-		dy = 1/_height; 
+		dy = 1/_height;
 	}
 };
 
@@ -197,15 +85,17 @@ int main(void) {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	auto w = 640;
-	auto h = 480;
-	Raycast rc(100,200,1,-100);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	auto w = 800;
+	auto h = 600;
+	Raycast rc(w,h,1,-100);
 	tnw::Image img(rc.width,rc.height);
 
-	for (int i = 0; i < rc.width; ++i) {
-		for (int j = 0; j < rc.height; ++j) {
-			std::cout << "i: " << i << "j: " <<  j << "\n";
-			if (j%5==0) {
+	for (size_t i = 0; i < rc.width; ++i) {
+		for (size_t j = 0; j < rc.height; ++j) {
+			// std::cout << "i: " << i << "j: " <<  j << "\n";
+			if (j==i) {
 				img(i,j) = std::make_tuple(0,1,1);
 			}
 			else {
@@ -214,6 +104,19 @@ int main(void) {
 
 		}
 	}
+
+	for (size_t i = 0; i < rc.width; ++i)
+		for (size_t j = 0; j < rc.height; ++j)
+			if (abs(i-j) == abs(w-h)) img(i,j) = std::make_tuple(0,1,1);
+
+	for (size_t i = 0; i < rc.width; ++i)
+		for (size_t j = 0; j < 1; ++j)
+			img(i,j) = std::make_tuple(0,i/(float)(rc.width-1),0);
+
+	for (size_t i = 0; i < rc.height; ++i)
+		for (size_t j = 0; j < 1; ++j)
+			img(j,i) = std::make_tuple(0,0,i/(float)(rc.height-1));
+
 	genImg = true;
 	// img(0,0) = std::make_tuple(1,0,0);
 	// img(0,1) = std::make_tuple(0,1,0);
@@ -227,24 +130,24 @@ int main(void) {
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	camera.aspect = 480/640.;
+	// camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
 
 	std::vector<tnw::Shape*> scene;
-	tnw::Shape *obj1 = new tnw::Sphere(glm::vec3(0,0,-1),0.5); 
+	tnw::Shape *obj1 = new tnw::Sphere(glm::vec3(0,0,-1),1);
 	scene.push_back(obj1);
 	scene.push_back(new tnw::Box(glm::vec3(4,1,-3),1,1,1));
 
-	std::cout << "SPHERE TEST\n";
-	tnw::Ray r(glm::vec3(0,0,1), glm::vec3(0,0,-100));
-	tnw::IntersectionList il5 = obj1->intersect_ray(r);
-	for (std::tuple<tnw::Color, float> ilel : il5) {
-		tnw::Color c;
-		float f;
-		std::tie(c,f) = ilel;
-		std::cout << "color: " << (int)c << " length: " << f << std::endl;
-	}
-	std::cout << "==================\n";
+	// std::cout << "SPHERE TEST\n";
+	// tnw::Ray r(glm::vec3(0,0,1), glm::vec3(0,0,-100));
+	// tnw::IntersectionList il5 = obj1->intersect_ray(r);
+	// for (std::tuple<tnw::Color, float> ilel : il5) {
+	// 	tnw::Color c;
+	// 	float f;
+	// 	std::tie(c,f) = ilel;
+	// 	std::cout << "color: " << (int)c << " length: " << f << std::endl;
+	// }
+	// std::cout << "==================\n";
 
 
 	// Loop until the user closes the window
@@ -263,33 +166,38 @@ int main(void) {
 			// std::flush(std::cout);
 			genImg = false;
 
-			for (int i = 0; i < rc.width; ++i)
-			{
-				for (int j = 0; j < rc.height; ++j)
-				{
-					float pospixx, pospixy;
-					pospixx = -2.f*(1.f/2.f - ((float)i)/rc.width);
-					pospixy = 2.f*(1.f/2.f - ((float)j)/rc.height);
+			for (size_t i = 0; i < rc.width; ++i) {
+				for (size_t j = 0; j < rc.height; ++j) {
+
+					auto nx = -2.f*(1.f/2.f - float(i+1)/rc.width);
+					auto ny = 2.f*(1.f/2.f - float(j+1)/rc.height);
+					auto x = -2.f*(1.f/2.f - float(i)/rc.width);
+					auto y = 2.f*(1.f/2.f - float(j)/rc.height);
+
+					float pospixx = x+nx/2;
+					float pospixy = y+ny/2;
+
 					glm::vec3 a(pospixx, pospixy, rc.near);
 					glm::vec3 b(pospixx, pospixy, rc.far);
-					
+					// std::cout << glm::to_string(a) << std::endl;
+
 					tnw::Ray r = tnw::Ray(a,b);
 
 					float minInter = rc.far;
 					int drawIndice = -1;
-					for (int k = 0; k < scene.size(); k++) {
+					for (size_t k = 0; k < scene.size(); k++) {
 						tnw::IntersectionList ilist = scene[k]->intersect_ray(r);
 						if (ilist.size() >= 2) {
 							if (minInter < std::abs(std::get<1>(ilist[0]))) {
 								minInter = std::abs(std::get<1>(ilist[0]));
 								drawIndice = k;
 							}
-						} 
+						}
 					}
 
 					if (drawIndice >= 0) {
 
-						std::cout << "\ni: " << i << " j: " << j << " drawIndice: " << drawIndice;
+						// std::cout << "\ni: " << i << " j: " << j << " drawIndice: " << drawIndice;
 						// tnw::IntersectionList ilist = scene[0]->intersect_ray(r);
 						// std::cout << "\nilist size: " << ilist.size();
 						// std::cout << "\na: " << glm::to_string(a) << "\nb: " << glm::to_string(b) << "\n";

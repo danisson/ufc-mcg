@@ -87,7 +87,7 @@ glm::mat4 tnw::isometric(float aspect, float near, float far, bool positive_hor,
 	return o*b*a;
 }
 
-tnw::Image::Image(size_t h, size_t w) : h(h), w(w) {
+tnw::Image::Image(size_t w, size_t h) : h(h), w(w) {
 	data.resize(h*w*3,0);
 }
 
@@ -95,40 +95,40 @@ tnw::Image::operator float*() {
 	return data.data();
 }
 
-float& tnw::Image::operator()(size_t i, size_t j, size_t k) {
-	return data[k + j*3 + i*w*3];
-}
-float  tnw::Image::operator()(size_t i, size_t j, size_t k) const{
-	return data[k + j*3 + i*w*3];
-}
-
-std::tuple<float&,float&,float&> tnw::Image::operator()(size_t i, size_t j) {
-	return std::tie(data[  j*3+i*w*3],
-	                data[1+j*3+i*w*3],
-	                data[2+j*3+i*w*3]);
-}
-
-std::tuple<float,float,float> tnw::Image::operator()(size_t i, size_t j) const {
-	return std::make_tuple(data[  j*3+i*w*3],
-	                       data[1+j*3+i*w*3],
-	                       data[2+j*3+i*w*3]);
-}
-
 // float& tnw::Image::operator()(size_t i, size_t j, size_t k) {
-// 	return data[k + i*3 + j*w*3];
+// 	return data[k + j*3 + i*w*3];
 // }
 // float  tnw::Image::operator()(size_t i, size_t j, size_t k) const{
-// 	return data[k + i*3 + j*w*3];
+// 	return data[k + j*3 + i*w*3];
 // }
 
 // std::tuple<float&,float&,float&> tnw::Image::operator()(size_t i, size_t j) {
-// 	return std::tie(data[  i*3+j*w*3],
-// 	                data[1+i*3+j*w*3],
-// 	                data[2+i*3+j*w*3]);
+// 	return std::tie(data[  j*3+i*w*3],
+// 	                data[1+j*3+i*w*3],
+// 	                data[2+j*3+i*w*3]);
 // }
 
 // std::tuple<float,float,float> tnw::Image::operator()(size_t i, size_t j) const {
-// 	return std::make_tuple(data[  i*3+j*w*3],
-// 	                       data[1+i*3+j*w*3],
-// 	                       data[2+i*3+j*w*3]);
+// 	return std::make_tuple(data[  j*3+i*w*3],
+// 	                       data[1+j*3+i*w*3],
+// 	                       data[2+j*3+i*w*3]);
 // }
+
+float& tnw::Image::operator()(size_t i, size_t j, size_t k) {
+	return data[k + i*3 + j*w*3];
+}
+float  tnw::Image::operator()(size_t i, size_t j, size_t k) const{
+	return data[k + i*3 + j*w*3];
+}
+
+std::tuple<float&,float&,float&> tnw::Image::operator()(size_t i, size_t j) {
+	return std::tie(data[  i*3+j*w*3],
+	                data[1+i*3+j*w*3],
+	                data[2+i*3+j*w*3]);
+}
+
+std::tuple<float,float,float> tnw::Image::operator()(size_t i, size_t j) const {
+	return std::make_tuple(data[  i*3+j*w*3],
+	                       data[1+i*3+j*w*3],
+	                       data[2+i*3+j*w*3]);
+}
