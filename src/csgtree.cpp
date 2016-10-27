@@ -118,6 +118,8 @@ tnw::CSGTree::CSGTree(unique_ptr<Shape>&& s) : root(new csg::ScaleNode(move(s),1
 	}
 }
 
+tnw::CSGTree::CSGTree(owner_ptr<Shape> s) : CSGTree(unique_ptr<Shape>(s)) {}
+
 Color tnw::CSGTree::intersect_point(const glm::vec3& x) const {
 	return root->intersect_point(x);
 }
