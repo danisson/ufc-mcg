@@ -1,4 +1,6 @@
 #include "csgtree.h"
+#include "octree.h"
+#include <random>
 
 using namespace tnw;
 using std::array;
@@ -99,7 +101,22 @@ Color tnw::csg::TranslateNode::intersect_box(const BoundingBox& x) const {
 
 std::string tnw::csg::TranslateNode::serialize() const {throw 0;}
 //---------------------------------------------------------------------------//
-void tnw::CSGTree::rdraw() const {throw 0;}
+void tnw::CSGTree::rdraw() const {
+	auto x = Octree(*root,BoundingBox({0,0,0},1),4);
+	x.setColor(color);
+	x.draw();
+}
+
+tnw::CSGTree::CSGTree(unique_ptr<Shape>&& s) : root(new csg::ScaleNode(move(s),1)) {
+	std::random_device r;
+	std::default_random_engine gen(r());
+
+	std::uniform_real_distribution<> dis(0,1);
+
+	for (int i = 0; i < 3; ++i) {
+		color[i] = dis(gen);
+	}
+}
 
 Color tnw::CSGTree::intersect_point(const glm::vec3& x) const {
 	return root->intersect_point(x);
@@ -137,7 +154,9 @@ BooleanErrorCodes tnw::CSGTree::bool_or(const Model& y) {
 std::string tnw::CSGTree::serialize() const {
 	return root->serialize();
 }
-void tnw::CSGTree::setColor(float c[3]) {
+void tnw::CSGTree::setColor(const float c[3]) {
 	for (size_t i = 0; i < 3; ++i)
 		color[i] = c[i];
 }
+
+owner_ptr<Model> tnw::CSGTree::clone() const {throw 0;}

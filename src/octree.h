@@ -25,7 +25,7 @@ namespace octree {
 
 		//Drawing function
 		void draw(const BoundingBox& bb);
-		void setColor(float c[3]);
+		void setColor(const float c[3]);
 
 		void set(size_t i, unique_ptr<Tree>&& t);
 		Tree* get(size_t);
@@ -59,7 +59,7 @@ namespace octree {
 
 		owner_ptr<Model> clone() const override;
 
-		void setColor(float c[3]) override;
+		void setColor(const float c[3]) override;
 
 		// Geometric operations
 		void translate(const glm::vec3& dv) override;

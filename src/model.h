@@ -68,7 +68,7 @@ public:
 	//Serialize
 	virtual std::string serialize() const = 0;
 	//Set color
-	virtual void setColor(float c[3]) = 0;
+	virtual void setColor(const float c[3]) = 0;
 };
 
 } // namespace tnw

@@ -1,6 +1,5 @@
 #include "model.h"
 #include "helper.h"
-#include "csgtree.h"
 #include "interface.h"
 
 #include <GLFW/glfw3.h>
@@ -43,44 +42,21 @@ int main(void) {
 		return 1;
 	}
 
-	// Make the window's context current
-	glfwMakeContextCurrent(window);
+	// glfwSetWindowIcon(window,1,)
 
 	// Init ImGui
 	ImGui_ImplGlfw_Init(window, true);
 	// Disable .ini
 	ImGui::GetIO().IniFilename = nullptr;
+	// Make the window's context current
+	glfwMakeContextCurrent(window);
 
 	//Opções de OpenGL
-	glClearColor(0.,0.,0.,0.);
-	// glEnable(GL_LINE_SMOOTH);
+	glClearColor(1.,1.,1.,1.);
+	glEnable(GL_LINE_SMOOTH);
 	// glEnable(GL_CULL_FACE);
-	// glEnable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
 	glFrontFace(GL_CCW);
-	glShadeModel(GL_SMOOTH);
-
-	GLuint tex;
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	auto w = 6;
-	auto h = 6;
-	tnw::Image img(w,h);
-
-	for (int i = 0; i < w; ++i) {
-		for (int j = 0; j < h; ++j) {
-			if (i%2 == 0)
-				img(i,j) = std::make_tuple(1,1,1);
-		}
-	}
-
-	// img(0,0) = std::make_tuple(0,0,0);
-	// img(1,1) = std::make_tuple(0,1,1);
-	// img(1,0) = std::make_tuple(0,1,0);
-	// img(0,1) = std::make_tuple(0,0,1);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_FLOAT, img);
 
 	//Set callbacks
 	glfwSetKeyCallback(window, key_callback);
@@ -93,21 +69,31 @@ int main(void) {
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
 
-		ImGui::SetNextWindowSize(ImVec2(350,350), ImGuiSetCond_FirstUseEver);
-		mainMenu.draw();
 		// Render here
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glBegin(GL_QUADS);
-		glTexCoord2d(0, 1);
-		glVertex2f(-1.,-1.);
-		glTexCoord2d(1, 1);
-		glVertex2f( 1.,-1.);
-		glTexCoord2d(1, 0);
-		glVertex2f( 1., 1.);
-		glTexCoord2d(0, 0);
-		glVertex2f(-1., 1.);
-		glEnd();
+		glShadeModel(GL_SMOOTH);
 
+		glPushMatrix();
+
+		glm::mat4 view;
+		view = glm::scale(glm::mat4(),{camera.scale,camera.scale,camera.scale}) * view;
+		view = glm::translate(glm::mat4(),camera.pos) * view;
+		view = tnw::isometric(camera.aspect, camera.near, camera.far, camera.positive_hor, camera.positive_ver) * view;
+		glLoadMatrixf(glm::value_ptr(view));
+
+		tnw::draw_axis();
+		for (auto&& model : models)
+			model->draw();
+
+		glPopMatrix();
+
+		ImGui::SetNextWindowSize(ImVec2(350,350), ImGuiSetCond_FirstUseEver);
+
+		//Interface construction
+		mainMenu.draw();
+		// ImGui::ShowTestWindow();
+
+		// Swap front and back buffers
 		ImGui::Render();
 		glfwSwapBuffers(window);
 
@@ -117,15 +103,15 @@ int main(void) {
 
 	ImGui_ImplGlfw_Shutdown();
 	glfwTerminate();
-	glDeleteTextures(1, &tex);
 	return 0;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
-	} else
+	} else {
 		ImGui_ImplGlFw_KeyCallback(window, key, scancode, action, mods);
+	}
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {

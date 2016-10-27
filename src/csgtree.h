@@ -62,6 +62,7 @@ class CSGTree : public tnw::Model {
 	float color[3];
 	void rdraw() const override;
 public:
+	CSGTree(unique_ptr<Shape>&&);
 	// Shape
 	// Geometric operations
 	Color intersect_point(const glm::vec3&) const override;
@@ -79,7 +80,7 @@ public:
 	//Serialize
 	std::string serialize() const override;
 	//Set color
-	void setColor(float c[3]) override;
+	void setColor(const float c[3]) override;
 };
 
 } // namespace tnw
