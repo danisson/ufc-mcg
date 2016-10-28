@@ -41,6 +41,10 @@ Color tnw::Sphere::intersect_box(const BoundingBox& bb) const{
 	}
 }
 
+tnw::BoundingBox tnw::Sphere::boundingBox() const {
+	return tnw::BoundingBox(center-radius,radius*2);
+}
+
 // ------------------------------------------------------------------------- //
 tnw::Box::Box(glm::vec3 center, float length, float depth, float height) : center(center), length(length), depth(depth), height(height){}
 
@@ -103,6 +107,13 @@ Color tnw::Box::intersect_box(const BoundingBox& bb) const{
 
 }
 
+tnw::BoundingBox tnw::Box::boundingBox() const {
+	const auto x = center[0] - length/2.f,
+	           y = center[1] - height/2.f,
+	           z = center[2] -  depth/2.f;
+	return tnw::BoundingBox(glm::vec3(x,y,z),std::max(std::max(length,height),depth));
+}
+
 // ------------------------------------------------------------------------- //
 tnw::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
 
@@ -141,6 +152,14 @@ Color tnw::Cilinder::intersect_box(const BoundingBox& bb) const{
 	} else {
 		return tnw::Color::gray;
 	}
+}
+
+tnw::BoundingBox tnw::Cilinder::boundingBox() const {
+	auto x = inferiorPoint;
+	x[0] -= radius;
+	x[2] -= radius;
+
+	return tnw::BoundingBox(x,std::max(radius*2,height));
 }
 
 // ------------------------------------------------------------------------- //
@@ -206,5 +225,13 @@ Color tnw::SquarePyramid::intersect_box(const BoundingBox& bb) const{
 		}
 	}
 	return tnw::Color::white;
+}
+
+tnw::BoundingBox tnw::SquarePyramid::boundingBox() const {
+	auto x = inferiorPoint;
+	x[0] -= basis/2;
+	x[2] -= basis/2;
+
+	return tnw::BoundingBox(x,std::max(basis,height));
 }
 // ------------------------------------------------------------------------- //

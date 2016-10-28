@@ -80,6 +80,11 @@ tnw::BooleanErrorCodes tnw::Octree::bool_or(const Model& y) {
 	} else return tnw::BooleanErrorCodes::unimplementedType;
 }
 // Geometric analysis
+
+BoundingBox tnw::Octree::boundingBox() const {
+	return bb;
+}
+
 double tnw::Octree::volume() const{
 	if (tree) {
 		return bb.volume() * tree->volume();

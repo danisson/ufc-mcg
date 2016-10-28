@@ -48,6 +48,12 @@ Color tnw::csg::AndNode::intersect_box(const BoundingBox& x) const {
 	return and_color(c1,c2);
 }
 
+BoundingBox tnw::csg::AndNode::boundingBox() const {
+	const auto b1 = children[0]->boundingBox();
+	const auto b2 = children[1]->boundingBox();
+	return b1.least_boundingbox(b2);
+}
+
 std::string tnw::csg::AndNode::serialize() const {throw 0;}
 //---------------------------------------------------------------------------//
 tnw::csg::OrNode::OrNode(unique_ptr<Shape>&& a, unique_ptr<Shape>&& b) {
@@ -67,6 +73,12 @@ Color tnw::csg::OrNode::intersect_box(const BoundingBox& x) const {
 	return or_color(c1,c2);
 }
 
+BoundingBox tnw::csg::OrNode::boundingBox() const {
+	const auto b1 = children[0]->boundingBox();
+	const auto b2 = children[1]->boundingBox();
+	return b1.least_boundingbox(b2);
+}
+
 std::string tnw::csg::OrNode::serialize() const {throw 0;}
 //---------------------------------------------------------------------------//
 tnw::csg::ScaleNode::ScaleNode(unique_ptr<Shape>&& child, float dv)
@@ -81,6 +93,12 @@ Color tnw::csg::ScaleNode::intersect_box(const BoundingBox& x) const {
 	auto x2 = x;
 	x2.scale(1/dv);
 	return child->intersect_box(x2);
+}
+
+BoundingBox tnw::csg::ScaleNode::boundingBox() const {
+	auto b = child->boundingBox();
+	b.scale(dv);
+	return b;
 }
 
 std::string tnw::csg::ScaleNode::serialize() const {throw 0;}
@@ -99,10 +117,16 @@ Color tnw::csg::TranslateNode::intersect_box(const BoundingBox& x) const {
 	return child->intersect_box(x2);
 }
 
+BoundingBox tnw::csg::TranslateNode::boundingBox() const {
+	auto b = child->boundingBox();
+	b.translate(dx);
+	return b;
+}
+
 std::string tnw::csg::TranslateNode::serialize() const {throw 0;}
 //---------------------------------------------------------------------------//
 void tnw::CSGTree::rdraw() const {
-	auto x = Octree(*root,BoundingBox({0,0,0},1),4);
+	auto x = Octree(*root,this->boundingBox(),6);
 	x.setColor(color);
 	x.draw();
 }
@@ -126,6 +150,10 @@ Color tnw::CSGTree::intersect_point(const glm::vec3& x) const {
 
 Color tnw::CSGTree::intersect_box(const BoundingBox& x) const {
 	return root->intersect_box(x);
+}
+
+BoundingBox tnw::CSGTree::boundingBox() const {
+	return root->boundingBox();
 }
 
 double tnw::CSGTree::volume() const {

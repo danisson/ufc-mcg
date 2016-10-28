@@ -573,9 +573,6 @@ void MainMenu::draw() {
 				ImGui::OpenPopup("Parâmetros da Pirâmide");
 			}
 			if (ImGui::BeginPopupModal("Parâmetros da Pirâmide")) {
-				ImGui::Text("Maximum depth:");
-				ImGui::InputInt("md", &md,1,2);
-				ImGui::Separator();
 				ImGui::Text("centro do lado inferior:");
 				ImGui::InputFloat("x", &x);
 				ImGui::InputFloat("y", &y);

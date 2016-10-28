@@ -70,6 +70,7 @@ namespace octree {
 		BooleanErrorCodes bool_and(const Model& y) override;
 		BooleanErrorCodes bool_or(const Model& y) override;
 		// Geometric analysis
+		BoundingBox boundingBox() const override;
 		double volume() const override;
 		//Serialize
 		std::string serialize() const override;

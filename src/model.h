@@ -28,12 +28,14 @@ public:
 	virtual Color intersect_point(const glm::vec3&) const = 0;
 	virtual Color intersect_box(const BoundingBox&) const = 0;
 	// Geometric analysis
+	virtual BoundingBox boundingBox() const = 0;
 	virtual double volume() const = 0;
 };
 
 struct BoundingBox : public Shape {
 	glm::vec3 corner;
 	float depth;
+
 	BoundingBox(glm::vec3 _corner, float _depth);
 	void draw() const;
 	void translate(const glm::vec3& dv);
@@ -43,6 +45,7 @@ struct BoundingBox : public Shape {
 	glm::vec3 getCenter() const;
 	glm::vec3 minPoint() const;
 	glm::vec3 maxPoint() const;
+	BoundingBox boundingBox() const override;
 	double volume() const override;
 	Color intersect_point(const glm::vec3&) const override;
 	Color intersect_box(const BoundingBox&) const override;

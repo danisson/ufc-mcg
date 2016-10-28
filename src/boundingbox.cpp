@@ -253,3 +253,7 @@ tnw::BoundingBox tnw::BoundingBox::least_boundingbox(const tnw::BoundingBox& bb)
 
 	return tnw::BoundingBox(mn,d);
 }
+
+tnw::BoundingBox tnw::BoundingBox::boundingBox() const {
+	return *this;
+}

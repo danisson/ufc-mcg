@@ -15,6 +15,7 @@ namespace csg {
 		virtual Color intersect_box(const BoundingBox&) const = 0;
 		virtual double volume() const {return 0;}; // TODO
 		virtual std::string serialize() const = 0;
+		BoundingBox boundingBox() const = 0;
 	};
 
 	class AndNode : public Node {
@@ -24,6 +25,7 @@ namespace csg {
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
 		std::string serialize() const override;
+		BoundingBox boundingBox() const override;
 	};
 
 	class OrNode : public Node {
@@ -33,6 +35,7 @@ namespace csg {
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
 		std::string serialize() const override;
+		BoundingBox boundingBox() const override;
 	};
 
 	class ScaleNode : public Node {
@@ -43,6 +46,7 @@ namespace csg {
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
 		std::string serialize() const override;
+		BoundingBox boundingBox() const override;
 	};
 
 	class TranslateNode : public Node {
@@ -53,6 +57,7 @@ namespace csg {
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
 		std::string serialize() const override;
+		BoundingBox boundingBox() const override;
 	};
 
 } // namespace tnw::csg
@@ -69,6 +74,7 @@ public:
 	Color intersect_point(const glm::vec3&) const override;
 	Color intersect_box(const BoundingBox&) const override;
 	// Geometric analysis
+	BoundingBox boundingBox() const override;
 	double volume() const override;
 	// Model
 	virtual owner_ptr<Model> clone() const;
