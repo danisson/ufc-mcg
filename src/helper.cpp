@@ -52,6 +52,66 @@ bool tnw::sphere_box_intersection(glm::vec3 s_center, double s_radius, glm::vec3
 	return squaredDistance < (s_radius * s_radius);
 }
 
+float tnw::seg_to_seg_dist(glm::vec3 s0, glm::vec3 s1, glm::vec3 t0, glm::vec3 t1, float epsilon) {
+	glm::vec3 u = s1-s0;
+	glm::vec3 v = t1-t0;
+	glm::vec3 w = s0-t0;
+	float a = glm::dot(u,u);
+	float b = glm::dot(u,v);
+	float c = glm::dot(v,v);
+	float d = glm::dot(u,w);
+	float e = glm::dot(v,w);
+	float D = a*c-b*b;
+	float sc, sN, sD = D;
+	float tc, tN, tD = D;
+
+	if (D < epsilon) {
+		sN = 0.0;
+		sD = 1.0;
+		tN = e;
+		tD = c;
+	} else {
+		sN = (b*e-c*d);
+		tN = (a*e-b*d);
+		if (sN < 0.0) {
+			sN = 0.0;
+			tN = e;
+			tD = c;
+		} else if (sN > sD) {
+			sN = sD;
+			tN = e + b;
+			tD = c;
+		}
+	}
+	if (tN < 0.0) {
+		tN = 0.0;
+		if (-d < 0.0) {
+			sN = 0.0;
+		} else if (-d > a) {
+			sN = sD;
+		} else {
+			sN = -d;
+			sD = a;
+		}
+	} else if (tN > tD) {
+		tN = tD;
+		if ((-d+b) < 0.0) {
+			sN = 0.0;
+		} else if ((-d+b) > a) {
+			sN = sD;
+		} else {
+			sN = -d+b;
+			sD = a;
+		}
+	}
+
+	sc = (std::abs(sN) < epsilon)? 0.0 : (sN/sD); 
+	tc = (std::abs(tN) < epsilon)? 0.0 : (tN/tD);
+	glm::vec3 dP = w + sc*u - tc*w;
+
+	return glm::length(dP);
+}
+
 void tnw::draw_axis(){
 	glBegin(GL_LINES);
 		glColor3f(1.000000f, 0.000000f, 0.000000f);

@@ -138,9 +138,10 @@ int main(void) {
 	scene.push_back(obj1);
 	scene.push_back(new tnw::Box(glm::vec3(4,1,-3),1,1,1));
 
-	// std::cout << "SPHERE TEST\n";
-	// tnw::Ray r(glm::vec3(0,0,1), glm::vec3(0,0,-100));
-	// tnw::IntersectionList il5 = obj1->intersect_ray(r);
+	// std::cout << "CILINDER TEST\n";
+	// tnw::Cilinder cl(glm::vec3(1,1,1), 3, 1);
+	// tnw::Ray r(glm::vec3(5,0,1), glm::vec3(5,5,1));
+	// tnw::IntersectionList il5 = cl.intersect_ray(r);
 	// for (std::tuple<tnw::Color, float> ilel : il5) {
 	// 	tnw::Color c;
 	// 	float f;
@@ -148,6 +149,8 @@ int main(void) {
 	// 	std::cout << "color: " << (int)c << " length: " << f << std::endl;
 	// }
 	// std::cout << "==================\n";
+
+
 
 
 	// Loop until the user closes the window

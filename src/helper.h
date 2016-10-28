@@ -16,6 +16,8 @@ namespace tnw
 
 	bool sphere_box_intersection(glm::vec3 s_center, double s_radius, glm::vec3 c, double l, double h, double d);
 
+	//Calcula a distância entre dois segmentos, cada um definido por dois pontos
+	float seg_to_seg_dist(glm::vec3 s0, glm::vec3 s1, glm::vec3 t0, glm::vec3 t1, float epsilon = 0.000001);
 	constexpr double pi = 3.14159265358979323846;
 
 	void draw_axis();

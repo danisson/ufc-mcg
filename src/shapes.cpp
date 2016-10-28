@@ -270,7 +270,103 @@ Color tnw::Cilinder::intersect_box(const BoundingBox& bb) const{
 }
 
 IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
-	return IntersectionList();
+	IntersectionList ilist;
+	float rayLength = glm::length(ray.b-ray.a);
+	// std::cout << "rayLength: " << rayLength << "\n";
+	glm::vec3 superiorPoint = inferiorPoint + glm::vec3(0,height,0);
+	// std::cout << "superiorPoint: " << glm::to_string(superiorPoint) << "\n";
+	glm::vec3 n = glm::cross(ray.b-ray.a, superiorPoint-inferiorPoint);
+	// std::cout << "n: " << glm::to_string(n) << "\n";
+	float normN = glm::length(n);
+	float normNSqr = normN*normN;
+	float dSqr;
+	float epsilon = 0.000001;
+	float s1, s2, s3, s4;
+
+	//Se o vetor é menor que um certo epsilon
+	glm::vec3 nabs = glm::abs(n);
+	// std::cout << "nabs: " << glm::to_string(nabs) << "\n";
+	if ((nabs[0] < epsilon) && (nabs[1] < epsilon) && (nabs[2] < epsilon)) {
+		// std::cout << "calculating seg to seg dist\n";
+		dSqr = seg_to_seg_dist(ray.a, ray.b, inferiorPoint, superiorPoint);
+		
+		if (dSqr <= radius*radius) {
+			double rayMaxY = std::fmax(ray.a.y, ray.b.y);
+			double rayMinY = std::fmin(ray.a.y, ray.b.y);
+			if (rayMinY > superiorPoint.y) {
+				ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
+				return ilist;
+			} else if (rayMaxY < inferiorPoint.y) {
+				ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
+				return ilist;
+			} else {
+				ilist.push_back(std::make_tuple(tnw::Color::white, std::abs(inferiorPoint.y-rayMinY)));
+				ilist.push_back(std::make_tuple(tnw::Color::black, superiorPoint.y-inferiorPoint.y));
+				ilist.push_back(std::make_tuple(tnw::Color::white, std::abs(rayMaxY-superiorPoint.y)));
+				return ilist;
+			}
+		}
+	} else {
+		dSqr = glm::dot(inferiorPoint-ray.a, n)/normNSqr;
+	}
+	// std::cout << "dSqr: " << dSqr << "\n";
+	if (dSqr > radius*radius) {
+		ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
+		return ilist;
+	} 
+
+	float l1 = glm::dot(superiorPoint-inferiorPoint, inferiorPoint-ray.a)/glm::dot(superiorPoint-inferiorPoint, ray.b-ray.a);
+	float l2 = glm::dot(superiorPoint-inferiorPoint, superiorPoint-ray.a)/glm::dot(superiorPoint-inferiorPoint, ray.b-ray.a);
+	s3 = std::fmin(l1,l2);
+	s4 = std::fmax(l1,l2);
+	//Direção do raio é normal à direção do eixo do cilindro
+	if (std::isinf(s3) && std::isinf(s4)) {
+		if (ray.a.y >= inferiorPoint.y && ray.a.y <= superiorPoint.y && ray.b.y >= inferiorPoint.y && ray.b.y <= superiorPoint.y) {
+			s3 = 0; s4 = 1;
+		} else {
+			ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
+			return ilist;	
+		}
+	}
+	// std::cout << " s3: " << s3 << " s4: " << s4 << "\n";
+	glm::vec3 apXpq = glm::cross(inferiorPoint-ray.a, superiorPoint-inferiorPoint);
+	float v = glm::dot(apXpq, n)/normNSqr;
+	// std::cout << "v: " << v << "\n";
+	glm::vec3 n2 = glm::cross(superiorPoint-inferiorPoint, n);
+	// std::cout << "n2: " << glm::to_string(n2) << "\n";
+	float normN2 = glm::length(n2);
+	// std::cout << "norm2: " << normN2 << "\n";
+	float s = std::sqrt(radius*radius-dSqr)*normN2/glm::length(glm::dot(ray.b-ray.a, n2));
+	// std::cout << "s: " << s << "\n";
+	s1 = v - s;
+	s2 = v + s;
+	// std::cout << "s1: " << s1 << " s2: " << s2 << "\n";
+	//Não há interseção entre eles
+	if (s3 > s2 || s1 > s4) {
+		ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
+		return ilist;	
+	} 
+	//Temos duas listas [s1,s2] e [s3, s4] que se intersectam. Temos 4 casos possíveis:
+	
+	float ab = glm::length(ray.b-ray.a);
+	float sbegin, send;
+
+	sbegin = std::fmax(s1, s3);
+	sbegin = std::fmax(sbegin, 0);
+	send = std::fmin(s2, s4);
+	send = std::fmin(send, 1);
+
+	// Interseção fica fora do intervalo 0 a 1
+	if (send < 0 || sbegin > 1) {
+		ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
+		return ilist;	
+	}
+
+	// std::cout << "sbegin: " << sbegin << " send: " << send << "\n";
+	ilist.push_back(std::make_tuple(tnw::Color::white, sbegin*ab));
+	ilist.push_back(std::make_tuple(tnw::Color::black, (send-sbegin)*ab));
+	ilist.push_back(std::make_tuple(tnw::Color::white, ab - send*ab));
+	return ilist;
 }
 // ------------------------------------------------------------------------- //
 tnw::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height, float basis) : inferiorPoint(inferiorPoint), height(height), basis(basis) {}
