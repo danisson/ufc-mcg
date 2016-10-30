@@ -6,18 +6,17 @@
 #include "helper.h"
 #include <GL/gl.h>
 
+using std::unique_ptr;
+
 namespace tnw {
 
-class Raycast
-{
+class Raycast {
 public:
-	Raycast();
-	Raycast(std::vector<owner_ptr<Model>> _models, IsometricCamera _camera, size_t _width, size_t _height, GLuint _texId);
+	Raycast(std::vector<unique_ptr<Model>>& _models, IsometricCamera _camera, size_t _width, size_t _height, GLuint _texId);
 	void generateRays();
 	void paintImage();
-	~Raycast();
 private:
-	std::vector<owner_ptr<Model>> models;
+	std::vector<unique_ptr<Model>>& models;
 	IsometricCamera camera;
 	size_t width;
 	size_t height;

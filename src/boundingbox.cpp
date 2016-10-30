@@ -233,7 +233,7 @@ tnw::Color tnw::BoundingBox::intersect_point(const glm::vec3& x) const {
 }
 
 tnw::IntersectionList tnw::BoundingBox::intersect_ray(const tnw::Ray&) const {
-	return tnw::IntersectionList();
+	throw 0;
 }
 
 tnw::BoundingBox tnw::BoundingBox::least_boundingbox(const tnw::BoundingBox& bb) const {

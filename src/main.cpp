@@ -27,7 +27,6 @@
 
 void key_callback(GLFWwindow*, int, int, int, int);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 //Camera initalization
 IsometricCamera camera;
@@ -66,7 +65,6 @@ int main(void) {
 
 	//Set callbacks
 	glfwSetKeyCallback(window, key_callback);
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// camera.aspect = 480/640.;
@@ -122,11 +120,4 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	camera.aspect = height/((float)width);
 	glViewport(0,0,width,height);
-}
-
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-
-	}
 }

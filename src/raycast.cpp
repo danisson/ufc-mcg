@@ -1,8 +1,8 @@
 #include "raycast.h"
 #undef near
 #undef far
-
-tnw::Raycast::Raycast(std::vector<owner_ptr<Model>> _models, IsometricCamera _camera, size_t _width, size_t _height, GLuint _texId) :
+using std::unique_ptr;
+tnw::Raycast::Raycast(std::vector<unique_ptr<Model>>& _models, IsometricCamera _camera, size_t _width, size_t _height, GLuint _texId) :
 	models(_models), camera(_camera), width(_width), height(_height), texId(_texId), image(width, height)
 {
 	glBindTexture(GL_TEXTURE_2D, texId);
@@ -10,7 +10,7 @@ tnw::Raycast::Raycast(std::vector<owner_ptr<Model>> _models, IsometricCamera _ca
 	for (size_t i = 0; i < width; i++) {
 		rays[i].reserve(height);
 	}
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, image);
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, image);
 	generateRays();
 	paintImage();
 }
@@ -59,5 +59,5 @@ void tnw::Raycast::paintImage() {
 		}
 	}
 
-	glTexSubImage2D(GL_TEXTURE_2D, 0 ,0, 0, width, height, GL_RGB, GL_FLOAT, image);
+	glTexImage2D(GL_TEXTURE_2D, 0 ,0, 0, width, height, GL_RGB, GL_FLOAT, image);
 }

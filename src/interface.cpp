@@ -5,6 +5,8 @@
 #include <sstream>
 #include <iostream>
 #include <random>
+#include "helper.h"
+#include "raycast.h"
 
 MainMenu::MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera& c) : models(m), camera(c) {
 	unsigned int m_size = m.size();
@@ -13,6 +15,8 @@ MainMenu::MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera&
 		ss << "Árvore " << model_names.size();
 		model_names.push_back(ss.str());
 	}
+
+	glGenTextures(1, &tex);
 }
 
 void MainMenu::errorDialog(const char* name,const char* msg) {
@@ -37,10 +41,26 @@ void MainMenu::errorDialog(char* name, char* msg) {
 	}
 }
 
+void MainMenu::renderWindow(const GLuint& t, size_t w, size_t h, bool& should_close) {
+	ImGui::SetNextWindowSize(ImVec2(w+15,h+35), ImGuiSetCond_FirstUseEver);
+	if (!ImGui::Begin("Vector Window##", &should_close)) {
+		ImGui::End();
+		return;
+	}
+	ImGui::Image((void*)(t), ImVec2(w, h), ImVec2(0,0), ImVec2(1,1));
+	ImGui::End();
+}
+
 void MainMenu::draw() {
 	ImGui::Begin("Menu");
 
+	if (render_show) renderWindow(tex,200,200,render_show);
+
 	if (ImGui::CollapsingHeader("Arquivo")) {
+		if (ImGui::Button("Render") && !render_show) {
+			tnw::Raycast(models,camera,200,200,tex);
+			render_show = true;
+		}
 		if (ImGui::Button("Abrir"))
 			ImGui::OpenPopup("##abrir_arq");
 		ImGui::SameLine();

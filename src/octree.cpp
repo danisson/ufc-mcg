@@ -1,5 +1,6 @@
 #include "model.h"
 #include "octree.h"
+#include "shapes.h"
 #include <typeindex>
 #include <typeinfo>
 #include <iostream>
@@ -62,8 +63,8 @@ Color tnw::Octree::intersect_point(const glm::vec3& x) const {
 	else return Color::white;
 }
 
-IntersectionList tnw::Octree::intersect_ray(const Ray&) const {
-	return IntersectionList();
+IntersectionList tnw::Octree::intersect_ray(const Ray& r) const {
+	throw 0;
 }
 
 // Boolean operations
