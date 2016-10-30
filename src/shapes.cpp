@@ -272,28 +272,28 @@ Color tnw::Cilinder::intersect_box(const BoundingBox& bb) const{
 
 IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 	IntersectionList ilist;
-	float rayLength = glm::length(ray.b-ray.a);
+	const float rayLength = glm::length(ray.b-ray.a);
 	// std::cout << "rayLength: " << rayLength << "\n";
-	glm::vec3 superiorPoint = inferiorPoint + glm::vec3(0,height,0);
+	const glm::vec3 superiorPoint = inferiorPoint + glm::vec3(0,height,0);
 	// std::cout << "superiorPoint: " << glm::to_string(superiorPoint) << "\n";
-	glm::vec3 n = glm::cross(ray.b-ray.a, superiorPoint-inferiorPoint);
+	const glm::vec3 n = glm::cross(ray.b-ray.a, superiorPoint-inferiorPoint);
 	// std::cout << "n: " << glm::to_string(n) << "\n";
-	float normN = glm::length(n);
-	float normNSqr = normN*normN;
+	const float normN = glm::length(n);
+	const float normNSqr = normN*normN;
 	float dSqr;
-	float epsilon = 0.000001;
+	const float epsilon = 0.000001;
 	float s1, s2, s3, s4;
 
 	//Se o vetor é menor que um certo epsilon
-	glm::vec3 nabs = glm::abs(n);
+	const glm::vec3 nabs = glm::abs(n);
 	// std::cout << "nabs: " << glm::to_string(nabs) << "\n";
 	if ((nabs[0] < epsilon) && (nabs[1] < epsilon) && (nabs[2] < epsilon)) {
 		// std::cout << "calculating seg to seg dist\n";
 		dSqr = seg_to_seg_dist(ray.a, ray.b, inferiorPoint, superiorPoint);
 		// std::cout << "dSqr: " << dSqr << "\n";	
 		if (dSqr <= radius*radius) {
-			double rayMaxY = std::fmax(ray.a.y, ray.b.y);
-			double rayMinY = std::fmin(ray.a.y, ray.b.y);
+			const double rayMaxY = std::fmax(ray.a.y, ray.b.y);
+			const double rayMinY = std::fmin(ray.a.y, ray.b.y);
 			// std::cout << "rayMaxY: " << rayMaxY << " rayMinY: " << rayMinY << "\n";
 			if (rayMinY > superiorPoint.y) {
 				ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
@@ -303,17 +303,17 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 				return removeZeroIntersections(ilist);
 			} else {
 
-				float dist1 = std::abs(inferiorPoint.y-rayMinY),
+				const float dist1 = std::abs(inferiorPoint.y-rayMinY),
 					  dist2 = std::abs(rayMaxY-superiorPoint.y),
 					  inferiorDist = std::fmin(dist1, dist2),
 					  superiorDist = std::fmax(dist1, dist2);
 
 				tnw::Color midColor = tnw::Color::black;
 				
-				glm::vec3 extremePointBegin = ray.a + inferiorDist*glm::normalize(ray.dir),
+				const glm::vec3 extremePointBegin = ray.a + inferiorDist*glm::normalize(ray.dir),
 						  extremePointEnd = ray.a + (rayLength-superiorDist)*glm::normalize(ray.dir);
-				glm::vec2 centerXZ(inferiorPoint.x, inferiorPoint.z);
-				float distanceBeginToCenterXZ = glm::distance(glm::vec2(extremePointBegin.x, extremePointBegin.z), centerXZ),
+				const glm::vec2 centerXZ(inferiorPoint.x, inferiorPoint.z);
+				const float distanceBeginToCenterXZ = glm::distance(glm::vec2(extremePointBegin.x, extremePointBegin.z), centerXZ),
 					  distanceEndToCenterXZ = glm::distance(glm::vec2(extremePointEnd.x, extremePointEnd.z), centerXZ);
 				if (std::abs(radius - distanceBeginToCenterXZ) < 0.000001 && std::abs(radius - distanceEndToCenterXZ) < 0.000001) {
 					midColor = tnw::Color::gray;
@@ -334,8 +334,8 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 		return removeZeroIntersections(ilist);
 	} 
 
-	float l1 = glm::dot(superiorPoint-inferiorPoint, inferiorPoint-ray.a)/glm::dot(superiorPoint-inferiorPoint, ray.b-ray.a);
-	float l2 = glm::dot(superiorPoint-inferiorPoint, superiorPoint-ray.a)/glm::dot(superiorPoint-inferiorPoint, ray.b-ray.a);
+	const float l1 = glm::dot(superiorPoint-inferiorPoint, inferiorPoint-ray.a)/glm::dot(superiorPoint-inferiorPoint, ray.b-ray.a);
+	const float l2 = glm::dot(superiorPoint-inferiorPoint, superiorPoint-ray.a)/glm::dot(superiorPoint-inferiorPoint, ray.b-ray.a);
 	s3 = std::fmin(l1,l2);
 	s4 = std::fmax(l1,l2);
 	//Direção do raio é normal à direção do eixo do cilindro
@@ -348,14 +348,14 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 		}
 	}
 	// std::cout << " s3: " << s3 << " s4: " << s4 << "\n";
-	glm::vec3 apXpq = glm::cross(inferiorPoint-ray.a, superiorPoint-inferiorPoint);
-	float v = glm::dot(apXpq, n)/normNSqr;
+	const glm::vec3 apXpq = glm::cross(inferiorPoint-ray.a, superiorPoint-inferiorPoint);
+	const float v = glm::dot(apXpq, n)/normNSqr;
 	// std::cout << "v: " << v << "\n";
-	glm::vec3 n2 = glm::cross(superiorPoint-inferiorPoint, n);
+	const glm::vec3 n2 = glm::cross(superiorPoint-inferiorPoint, n);
 	// std::cout << "n2: " << glm::to_string(n2) << "\n";
-	float normN2 = glm::length(n2);
+	const float normN2 = glm::length(n2);
 	// std::cout << "norm2: " << normN2 << "\n";
-	float s = std::sqrt(radius*radius-dSqr)*normN2/glm::length(glm::dot(ray.b-ray.a, n2));
+	const float s = std::sqrt(radius*radius-dSqr)*normN2/glm::length(glm::dot(ray.b-ray.a, n2));
 	// std::cout << "s: " << s << "\n";
 	s1 = v - s;
 	s2 = v + s;
@@ -367,7 +367,7 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 	} 
 	//Temos duas listas [s1,s2] e [s3, s4] que se intersectam. Temos 4 casos possíveis:
 	
-	float ab = glm::length(ray.b-ray.a);
+	const float ab = glm::length(ray.b-ray.a);
 	float sbegin, send;
 
 	sbegin = std::fmax(s1, s3);
