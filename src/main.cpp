@@ -137,12 +137,11 @@ int main(void) {
 	tnw::Shape *obj1 = new tnw::Sphere(glm::vec3(0,0,-1),1);
 	scene.push_back(obj1);
 	scene.push_back(new tnw::Box(glm::vec3(4,1,-3),1,1,1));
-
 	// std::cout << "CILINDER TEST\n";
 	// tnw::Cilinder cl(glm::vec3(1,1,1), 3, 1);
-	// tnw::Ray r(glm::vec3(5,0,1), glm::vec3(5,5,1));
-	// tnw::IntersectionList il5 = cl.intersect_ray(r);
-	// for (std::tuple<tnw::Color, float> ilel : il5) {
+	// tnw::Ray r(glm::vec3(1,4,2), glm::vec3(1,1,2));
+	// tnw::IntersectionList il = cl.intersect_ray(r);
+	// for (std::tuple<tnw::Color, float> ilel : il) {
 	// 	tnw::Color c;
 	// 	float f;
 	// 	std::tie(c,f) = ilel;
@@ -151,6 +150,18 @@ int main(void) {
 	// std::cout << "==================\n";
 
 
+
+	std::cout << "PYRAMID TEST\n";
+	tnw::SquarePyramid sqrPir(glm::vec3(0,0,0), 10, 2);
+	tnw::Ray r2(glm::vec3(1,0,1), glm::vec3(0,10,0));
+	tnw::IntersectionList il5 = sqrPir.intersect_ray(r2);
+	for (std::tuple<tnw::Color, float> ilel : il5) {
+		tnw::Color c;
+		float f;
+		std::tie(c,f) = ilel;
+		std::cout << "color: " << (int)c << " length: " << f << std::endl;
+	}
+	std::cout << "==================\n";
 
 
 	// Loop until the user closes the window

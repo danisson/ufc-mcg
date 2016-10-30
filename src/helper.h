@@ -1,5 +1,7 @@
 #ifndef _H_HELPER
 #define _H_HELPER
+#include "model.h"
+#include "shapes.h"
 #include <glm/glm.hpp>
 #include <cmath>
 #include <vector>
@@ -18,6 +20,17 @@ namespace tnw
 
 	//Calcula a distância entre dois segmentos, cada um definido por dois pontos
 	float seg_to_seg_dist(glm::vec3 s0, glm::vec3 s1, glm::vec3 t0, glm::vec3 t1, float epsilon = 0.000001);
+
+	//Calcula a interseção entre um raio e um triângulo com vértices v0, v1, e v2, o resultado é um vetor composto por
+	// [t, u, v], t = distância, u,v = coordenadas no plano do triângulo, calculamos o ponto no triângulo a partir de 
+	//T(u,v) = (1-u-v)V0 + uV1 + vV2
+	glm::vec3 ray_tri_intersection(const tnw::Ray& r, const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2);
+
+	//Remove as interseções da lista que tem tamanho zero
+	tnw::IntersectionList removeZeroIntersections(const tnw::IntersectionList& ilist);
+
+	//Checa se um raio está em um plano determinado por 3 pontos
+	bool ray_on_plane(const tnw::Ray& r, const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const float epsilon = 0.000001);
 	constexpr double pi = 3.14159265358979323846;
 
 	void draw_axis();

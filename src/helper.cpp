@@ -112,6 +112,35 @@ float tnw::seg_to_seg_dist(glm::vec3 s0, glm::vec3 s1, glm::vec3 t0, glm::vec3 t
 	return glm::length(dP);
 }
 
+glm::vec3 tnw::ray_tri_intersection(const tnw::Ray& ray, const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2) {
+	glm::vec3 d = glm::normalize(ray.dir),
+			  e1 = v1-v0,
+			  e2 = v2-v0,
+			  t = ray.a-v0,
+			  p = glm::cross(d, e2),
+			  q = glm::cross(t, e1);
+	glm::vec3 res = (1/glm::dot(p, e1))*glm::vec3(glm::dot(q, e2), glm::dot(p, t), glm::dot(q, d));
+	return res;
+}
+
+bool tnw::ray_on_plane(const tnw::Ray& ray, const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const float epsilon) {
+	glm::vec3 l1 = v1-v0,
+			  l2 = v2-v0,
+			  n = glm::cross(l1, l2);
+	bool on = (std::abs(0.0-glm::dot(ray.dir, n)) < epsilon);
+	return on;
+}
+
+tnw::IntersectionList tnw::removeZeroIntersections(const tnw::IntersectionList& ilist) {
+	IntersectionList r;
+	for (int i = 0; i < ilist.size(); i++) {
+		if (std::abs(0.0 - std::get<1>(ilist[i])) > 0.0000001) {
+			r.push_back(ilist[i]);
+		}
+	}
+	return r;
+}
+
 void tnw::draw_axis(){
 	glBegin(GL_LINES);
 		glColor3f(1.000000f, 0.000000f, 0.000000f);

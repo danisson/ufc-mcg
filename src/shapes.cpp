@@ -3,6 +3,7 @@
 #include "helper.h"
 #include <iostream>
 #include <cmath>
+#include <limits>
 #include <glm/gtx/string_cast.hpp>
 
 using tnw::Color;
@@ -84,7 +85,7 @@ IntersectionList tnw::Sphere::intersect_ray(const Ray& ray) const {
 		ilist.push_back(std::make_tuple(tnw::Color::white, length));
 	}
 
-	return ilist;
+	return removeZeroIntersections(ilist);
 }
 
 // ------------------------------------------------------------------------- //
@@ -195,15 +196,15 @@ IntersectionList tnw::Box::intersect_ray(const Ray& ray) const {
 
 	if (!clip_line(0, ray, f_low, f_high)) {
 		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
-		return ilist;
+		return removeZeroIntersections(ilist);
 	}
 	if (!clip_line(1, ray, f_low, f_high)) {
 		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
-		return ilist;
+		return removeZeroIntersections(ilist);
 	}
 	if (!clip_line(2, ray, f_low, f_high)) {
 		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
-		return ilist;
+		return removeZeroIntersections(ilist);
 	}
 
 	float inter_min_length = f_low * tot_length;
@@ -226,7 +227,7 @@ IntersectionList tnw::Box::intersect_ray(const Ray& ray) const {
 	//Terceiro pedaço começa no comp máximo da interseção e vai até o final
 	ilist.push_back(std::make_tuple(tnw::Color::white, tot_length - inter_max_length));
 
-	return ilist;
+	return removeZeroIntersections(ilist);
 }
 
 // ------------------------------------------------------------------------- //
@@ -289,21 +290,39 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 	if ((nabs[0] < epsilon) && (nabs[1] < epsilon) && (nabs[2] < epsilon)) {
 		// std::cout << "calculating seg to seg dist\n";
 		dSqr = seg_to_seg_dist(ray.a, ray.b, inferiorPoint, superiorPoint);
-		
+		// std::cout << "dSqr: " << dSqr << "\n";	
 		if (dSqr <= radius*radius) {
 			double rayMaxY = std::fmax(ray.a.y, ray.b.y);
 			double rayMinY = std::fmin(ray.a.y, ray.b.y);
+			// std::cout << "rayMaxY: " << rayMaxY << " rayMinY: " << rayMinY << "\n";
 			if (rayMinY > superiorPoint.y) {
 				ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
-				return ilist;
+				return removeZeroIntersections(ilist);
 			} else if (rayMaxY < inferiorPoint.y) {
 				ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
-				return ilist;
+				return removeZeroIntersections(ilist);
 			} else {
-				ilist.push_back(std::make_tuple(tnw::Color::white, std::abs(inferiorPoint.y-rayMinY)));
-				ilist.push_back(std::make_tuple(tnw::Color::black, superiorPoint.y-inferiorPoint.y));
-				ilist.push_back(std::make_tuple(tnw::Color::white, std::abs(rayMaxY-superiorPoint.y)));
-				return ilist;
+
+				float dist1 = std::abs(inferiorPoint.y-rayMinY),
+					  dist2 = std::abs(rayMaxY-superiorPoint.y),
+					  inferiorDist = std::fmin(dist1, dist2),
+					  superiorDist = std::fmax(dist1, dist2);
+
+				tnw::Color midColor = tnw::Color::black;
+				
+				glm::vec3 extremePointBegin = ray.a + inferiorDist*glm::normalize(ray.dir),
+						  extremePointEnd = ray.a + (rayLength-superiorDist)*glm::normalize(ray.dir);
+				glm::vec2 centerXZ(inferiorPoint.x, inferiorPoint.z);
+				float distanceBeginToCenterXZ = glm::distance(glm::vec2(extremePointBegin.x, extremePointBegin.z), centerXZ),
+					  distanceEndToCenterXZ = glm::distance(glm::vec2(extremePointEnd.x, extremePointEnd.z), centerXZ);
+				if (std::abs(radius - distanceBeginToCenterXZ) < 0.000001 && std::abs(radius - distanceEndToCenterXZ) < 0.000001) {
+					midColor = tnw::Color::gray;
+				}
+
+				ilist.push_back(std::make_tuple(tnw::Color::white, inferiorDist));
+				ilist.push_back(std::make_tuple(midColor, superiorPoint.y-inferiorPoint.y));
+				ilist.push_back(std::make_tuple(tnw::Color::white, superiorDist));
+				return removeZeroIntersections(ilist);
 			}
 		}
 	} else {
@@ -312,7 +331,7 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 	// std::cout << "dSqr: " << dSqr << "\n";
 	if (dSqr > radius*radius) {
 		ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
-		return ilist;
+		return removeZeroIntersections(ilist);
 	} 
 
 	float l1 = glm::dot(superiorPoint-inferiorPoint, inferiorPoint-ray.a)/glm::dot(superiorPoint-inferiorPoint, ray.b-ray.a);
@@ -325,7 +344,7 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 			s3 = 0; s4 = 1;
 		} else {
 			ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
-			return ilist;	
+			return removeZeroIntersections(ilist);	
 		}
 	}
 	// std::cout << " s3: " << s3 << " s4: " << s4 << "\n";
@@ -344,7 +363,7 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 	//Não há interseção entre eles
 	if (s3 > s2 || s1 > s4) {
 		ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
-		return ilist;	
+		return removeZeroIntersections(ilist);	
 	} 
 	//Temos duas listas [s1,s2] e [s3, s4] que se intersectam. Temos 4 casos possíveis:
 	
@@ -359,14 +378,30 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const{
 	// Interseção fica fora do intervalo 0 a 1
 	if (send < 0 || sbegin > 1) {
 		ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
-		return ilist;	
+		return removeZeroIntersections(ilist);	
+	}
+
+	tnw::Color midColor = tnw::Color::black;
+	//Pontos para checar se o raio está ON em vez de IN
+	glm::vec3 p0, p1, p2, p3, p4, p5;
+	//Plano de cima
+	p0 = superiorPoint;
+	p1 = superiorPoint + glm::vec3(1,0,1);
+	p2 = superiorPoint + glm::vec3(1,0,-1);
+	//Plano de baixo
+	p3 = inferiorPoint;
+	p4 = inferiorPoint + glm::vec3(1,0,1);
+	p5 = inferiorPoint + glm::vec3(1,0,-1);
+
+	if (ray_on_plane(ray, p0, p1, p2) || ray_on_plane(ray, p3, p4, p5)) {
+		midColor = tnw::Color::gray;
 	}
 
 	// std::cout << "sbegin: " << sbegin << " send: " << send << "\n";
 	ilist.push_back(std::make_tuple(tnw::Color::white, sbegin*ab));
-	ilist.push_back(std::make_tuple(tnw::Color::black, (send-sbegin)*ab));
+	ilist.push_back(std::make_tuple(midColor, (send-sbegin)*ab));
 	ilist.push_back(std::make_tuple(tnw::Color::white, ab - send*ab));
-	return ilist;
+	return removeZeroIntersections(ilist);
 }
 // ------------------------------------------------------------------------- //
 tnw::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height, float basis) : inferiorPoint(inferiorPoint), height(height), basis(basis) {}
@@ -433,6 +468,68 @@ Color tnw::SquarePyramid::intersect_box(const BoundingBox& bb) const {
 	return tnw::Color::white;
 }
 IntersectionList tnw::SquarePyramid::intersect_ray(const Ray& ray) const {
-	return IntersectionList();
+	tnw::Ray inverseRay(ray.b, ray.a);
+	//Decompõe a pirâmide em triângulos!
+	IntersectionList ilist;
+	float basisby2 = basis/2.0;
+	glm::vec3 p1 = inferiorPoint + glm::vec3(0, height, 0),
+			  p2 = inferiorPoint + glm::vec3(-basisby2, 0, -basisby2),
+			  p3 = inferiorPoint + glm::vec3(-basisby2, 0, basisby2),
+			  p4 = inferiorPoint + glm::vec3(basisby2, 0, basisby2),
+			  p5 = inferiorPoint + glm::vec3(basisby2, 0, -basisby2);
+	
+	glm::vec3 triangles[6][3] = {{p1,p2,p3}, {p1,p3,p4}, {p1,p4,p5}, {p1,p5,p2}, {p2,p4,p3}, {p2,p5,p4}};
+	//Testa a interseção do raio com cada um dos seis triângulos da pirâmide. Caso a interseção seja maior que o tamanho do raio, ou meno que zero, ela é ignorada. Se encontrarmos 2 interseções, então temos um segmento dentro da pirâmide, encontramos as distãncias delas e botamos na lista de interseção
+	unsigned intersectionCount1, intersectionCount2, rayOnPlaneCount;
+	intersectionCount1 = intersectionCount2 = rayOnPlaneCount = 0;
+	float rayLength = glm::length(ray.dir);
+	float minDist1, minDist2;
+	minDist1 = minDist2 = std::numeric_limits<float>::max();
+
+	for (unsigned i = 0; i < 6; i++) {
+		glm::vec3 interResult1 = ray_tri_intersection(ray, triangles[i][0], triangles[i][1], triangles[i][2]);
+		// std::cout << "i: " << i << " interResult1: " << glm::to_string(interResult1) << "\n";
+		glm::vec3 interResult2 = ray_tri_intersection(inverseRay, triangles[i][0], triangles[i][1], triangles[i][2]);
+		// std::cout << "i: " << i << " interResult2: " << glm::to_string(interResult2) << "\n";
+
+		if (ray_on_plane(ray, triangles[i][0], triangles[i][1], triangles[i][2])) {
+			rayOnPlaneCount++;
+		}
+
+		//t < tamanho do raio, t > 0
+		//u < 1 e u > 0
+		//v < 1 e v > 0
+		if (interResult1[0] <= rayLength && interResult1[0] >= 0.0 &&
+			interResult1[1] <= 1.0 && interResult1[1] >= 0.0 &&
+			interResult1[2] <= 1.0 && interResult1[2] >= 0.0) {
+			intersectionCount1++;
+			if (interResult1[0] < minDist1) {
+				minDist1 = interResult1[0];
+			}
+		}
+		if (interResult2[0] <= rayLength && interResult2[0] >= 0.0 &&
+			interResult2[1] <= 1.0 && interResult2[1] >= 0.0 &&
+			interResult2[2] <= 1.0 && interResult2[2] >= 0.0) {
+			intersectionCount2++;
+			if (interResult2[0] < minDist2) {
+				minDist2 = interResult2[0];
+			}
+		}
+	}
+	tnw::Color midColor = tnw::Color::black;
+	if (rayOnPlaneCount >= 1) {
+		midColor = tnw::Color::gray;
+	}
+	// std::cout << "minDist1: " << minDist1 << " minDist2: " << minDist2 << "\n";
+	// std::cout << "intersectionCount1: " << intersectionCount1 << " intersectionCount2: " << intersectionCount2 << "\n";
+	//Tem 2 interseções!
+	if (intersectionCount1 >= 2 && intersectionCount2 >= 2) {
+		ilist.push_back(std::make_tuple(tnw::Color::white, minDist1));
+		ilist.push_back(std::make_tuple(midColor, rayLength-(minDist1+minDist2)));
+		ilist.push_back(std::make_tuple(tnw::Color::white, minDist2));	
+	} else {
+		ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
+	}
+	return removeZeroIntersections(ilist);
 }
 // ------------------------------------------------------------------------- //
