@@ -6,7 +6,8 @@ tnw::Raycast::Raycast(std::vector<unique_ptr<Model>>& _models, IsometricCamera _
 	models(_models), camera(_camera), width(_width), height(_height), texId(_texId), image(width, height)
 {
 	glBindTexture(GL_TEXTURE_2D, texId);
-	rays.reserve(width);
+
+	rays.resize(width);
 	for (size_t i = 0; i < width; i++) {
 		rays[i].reserve(height);
 	}
@@ -31,8 +32,9 @@ void tnw::Raycast::generateRays() {
 			glm::vec3 b(pospixx, pospixy, camera.far);
 			// std::cout << glm::to_string(a) << std::endl;
 
-			tnw::Ray r = tnw::Ray(a,b);
-			rays[i][j] = r;
+			// tnw::Ray r = tnw::Ray(a,b);
+			// rays[i][j] = r;
+			rays[i].push_back(tnw::Ray(a,b));
 		}
 	}
 }
