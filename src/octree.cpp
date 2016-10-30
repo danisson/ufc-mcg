@@ -12,7 +12,7 @@ using namespace tnw::octree;
 //Octree com raiz vazia
 tnw::Octree::Octree(const BoundingBox& _bb) : bb(_bb) {}
 //Octree com raiz pronta
-tnw::Octree::Octree(std::unique_ptr<Tree> tree, const BoundingBox& _bb) : bb(_bb) {}
+tnw::Octree::Octree(std::unique_ptr<Tree>&& tree, const BoundingBox& _bb) : tree(std::move(tree)), bb(_bb) {}
 //Octree a partir de um forma e uma Bounding Box
 tnw::Octree::Octree(const Shape& s, const BoundingBox& _bb, unsigned int depth) : bb(_bb) {
 	tree = std::unique_ptr<Tree>(octree::classify(s, _bb, depth, 0));
@@ -25,7 +25,13 @@ tnw::Octree::Octree(FILE *f) : bb(glm::vec3(), 1) {
 	tree = unique_ptr<Tree>(make_from_file(f));
 }
 
-void tnw::Octree::rdraw() const {
+owner_ptr<Model> tnw::Octree::clone() const {
+	auto c = new Octree(bb);
+	c->tree.reset(new Tree(*tree));
+	return c;
+}
+
+void tnw::Octree::rdraw() {
 	//Desenha a bounding box
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	glColor3f(0,0,0);
@@ -38,10 +44,10 @@ void tnw::Octree::rdraw() const {
 }
 // Geometric operations
 void tnw::Octree::translate(const glm::vec3& dv) {
-	bb.corner += dv;
+	bb.translate(dv);
 }
 void tnw::Octree::scale(const float dx) {
-	bb.depth *= dx;
+	bb.scale(dx);
 }
 
 Color tnw::Octree::intersect_box(const BoundingBox& b2) const {
@@ -78,6 +84,11 @@ tnw::BooleanErrorCodes tnw::Octree::bool_or(const Model& y) {
 	} else return tnw::BooleanErrorCodes::unimplementedType;
 }
 // Geometric analysis
+
+BoundingBox tnw::Octree::boundingBox() const {
+	return bb;
+}
+
 double tnw::Octree::volume() const{
 	if (tree) {
 		return bb.volume() * tree->volume();
@@ -98,7 +109,7 @@ std::string tnw::Octree::serialize() const {
 }
 
 //Set color
-void tnw::Octree::setColor(float c[3]){
+void tnw::Octree::setColor(const float c[3]){
 	if (tree) {
 		tree->setColor(c);
 	}

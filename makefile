@@ -16,8 +16,8 @@ LINK = -lm -l:imgui.a $(LINKGL)
 
 default: bin/main
 
-bin/main: src/main.cpp bin/imgui.a bin/ray.o bin/tree.o bin/octree.o bin/boundingbox.o bin/shapes.o bin/helper.o bin/raycast.o bin/interface.o
-	$(CC) $(CFLAGS) bin/interface.o bin/ray.o bin/tree.o bin/octree.o bin/boundingbox.o bin/shapes.o bin/helper.o src/main.cpp -o bin/main $(LINK)
+bin/main: src/main.cpp bin/imgui.a bin/ray.o bin/tree.o bin/octree.o bin/boundingbox.o bin/shapes.o bin/helper.o bin/raycast.o bin/interface.o bin/csgtree.o
+	$(CC) $(CFLAGS) bin/interface.o bin/ray.o bin/tree.o bin/octree.o bin/boundingbox.o bin/shapes.o bin/helper.o bin/csgtree.o src/main.cpp -o bin/main $(LINK)
 
 bin/imgui.a: lib/imgui/*.cpp
 	$(CC) $(CFLAGS) -c lib/imgui/imgui.cpp -o bin/imgui.o
@@ -39,17 +39,23 @@ bin/octree.o: src/octree.cpp src/model.h
 bin/shapes.o: src/shapes.cpp src/shapes.h src/model.h
 		$(CC) $(CFLAGS) -c src/shapes.cpp -o bin/shapes.o
 
+bin/csgtree.o: src/csgtree.cpp src/csgtree.h src/shapes.h src/model.h
+		$(CC) $(CFLAGS) -c src/csgtree.cpp -o bin/csgtree.o
+
 bin/helper.o: src/helper.cpp src/helper.h src/octree.h
 	$(CC) $(CFLAGS) -c src/helper.cpp -o bin/helper.o
 
 bin/raycast.o: src/raycast.cpp src/raycast.h src/model.h src/helper.h src/interface.h
-	$(CC) $(CFLAGS) -c src/raycast.cpp -o bin/raycast.o	
+	$(CC) $(CFLAGS) -c src/raycast.cpp -o bin/raycast.o
 
 bin/interface.o: src/interface.cpp src/interface.h
 	$(CC) $(CFLAGS) -c src/interface.cpp -o bin/interface.o
 
 bin/ray.o: src/ray.cpp src/model.h
 	$(CC) $(CFLAGS) -c src/ray.cpp -o bin/ray.o
-		
+
 clear:
-	rm -f bin/main{,.exe} bin/imgui.a bin/*.o
+	rm -f bin/main{,.exe} bin/*.o
+
+fullclear: clear
+	rm -f bin/imgui.a

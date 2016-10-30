@@ -58,9 +58,21 @@ void tnw::BoundingBox::draw() const{
 
 	glEnd();
 }
+
+void tnw::BoundingBox::translate(const glm::vec3& dv) {
+	corner += dv;
+}
+
+void tnw::BoundingBox::scale(const float dx) {
+	corner *= dx;
+	depth  *= dx;
+}
+
 //Retorna o centro da bounding box
 glm::vec3 tnw::BoundingBox::getCenter() const {
-	glm::vec3 x = glm::vec3(1.,0.,0.), y = glm::vec3(0.,1.,0.), z = glm::vec3(0.,0.,1.);
+	glm::vec3 x = glm::vec3(1.,0.,0.),
+	          y = glm::vec3(0.,1.,0.),
+	          z = glm::vec3(0.,0.,1.);
 	float depth = this->depth/2;
 	return this->corner + depth*(x+y+z);
 }
@@ -244,4 +256,8 @@ tnw::BoundingBox tnw::BoundingBox::least_boundingbox(const tnw::BoundingBox& bb)
 	d = std::max(d,dp[2]);
 
 	return tnw::BoundingBox(mn,d);
+}
+
+tnw::BoundingBox tnw::BoundingBox::boundingBox() const {
+	return *this;
 }

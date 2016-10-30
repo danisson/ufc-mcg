@@ -1,6 +1,7 @@
 #include "interface.h"
 #include "shapes.h"
 #include "octree.h"
+#include "csgtree.h"
 #include <sstream>
 #include <iostream>
 #include <random>
@@ -257,10 +258,11 @@ void MainMenu::draw() {
 		// ImGui::SameLine();
 		buttonSize.x = fullWidth/1-margin;
 		if (ImGui::Button("Volume",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
+			volumeCache = models[curr_item]->volume();
 			ImGui::OpenPopup("Volume##2");
 		}
 		if (ImGui::BeginPopup("Volume##2")) {
-			ImGui::Text("%lf",models[curr_item]->volume());
+			ImGui::Text("%lf",volumeCache);
 			ImGui::EndPopup();
 		}
 
@@ -305,7 +307,8 @@ void MainMenu::draw() {
 			model_names.erase(model_names.begin() + curr_item);
 		}
 
-		if (ImGui::CollapsingHeader("Nova Primitiva")) {
+		ImGui::PushID("Octree");
+		if (ImGui::CollapsingHeader("Nova Octree")) {
 			if (ImGui::Button("Esfera")) {
 				ImGui::OpenPopup("Parâmetros da Esfera");
 			}
@@ -454,7 +457,7 @@ void MainMenu::draw() {
 				ImGui::EndPopup();
 			}
 
-			if (ImGui::Button("Octree")) {
+			if (ImGui::Button("Modelo")) {
 				if (isSelected)
 					ImGui::OpenPopup("Parâmetros da Classificação");
 				else
@@ -484,6 +487,137 @@ void MainMenu::draw() {
 			}
 			errorDialog("Erro de seleção","Selecione um objeto.");
 		}
+		ImGui::PopID();
+
+		ImGui::PushID("CSG");
+		if (ImGui::CollapsingHeader("Nova CSG")) {
+			if (ImGui::Button("Esfera")) {
+				ImGui::OpenPopup("Parâmetros da Esfera");
+			}
+			if (ImGui::BeginPopupModal("Parâmetros da Esfera")) {
+				ImGui::Text("centro:");
+				ImGui::InputFloat("x", &x);
+				ImGui::InputFloat("y", &y);
+				ImGui::InputFloat("z", &z);
+				ImGui::Separator();
+				ImGui::InputFloat("raio", &r);
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					auto s = new tnw::Sphere({x,y,z}, r);
+					models.push_back(std::make_unique<tnw::CSGTree>(s));
+					std::stringstream ss;
+					ss << "CSG " << model_names.size() << "[ESFERA]";
+					model_names.push_back(ss.str());
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Caixa")) {
+				ImGui::OpenPopup("Parâmetros da Caixa");
+			}
+			if (ImGui::BeginPopupModal("Parâmetros da Caixa")) {
+				ImGui::Text("centro:");
+				ImGui::InputFloat("x", &x);
+				ImGui::InputFloat("y", &y);
+				ImGui::InputFloat("z", &z);
+				ImGui::Separator();
+				ImGui::InputFloat("largura", &l);
+				ImGui::InputFloat("altura", &h);
+				ImGui::InputFloat("profundidade", &d);
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					auto bb = new tnw::Box({x,y,z}, l, h, d);
+					models.push_back(std::make_unique<tnw::CSGTree>(bb));
+					std::stringstream ss;
+					ss << "CSG " << model_names.size() << "[CAIXA]";
+					model_names.push_back(ss.str());
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Cilindro")) {
+				ImGui::OpenPopup("Parâmetros do Cilindro");
+			}
+			if (ImGui::BeginPopupModal("Parâmetros do Cilindro")) {
+				ImGui::Text("centro do lado inferior:");
+				ImGui::InputFloat("x", &x);
+				ImGui::InputFloat("y", &y);
+				ImGui::InputFloat("z", &z);
+
+				ImGui::Separator();
+				ImGui::InputFloat("raio", &r);
+				ImGui::InputFloat("altura", &h);
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					auto cl = new tnw::Cilinder({x,y,z}, h, r);
+					models.push_back(std::make_unique<tnw::CSGTree>(cl));
+					std::stringstream ss;
+					ss << "CSG " << model_names.size() << "[CILINDRO]";
+					model_names.push_back(ss.str());
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Pirâmide Base Quadrada")) {
+				ImGui::OpenPopup("Parâmetros da Pirâmide");
+			}
+			if (ImGui::BeginPopupModal("Parâmetros da Pirâmide")) {
+				ImGui::Text("centro do lado inferior:");
+				ImGui::InputFloat("x", &x);
+				ImGui::InputFloat("y", &y);
+				ImGui::InputFloat("z", &z);
+
+				ImGui::Separator();
+				ImGui::InputFloat("altura", &h);
+				ImGui::InputFloat("lado", &l);
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					auto sp = new tnw::SquarePyramid({x,y,z}, h, l);
+					models.push_back(std::make_unique<tnw::CSGTree>(sp));
+					std::stringstream ss;
+					ss << "CSG " << model_names.size() << "[PIRÂMIDE]";
+					model_names.push_back(ss.str());
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			if (ImGui::Button("Modelo")) {
+				if (isSelected)
+					ImGui::OpenPopup("Parâmetros da Classificação");
+				else
+					ImGui::OpenPopup("Erro de seleção");
+			}
+			if (ImGui::BeginPopupModal("Parâmetros da Classificação")) {
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					auto c = models[curr_item]->clone();
+					models.push_back(std::make_unique<tnw::CSGTree>(c));
+					std::stringstream ss;
+					ss << "CSG " << model_names.size() << "[MODEL]";
+					model_names.push_back(ss.str());
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+			errorDialog("Erro de seleção","Selecione um objeto.");
+		}
+		ImGui::PopID();
 	}
 
 	if (ImGui::CollapsingHeader("Câmera")) {
