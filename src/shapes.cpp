@@ -89,7 +89,8 @@ IntersectionList tnw::Sphere::intersect_ray(const Ray& ray) const {
 		ilist.push_back(std::make_tuple(tnw::Color::white, length));
 	}
 
-	return removeZeroIntersections(ilist);
+	// return removeZeroIntersections(ilist);
+	return ilist;
 }
 
 // ------------------------------------------------------------------------- //

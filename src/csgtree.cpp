@@ -1,4 +1,5 @@
 #include "csgtree.h"
+#include "shapes.h"
 #include <random>
 
 using namespace tnw;
@@ -187,7 +188,9 @@ Color tnw::CSGTree::intersect_box(const BoundingBox& x) const {
 	return root->intersect_box(x);
 }
 
-IntersectionList tnw::CSGTree::intersect_ray(const Ray& ray) const {throw 0;}
+IntersectionList tnw::CSGTree::intersect_ray(const Ray& ray) const {
+	return tnw::Sphere({0.5,0.5,0.5},0.5).intersect_ray(ray);
+}
 
 BoundingBox tnw::CSGTree::boundingBox() const {
 	return root->boundingBox();

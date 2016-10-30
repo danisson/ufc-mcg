@@ -1,8 +1,10 @@
 #include "raycast.h"
+#include <iostream>
+#include <glm/gtx/string_cast.hpp>
 #undef near
 #undef far
 using std::unique_ptr;
-tnw::Raycast::Raycast(std::vector<unique_ptr<Model>>& _models, IsometricCamera _camera, size_t _width, size_t _height, GLuint _texId) :
+tnw::Raycast::Raycast(std::vector<unique_ptr<Model>>& _models, IsometricCamera &_camera, size_t _width, size_t _height, GLuint _texId) :
 	models(_models), camera(_camera), width(_width), height(_height), texId(_texId), image(width, height)
 {
 	glBindTexture(GL_TEXTURE_2D, texId);
@@ -11,26 +13,35 @@ tnw::Raycast::Raycast(std::vector<unique_ptr<Model>>& _models, IsometricCamera _
 	for (size_t i = 0; i < width; i++) {
 		rays[i].reserve(height);
 	}
-	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, image);
+	for (int j = 0; j < height; j++) {
+		for (int i = 0; i < width; i++) {
+			image(i,j) = std::make_tuple(0,0,1);
+		}		
+	}
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, image);
 	generateRays();
 	paintImage();
 }
 
 void tnw::Raycast::generateRays() {
+	auto dx = 2.0/width,
+		 dy = 2.0/height;
 	for (size_t j = 0; j < height; ++j) {
 		for (size_t i = 0; i < width; ++i) {
-
-			auto nx = -2.f*(1.f/2.f - float(i+1)/width);
-			auto ny = 2.f*(1.f/2.f - float(j+1)/height);
+			
 			auto x = -2.f*(1.f/2.f - float(i)/width);
 			auto y = 2.f*(1.f/2.f - float(j)/height);
 
-			float pospixx = x+nx/2;
-			float pospixy = y+ny/2;
+			float pospixx = x+dx/2;
+			float pospixy = y-dy/2;
 
 			glm::vec3 a(pospixx, pospixy, camera.near);
 			glm::vec3 b(pospixx, pospixy, camera.far);
-			// std::cout << glm::to_string(a) << std::endl;
+			// std::cout << "i: " << i << " j: " << j << "\n";
+			// std::cout << "a: " << glm::to_string(a) << "b: " << glm::to_string(b) << std::endl;
 
 			// tnw::Ray r = tnw::Ray(a,b);
 			// rays[i][j] = r;
@@ -40,26 +51,57 @@ void tnw::Raycast::generateRays() {
 }
 
 void tnw::Raycast::paintImage() {
+	
 	for (size_t j = 0; j < height; ++j) {
 		for (size_t i = 0; i < width; ++i) {
-			float minInter = camera.far;
 			PaintColor paintColor = {0.0, 0.0, 0.0};
+			float maxDist = glm::length(rays[i][j].dir);
+			std::tuple<tnw::Color, float> minInter = std::make_tuple(tnw::Color::white, maxDist);
+
 			for (size_t k = 0; k < models.size(); k++) {
+				// std::cout << "a: " << glm::to_string(rays[i][j].a) << "b: " << glm::to_string(rays[i][j].b) << std::endl;
+				
+				// std::cout << "minInter: " << minInter << "\n";
 				tnw::IntersectionList ilist = models[k]->intersect_ray(rays[i][j]);
-				for (size_t l = 0; l < ilist.size(); l++) {
-					tnw::Color modelColor = std::get<0>(ilist[l]);
-					if (modelColor == tnw::Color::black || modelColor == tnw::Color::gray) {
-						float intersDist = std::get<1>(ilist[l]);
-						if (intersDist < minInter) {
-							minInter = intersDist;
+
+				switch (std::get<0>(ilist[0])) {
+					case tnw::Color::black:
+					case tnw::Color::gray:
+						if (std::get<1>(minInter) > std::get<1>(ilist[0])) {
+							minInter = ilist[0];
 							paintColor = models[k]->getColor();
-							break;
 						}
-					}
+						break;
+					case tnw::Color::white:
+						if (std::get<1>(ilist[0]) < maxDist && std::get<1>(minInter) > std::get<1>(ilist[0])) {
+							minInter = ilist[0];
+							paintColor = models[k]->getColor();
+						}
 				}
+
+				// for (size_t l = 0; l < ilist.size(); l++) {
+				// 	tnw::Color modelColor = std::get<0>(ilist[l]);
+				// 	// std::cout << "modelColor: " << (int)modelColor << "\n";
+				// 	if ((modelColor == tnw::Color::black) || (modelColor == tnw::Color::gray)) {
+				// 		// std::cout << "i: " << i << " j: " << j << std::endl;
+				// 		std::cout << "a: " << glm::to_string(rays[i][j].a) << "b: " << glm::to_string(rays[i][j].b) << std::endl;
+				// 		float intersDist = std::get<1>(ilist[l]);
+				// 		std::cout << "intersDist: " << intersDist << "\n";
+				// 		if (intersDist <= minInter) {
+				// 		// if (true) {
+				// 			minInter = intersDist;
+				// 			paintColor = models[k]->getColor();
+				// 			// paintColor = {0.5,0,0};
+				// 			break;
+				// 		}
+				// 	}
+				// }
 			}
+
+			image(i,j) = std::make_tuple(paintColor[0], paintColor[1], paintColor[2]);
+			// image(i,j) = std::make_tuple(0.0,1.0,0.0);
 		}
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0 ,0, 0, width, height, GL_RGB, GL_FLOAT, image);
+	glTexSubImage2D(GL_TEXTURE_2D, 0 ,0, 0, width, height, GL_RGB, GL_FLOAT, image);
 }

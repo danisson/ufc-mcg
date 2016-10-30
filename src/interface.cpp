@@ -47,7 +47,17 @@ void MainMenu::renderWindow(const GLuint& t, size_t w, size_t h, bool& should_cl
 		ImGui::End();
 		return;
 	}
-	ImGui::Image((void*)(t), ImVec2(w, h), ImVec2(0,0), ImVec2(1,1));
+	
+	// glBindTexture(GL_TEXTURE_2D, t);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	// tnw::Image img(w,h);
+	// for (size_t i = 0; i < w; ++i)
+	// for (size_t j = 0; j < h; ++j)
+	// if (j==i) img(i,j) = std::make_tuple(0,1,1);
+	// else img(i,j) = std::make_tuple(1,1,1);
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_FLOAT, img);
+	ImGui::Image((void*)(t), ImVec2(w, h), ImVec2(0,0), ImVec2(1,1), ImColor(255,255,255,255), ImColor(255,255,255,128));
 	ImGui::End();
 }
 
@@ -58,7 +68,7 @@ void MainMenu::draw() {
 
 	if (ImGui::CollapsingHeader("Arquivo")) {
 		if (ImGui::Button("Render") && !render_show) {
-			tnw::Raycast(models,camera,200,200,tex);
+			tnw::Raycast rc(models,camera,200,200,tex);
 			render_show = true;
 		}
 		if (ImGui::Button("Abrir"))
