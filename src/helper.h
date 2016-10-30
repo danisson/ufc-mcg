@@ -47,7 +47,7 @@ namespace tnw
 		tuple<float&,float&,float&> operator()(size_t i, size_t j);
 		float  operator()(size_t i, size_t j, size_t k) const;
 		tuple<float,float,float> operator()(size_t i, size_t j) const;
-		Image(size_t height, size_t width);
+		Image(size_t width, size_t height);
 	};
 }
 

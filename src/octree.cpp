@@ -103,3 +103,18 @@ void tnw::Octree::setColor(float c[3]){
 		tree->setColor(c);
 	}
 }
+
+PaintColor tnw::Octree::getColor() const {
+	std::array<float, 3> color;
+	if (tree) {
+		for (int i = 0; i < 3; ++i) {
+			color[i] = tree->drawColor[i];
+		}
+		return color;
+	} else {
+		for (int i = 0; i < 3; ++i) {
+			color[i] = 0.0;
+		}
+		return color;
+	}
+}

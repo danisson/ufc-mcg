@@ -58,6 +58,7 @@ namespace octree {
 		Octree(FILE *f);
 
 		void setColor(float c[3]) override;
+		PaintColor getColor() const override;
 
 		// Geometric operations
 		void translate(const glm::vec3& dv) override;

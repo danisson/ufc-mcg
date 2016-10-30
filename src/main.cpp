@@ -2,6 +2,7 @@
 #include "helper.h"
 #include "interface.h"
 #include "shapes.h"
+#include "raycast.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -27,25 +28,20 @@
 void key_callback(GLFWwindow*, int, int, int, int);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-//Camera initalization
-IsometricCamera camera;
-double xpos, ypos;
-unsigned int swidth, sheight;
+
 bool imgChanged = false, genImg = true;
 
-struct Raycast
-{
-	size_t width, height;
-	float dx, dy, near, far;
+// struct Raycast
+// {
+// 	size_t width, height;
+// 	float dx, dy, near, far;
 
-	Raycast(size_t _width, size_t _height, float _near, float _far) : width(_width), height(_height), near(_near), far(_far) {
-		dx = 1/_width;
-		dy = 1/_height;
-	}
-};
+// 	Raycast(size_t _width, size_t _height, float _near, float _far) : width(_width), height(_height), near(_near), far(_far) {
+// 		dx = 1/_width;
+// 		dy = 1/_height;
+// 	}
+// };
 
-// std::vector<BoxS> boxes;
-// std::vector<Sphere> spheres = {Sphere(glm::vec3(0,0,-3), 0.5, glm::vec3(0,1,0))};
 int main(void) {
 	GLFWwindow* window;
 	std::vector<std::unique_ptr<tnw::Model>> models;
@@ -73,9 +69,9 @@ int main(void) {
 
 	//Opções de OpenGL
 	glClearColor(0.,0.,0.,0.);
-	// glEnable(GL_LINE_SMOOTH);
-	// glEnable(GL_CULL_FACE);
-	// glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glFrontFace(GL_CCW);
 	glShadeModel(GL_SMOOTH);
@@ -85,45 +81,14 @@ int main(void) {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	auto w = 800;
-	auto h = 600;
-	Raycast rc(w,h,1,-100);
-	tnw::Image img(rc.width,rc.height);
 
-	for (size_t i = 0; i < rc.width; ++i) {
-		for (size_t j = 0; j < rc.height; ++j) {
-			// std::cout << "i: " << i << "j: " <<  j << "\n";
-			if (j==i) {
-				img(i,j) = std::make_tuple(0,1,1);
-			}
-			else {
-				img(i,j) = std::make_tuple(1,0,1);
-			}
+	//Camera initalization
+	IsometricCamera camera;
 
-		}
-	}
-
-	for (size_t i = 0; i < rc.width; ++i)
-		for (size_t j = 0; j < rc.height; ++j)
-			if (abs(i-j) == abs(w-h)) img(i,j) = std::make_tuple(0,1,1);
-
-	for (size_t i = 0; i < rc.width; ++i)
-		for (size_t j = 0; j < 1; ++j)
-			img(i,j) = std::make_tuple(0,i/(float)(rc.width-1),0);
-
-	for (size_t i = 0; i < rc.height; ++i)
-		for (size_t j = 0; j < 1; ++j)
-			img(j,i) = std::make_tuple(0,0,i/(float)(rc.height-1));
-
+	auto w = 41;
+	auto h = 40;
+	// Raycast rc(w,h,1,-100);
 	genImg = true;
-	// img(0,0) = std::make_tuple(1,0,0);
-	// img(0,1) = std::make_tuple(0,1,0);
-	// img(1,0) = std::make_tuple(0,0,1);
-	// img(1,1) = std::make_tuple(1,0,1);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, rc.width, rc.height, 0, GL_RGB, GL_FLOAT, img);
 
 	//Set callbacks
 	glfwSetKeyCallback(window, key_callback);
@@ -137,31 +102,7 @@ int main(void) {
 	tnw::Shape *obj1 = new tnw::Sphere(glm::vec3(0,0,-1),1);
 	scene.push_back(obj1);
 	scene.push_back(new tnw::Box(glm::vec3(4,1,-3),1,1,1));
-	// std::cout << "CILINDER TEST\n";
-	// tnw::Cilinder cl(glm::vec3(1,1,1), 3, 1);
-	// tnw::Ray r(glm::vec3(1,4,2), glm::vec3(1,1,2));
-	// tnw::IntersectionList il = cl.intersect_ray(r);
-	// for (std::tuple<tnw::Color, float> ilel : il) {
-	// 	tnw::Color c;
-	// 	float f;
-	// 	std::tie(c,f) = ilel;
-	// 	std::cout << "color: " << (int)c << " length: " << f << std::endl;
-	// }
-	// std::cout << "==================\n";
-
-
-
-	std::cout << "PYRAMID TEST\n";
-	tnw::SquarePyramid sqrPir(glm::vec3(0,0,0), 10, 2);
-	tnw::Ray r2(glm::vec3(1,0,1), glm::vec3(0,10,0));
-	tnw::IntersectionList il5 = sqrPir.intersect_ray(r2);
-	for (std::tuple<tnw::Color, float> ilel : il5) {
-		tnw::Color c;
-		float f;
-		std::tie(c,f) = ilel;
-		std::cout << "color: " << (int)c << " length: " << f << std::endl;
-	}
-	std::cout << "==================\n";
+	tnw::Raycast raycast(scene, camera, w, h, tex);
 
 
 	// Loop until the user closes the window
@@ -173,76 +114,58 @@ int main(void) {
 		// Render here
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		if (genImg) {
-			std::cout << "Generating image...\n";
-			std::flush(std::cout);
-			// std::cout << "Generating image...";
-			// std::flush(std::cout);
-			genImg = false;
+		// if (genImg) {
+		// 	std::cout << "Generating image...\n";
+		// 	std::flush(std::cout);
+		// 	// std::cout << "Generating image...";
+		// 	// std::flush(std::cout);
+		// 	genImg = false;
 
-			for (size_t i = 0; i < rc.width; ++i) {
-				for (size_t j = 0; j < rc.height; ++j) {
+		// 	for (size_t i = 0; i < rc.width; ++i) {
+		// 		for (size_t j = 0; j < rc.height; ++j) {
 
-					auto nx = -2.f*(1.f/2.f - float(i+1)/rc.width);
-					auto ny = 2.f*(1.f/2.f - float(j+1)/rc.height);
-					auto x = -2.f*(1.f/2.f - float(i)/rc.width);
-					auto y = 2.f*(1.f/2.f - float(j)/rc.height);
+		// 			auto nx = -2.f*(1.f/2.f - float(i+1)/rc.width);
+		// 			auto ny = 2.f*(1.f/2.f - float(j+1)/rc.height);
+		// 			auto x = -2.f*(1.f/2.f - float(i)/rc.width);
+		// 			auto y = 2.f*(1.f/2.f - float(j)/rc.height);
 
-					float pospixx = x+nx/2;
-					float pospixy = y+ny/2;
+		// 			float pospixx = x+nx/2;
+		// 			float pospixy = y+ny/2;
 
-					glm::vec3 a(pospixx, pospixy, rc.near);
-					glm::vec3 b(pospixx, pospixy, rc.far);
-					// std::cout << glm::to_string(a) << std::endl;
+		// 			glm::vec3 a(pospixx, pospixy, rc.near);
+		// 			glm::vec3 b(pospixx, pospixy, rc.far);
+		// 			// std::cout << glm::to_string(a) << std::endl;
 
-					tnw::Ray r = tnw::Ray(a,b);
+		// 			tnw::Ray r = tnw::Ray(a,b);
 
-					float minInter = rc.far;
-					int drawIndice = -1;
-					for (size_t k = 0; k < scene.size(); k++) {
-						tnw::IntersectionList ilist = scene[k]->intersect_ray(r);
-						if (ilist.size() >= 2) {
-							if (minInter < std::abs(std::get<1>(ilist[0]))) {
-								minInter = std::abs(std::get<1>(ilist[0]));
-								drawIndice = k;
-							}
-						}
-					}
+		// 			float minInter = rc.far;
+		// 			int drawIndice = -1;
+		// 			for (size_t k = 0; k < scene.size(); k++) {
+		// 				tnw::IntersectionList ilist = scene[k]->intersect_ray(r);
+		// 				if (ilist.size() >= 2) {
+		// 					if (minInter < std::abs(std::get<1>(ilist[0]))) {
+		// 						minInter = std::abs(std::get<1>(ilist[0]));
+		// 						drawIndice = k;
+		// 					}
+		// 				}
+		// 			}
 
-					if (drawIndice >= 0) {
+		// 			if (drawIndice >= 0) {
 
-						// std::cout << "\ni: " << i << " j: " << j << " drawIndice: " << drawIndice;
-						// tnw::IntersectionList ilist = scene[0]->intersect_ray(r);
-						// std::cout << "\nilist size: " << ilist.size();
-						// std::cout << "\na: " << glm::to_string(a) << "\nb: " << glm::to_string(b) << "\n";
+		// 				// std::cout << "\ni: " << i << " j: " << j << " drawIndice: " << drawIndice;
+		// 				// tnw::IntersectionList ilist = scene[0]->intersect_ray(r);
+		// 				// std::cout << "\nilist size: " << ilist.size();
+		// 				// std::cout << "\na: " << glm::to_string(a) << "\nb: " << glm::to_string(b) << "\n";
 
-						img(i,j) = std::make_tuple(0,0,0);
-					}
-				}
-			}
+		// 				img(i,j) = std::make_tuple(0,0,0);
+		// 			}
+		// 		}
+		// 	}
 
-			// for (unsigned i = 0; i < swidth; i++) {
-			// 	for (unsigned j = 0; j < sheight; j++) {
-			// 		glm::vec3 unprojectedCoords = glm::unProject(glm::vec3(i,j,0), glm::mat4(1.0f), glm::mat4(1.0f), glm::vec4(0,0,swidth,sheight));
-			// 		Ray primRay = Ray::computePrimRay(unprojectedCoords, glm::vec3(0,0,0));
-
-			// 		for (BoxS& box : boxes) {
-			// 			if (box.intersect(primRay)) {
-			// 				std::cout << "box intersect\n";
-			// 				std::cout << "unproject: " << unprojectedCoords[0] << " " << unprojectedCoords[1] << " " << unprojectedCoords[2] << "\n";
-			// 				std::cout << "primary ray:\n \torigin: " << primRay.o.x << " " << primRay.o.y << " " << primRay.o.z << "\n\t direction: " << primRay.dir.x << " " << primRay.dir.y << " " << primRay.dir.z << "\n";
-			// 				std::flush(std::cout);
-			// 				img(i,j) = std::make_tuple(box.color[0], box.color[1], box.color[2]);
-			// 			} else {
-			// 				img(i,j) = std::make_tuple(1,0,0);
-			// 			}
-			// 		}
-			// 	}
-			// }
-			glTexSubImage2D(GL_TEXTURE_2D, 0 ,0, 0, rc.width, rc.height, GL_RGB, GL_FLOAT, img);
-			std::cout << " generated image\n";
-			std::flush(std::cout);
-		}
+		// 	glTexSubImage2D(GL_TEXTURE_2D, 0 ,0, 0, rc.width, rc.height, GL_RGB, GL_FLOAT, img);
+		// 	std::cout << " generated image\n";
+		// 	std::flush(std::cout);
+		// }
 
 		glBegin(GL_QUADS);
 		glTexCoord2d(0, 1);

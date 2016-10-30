@@ -7,11 +7,14 @@
 #include <memory>
 #include <tuple>
 #include <vector>
+#include <array>
 
 namespace tnw {
 
 template <typename T>
 using owner_ptr = T*;
+
+typedef std::array<float, 3> PaintColor;
 
 enum class BooleanErrorCodes {
 	success,
@@ -83,6 +86,7 @@ public:
 	virtual std::string serialize() const = 0;
 	//Set color
 	virtual void setColor(float c[3]) = 0;
+	virtual PaintColor getColor() const = 0;
 };
 
 } // namespace tnw

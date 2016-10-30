@@ -133,7 +133,7 @@ bool tnw::ray_on_plane(const tnw::Ray& ray, const glm::vec3 &v0, const glm::vec3
 
 tnw::IntersectionList tnw::removeZeroIntersections(const tnw::IntersectionList& ilist) {
 	IntersectionList r;
-	for (int i = 0; i < ilist.size(); i++) {
+	for (unsigned i = 0; i < ilist.size(); i++) {
 		if (std::abs(0.0 - std::get<1>(ilist[i])) > 0.0000001) {
 			r.push_back(ilist[i]);
 		}
