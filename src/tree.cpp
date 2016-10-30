@@ -23,11 +23,9 @@ tnw::octree::Tree::Tree(Tree* parent) {
 
 	std::uniform_real_distribution<> dis(0,1);
 
-	for (int i = 0; i < 3; ++i)
-	{
+	for (int i = 0; i < 3; ++i) {
 		drawColor[i] = dis(gen);
 	}
-
 }
 
 tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
@@ -48,7 +46,6 @@ tnw::octree::Tree::Tree(array<unique_ptr<Tree>,8>&& children, Tree* parent) {
 	for (int i = 0; i < 3; ++i) {
 		drawColor[i] = dis(gen);
 	}
-
 }
 
 tnw::octree::Tree::Tree(const Tree& o) {
@@ -314,12 +311,12 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 				b.draw();
 
 				//Desenha wireframe cinza
-				// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-				// glColor3f(.5,.5,.5);
-				// glLineWidth(0.5);
-				// b.draw();
-				// glLineWidth(1.0);
-				// glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+				glColor3f(.5,.5,.5);
+				glLineWidth(0.5);
+				b.draw();
+				glLineWidth(1.0);
+				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 				break;
 			}
@@ -328,7 +325,7 @@ void tnw::octree::Tree::draw(const BoundingBox& bb){
 }
 
 
-void tnw::octree::Tree::setColor(float c[3]) {
+void tnw::octree::Tree::setColor(const float c[3]) {
 	drawColor[0] = c[0];
 	drawColor[1] = c[1];
 	drawColor[2] = c[2];

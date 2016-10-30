@@ -14,7 +14,7 @@ namespace tnw {
 template <typename T>
 using owner_ptr = T*;
 
-typedef std::array<float, 3> PaintColor;
+using PaintColor = std::array<float, 3>;
 
 enum class BooleanErrorCodes {
 	success,
@@ -26,6 +26,9 @@ enum class Color {
 	white, black, gray
 };
 
+//Lista de interseções é representada como um par <Cor>, <Comprimento dessa cor no raio>
+using IntersectionList = std::vector<std::tuple<Color, float>>;
+
 class Ray {
 public:
 	Ray(glm::vec3 _a, glm::vec3 _b);
@@ -36,8 +39,6 @@ public:
 	glm::vec3 dir, invdir;
 };
 
-//Lista de interseções é representada como um par <Cor>, <Comprimento dessa cor no raio>
-typedef std::vector<std::tuple<Color, float>> IntersectionList;
 
 struct BoundingBox;
 class Shape {
@@ -47,19 +48,24 @@ public:
 	virtual Color intersect_box(const BoundingBox&) const = 0;
 	virtual IntersectionList intersect_ray(const Ray&) const = 0;
 	// Geometric analysis
+	virtual BoundingBox boundingBox() const = 0;
 	virtual double volume() const = 0;
 };
 
 struct BoundingBox : public Shape {
 	glm::vec3 corner;
 	float depth;
+
 	BoundingBox(glm::vec3 _corner, float _depth);
 	void draw() const;
+	void translate(const glm::vec3& dv);
+	void scale(const float dx);
 	BoundingBox operator[](size_t position) const;
 	glm::vec3 getVertice(unsigned int i) const;
 	glm::vec3 getCenter() const;
 	glm::vec3 minPoint() const;
 	glm::vec3 maxPoint() const;
+	BoundingBox boundingBox() const override;
 	double volume() const override;
 	Color intersect_point(const glm::vec3&) const override;
 	Color intersect_box(const BoundingBox&) const override;
@@ -71,11 +77,12 @@ struct BoundingBox : public Shape {
 
 class Model : public Shape {
 private:
-	virtual void rdraw() const = 0;
+	virtual void rdraw() = 0;
 public:
 	bool visible = true;
 	void toggle() {visible = !visible;}
-	void draw() const {if(visible) this->rdraw();}
+	void draw() {if(visible) this->rdraw();}
+	virtual owner_ptr<Model> clone() const = 0;
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;
 	virtual void scale(const float dx) = 0;
@@ -85,7 +92,7 @@ public:
 	//Serialize
 	virtual std::string serialize() const = 0;
 	//Set color
-	virtual void setColor(float c[3]) = 0;
+	virtual void setColor(const float c[3]) = 0;
 	virtual PaintColor getColor() const = 0;
 };
 

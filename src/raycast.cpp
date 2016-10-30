@@ -1,6 +1,8 @@
 #include "raycast.h"
+#undef near
+#undef far
 
-tnw::Raycast::Raycast(std::vector<owner_ptr<Model>> _models, IsometricCamera _camera, size_t _width, size_t _height, GLuint _texId) : 
+tnw::Raycast::Raycast(std::vector<owner_ptr<Model>> _models, IsometricCamera _camera, size_t _width, size_t _height, GLuint _texId) :
 	models(_models), camera(_camera), width(_width), height(_height), texId(_texId), image(width, height)
 {
 	glBindTexture(GL_TEXTURE_2D, texId);
@@ -43,9 +45,9 @@ void tnw::Raycast::paintImage() {
 			for (size_t k = 0; k < models.size(); k++) {
 				tnw::IntersectionList ilist = models[k]->intersect_ray(rays[i][j]);
 				for (size_t l = 0; l < ilist.size(); l++) {
-					tnw::Color modelColor = std::get<0>(ilist[l]); 
+					tnw::Color modelColor = std::get<0>(ilist[l]);
 					if (modelColor == tnw::Color::black || modelColor == tnw::Color::gray) {
-						float intersDist = std::get<1>(ilist[l]); 
+						float intersDist = std::get<1>(ilist[l]);
 						if (intersDist < minInter) {
 							minInter = intersDist;
 							paintColor = models[k]->getColor();

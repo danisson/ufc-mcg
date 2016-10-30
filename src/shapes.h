@@ -11,6 +11,8 @@ namespace tnw {
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
 		IntersectionList intersect_ray(const Ray&) const override;
+
+		BoundingBox boundingBox() const override;
 		double volume() const override;
 	private:
 		glm::vec3 center;
@@ -24,6 +26,8 @@ namespace tnw {
 		Color intersect_box(const BoundingBox&) const override;
 		IntersectionList intersect_ray(const Ray&) const override;
 		bool clip_line(int d, const Ray& ray, float& f_low, float& f_high) const;
+
+		BoundingBox boundingBox() const override;
 		double volume() const override;
 	private:
 		glm::vec3 center;
@@ -36,6 +40,8 @@ namespace tnw {
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
 		IntersectionList intersect_ray(const Ray&) const override;
+
+		BoundingBox boundingBox() const override;
 		double volume() const override;
 	private:
 		glm::vec3 inferiorPoint;
@@ -48,6 +54,8 @@ namespace tnw {
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
 		IntersectionList intersect_ray(const Ray&) const override;
+
+		BoundingBox boundingBox() const override;
 		double volume() const override;
 	private:
 		glm::vec3 inferiorPoint;

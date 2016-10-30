@@ -25,7 +25,7 @@ namespace octree {
 
 		//Drawing function
 		void draw(const BoundingBox& bb);
-		void setColor(float c[3]);
+		void setColor(const float c[3]);
 
 		void set(size_t i, unique_ptr<Tree>&& t);
 		Tree* get(size_t);
@@ -51,14 +51,15 @@ namespace octree {
 		//Octree com raiz vazia
 		Octree(const BoundingBox& _bb);
 		//Octree com raiz pronta
-		Octree(std::unique_ptr<octree::Tree> tree, const BoundingBox& _bb);
+		Octree(std::unique_ptr<octree::Tree>&& tree, const BoundingBox& _bb);
 		//Octree a partir de um forma e uma Bounding Box
 		Octree(const Shape& c, const BoundingBox& _bb, unsigned int depth);
 		//Octree a partir de um arquivo
 		Octree(FILE *f);
 
-		void setColor(float c[3]) override;
+		void setColor(const float c[3]) override;
 		PaintColor getColor() const override;
+		owner_ptr<Model> clone() const override;
 
 		// Geometric operations
 		void translate(const glm::vec3& dv) override;
@@ -70,6 +71,7 @@ namespace octree {
 		BooleanErrorCodes bool_and(const Model& y) override;
 		BooleanErrorCodes bool_or(const Model& y) override;
 		// Geometric analysis
+		BoundingBox boundingBox() const override;
 		double volume() const override;
 		//Serialize
 		std::string serialize() const override;
@@ -77,7 +79,7 @@ namespace octree {
 	private:
 		std::unique_ptr<octree::Tree> tree;
 		BoundingBox bb;
-		void rdraw() const override;
+		void rdraw() override;
 	};
 
 }
