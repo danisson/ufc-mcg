@@ -258,10 +258,11 @@ void MainMenu::draw() {
 		// ImGui::SameLine();
 		buttonSize.x = fullWidth/1-margin;
 		if (ImGui::Button("Volume",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
+			volumeCache = models[curr_item]->volume();
 			ImGui::OpenPopup("Volume##2");
 		}
 		if (ImGui::BeginPopup("Volume##2")) {
-			ImGui::Text("%lf",models[curr_item]->volume());
+			ImGui::Text("%lf",volumeCache);
 			ImGui::EndPopup();
 		}
 

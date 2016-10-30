@@ -1,5 +1,4 @@
 #include "csgtree.h"
-#include "octree.h"
 #include <random>
 
 using namespace tnw;
@@ -28,6 +27,35 @@ Color or_color(Color c1, Color c2) {
 			else return c2;
 	}
 	return Color::white;
+}
+
+// Computa volume usando integração de Monte-Carlo
+double tnw::csg::Node::volume() const {
+	using        uniform          = std::uniform_real_distribution<double>;
+	auto         bb               = boundingBox();
+
+	auto         bounding_volume  = bb.volume();
+	const size_t samples          = 10000;
+	      size_t points_inside    = 0;
+	const auto   min              = bb.minPoint();
+	const auto   max              = bb.maxPoint();
+
+	std::random_device r;
+	std::default_random_engine gen(r());
+
+	uniform dis[] = {uniform(min[0],max[0]),
+	                 uniform(min[1],max[1]),
+	                 uniform(min[2],max[2])};
+
+	glm::vec3 test;
+	for (size_t t = 0; t < samples; ++t) {
+		for (size_t i = 0; i < 3; ++i)
+			test[i] = dis[i](gen);
+
+		if (intersect_point(test) != Color::white) points_inside++;
+	}
+
+	return bounding_volume * points_inside/double(samples);
 }
 
 //---------------------------------------------------------------------------//
@@ -125,13 +153,18 @@ BoundingBox tnw::csg::TranslateNode::boundingBox() const {
 
 std::string tnw::csg::TranslateNode::serialize() const {throw 0;}
 //---------------------------------------------------------------------------//
-void tnw::CSGTree::rdraw() const {
-	auto x = Octree(*root,this->boundingBox(),6);
-	x.setColor(color);
-	x.draw();
+void tnw::CSGTree::rdraw() {
+	if (should_update) {
+		should_update = false;
+		render_model = Octree(*root,this->boundingBox(),5);
+		render_model.setColor(color);
+	}
+
+	render_model.draw();
 }
 
-tnw::CSGTree::CSGTree(unique_ptr<Shape>&& s) : root(new csg::ScaleNode(move(s),1)) {
+tnw::CSGTree::CSGTree(unique_ptr<Shape>&& s) : root(new csg::ScaleNode(move(s),1)), render_model(BoundingBox({0,0,0},1)) {
+	should_update = true;
 	std::random_device r;
 	std::default_random_engine gen(r());
 
@@ -161,21 +194,25 @@ double tnw::CSGTree::volume() const {
 }
 
 void tnw::CSGTree::translate(const glm::vec3& dx) {
+	render_model.translate(dx);
 	auto x = new csg::TranslateNode(move(root),dx);
 	root.reset(x);
 }
 void tnw::CSGTree::scale(const float dv) {
+	should_update = true;
 	auto x = new csg::ScaleNode(move(root),dv);
 	root.reset(x);
 }
 
 BooleanErrorCodes tnw::CSGTree::bool_and(const Model& y) {
+	should_update = true;
 	auto x = new csg::AndNode(move(root),unique_ptr<Shape>(y.clone()));
 	root.reset(x);
 	return BooleanErrorCodes::success;
 }
 
 BooleanErrorCodes tnw::CSGTree::bool_or(const Model& y) {
+	should_update = true;
 	auto x = new csg::OrNode(move(root),unique_ptr<Shape>(y.clone()));
 	root.reset(x);
 	return BooleanErrorCodes::success;
@@ -185,6 +222,7 @@ std::string tnw::CSGTree::serialize() const {
 	return root->serialize();
 }
 void tnw::CSGTree::setColor(const float c[3]) {
+	render_model.setColor(color);
 	for (size_t i = 0; i < 3; ++i)
 		color[i] = c[i];
 }

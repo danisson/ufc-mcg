@@ -31,7 +31,7 @@ owner_ptr<Model> tnw::Octree::clone() const {
 	return c;
 }
 
-void tnw::Octree::rdraw() const {
+void tnw::Octree::rdraw() {
 	//Desenha a bounding box
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	glColor3f(0,0,0);
@@ -44,10 +44,10 @@ void tnw::Octree::rdraw() const {
 }
 // Geometric operations
 void tnw::Octree::translate(const glm::vec3& dv) {
-	bb.corner += dv;
+	bb.translate(dv);
 }
 void tnw::Octree::scale(const float dx) {
-	bb.depth *= dx;
+	bb.scale(dx);
 }
 
 Color tnw::Octree::intersect_box(const BoundingBox& b2) const {

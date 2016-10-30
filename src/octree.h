@@ -78,7 +78,7 @@ namespace octree {
 	private:
 		std::unique_ptr<octree::Tree> tree;
 		BoundingBox bb;
-		void rdraw() const override;
+		void rdraw() override;
 	};
 
 }

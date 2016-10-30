@@ -56,11 +56,11 @@ struct BoundingBox : public Shape {
 
 class Model : public Shape {
 private:
-	virtual void rdraw() const = 0;
+	virtual void rdraw() = 0;
 public:
 	bool visible = true;
 	void toggle() {visible = !visible;}
-	void draw() const {if(visible) this->rdraw();}
+	void draw() {if(visible) this->rdraw();}
 	virtual owner_ptr<Model> clone() const = 0;
 	// Geometric operations
 	virtual void translate(const glm::vec3& dv) = 0;

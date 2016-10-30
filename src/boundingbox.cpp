@@ -64,8 +64,8 @@ void tnw::BoundingBox::translate(const glm::vec3& dv) {
 }
 
 void tnw::BoundingBox::scale(const float dx) {
-	corner += (depth*dx-depth)/2;
-	depth *= dx;
+	corner *= dx;
+	depth  *= dx;
 }
 
 //Retorna o centro da bounding box

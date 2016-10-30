@@ -1,6 +1,7 @@
 #ifndef _H_CSG
 #define _H_CSG
 #include "model.h"
+#include "octree.h"
 #include <memory>
 #include <array>
 
@@ -13,7 +14,7 @@ namespace csg {
 	public:
 		virtual Color intersect_point(const glm::vec3&) const = 0;
 		virtual Color intersect_box(const BoundingBox&) const = 0;
-		virtual double volume() const {return 0;}; // TODO
+		double volume() const; // TODO
 		virtual std::string serialize() const = 0;
 		BoundingBox boundingBox() const = 0;
 	};
@@ -65,7 +66,10 @@ namespace csg {
 class CSGTree : public tnw::Model {
 	unique_ptr<csg::Node> root;
 	float color[3];
-	void rdraw() const override;
+	void rdraw() override;
+
+	Octree render_model;
+	bool should_update;
 public:
 	CSGTree(unique_ptr<Shape>&&);
 	CSGTree(owner_ptr<Shape>);
