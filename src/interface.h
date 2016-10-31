@@ -2,10 +2,12 @@
 #define _H_INTERFACE
 #include <imgui.h>
 #include "model.h"
+#include "helper.h"
 #include <vector>
 #include <memory>
 #include <GLFW/glfw3.h>
-
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #undef near
 #undef far
 

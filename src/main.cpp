@@ -69,17 +69,7 @@ int main(void) {
 
 	// camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
-
-	std::cout << "CILINDER TEST\n";
-	tnw::Cilinder s({0,-1,0}, 1, 0.5);
-	tnw::Ray r({4,-2,0}, {4,2,10});
-	tnw::IntersectionList il = s.intersect_ray(r);
-	for (std::tuple<tnw::Color, float> ilel : il) {
-		tnw::Color c;
-		float f;
-		std::tie(c,f) = ilel;
-		std::cout << "color: " << (int)c << " length: " << f << std::endl;
-	}
+	std::cout << glm::to_string(glm::ortho(-1,1,-1,1,1,-1)) << "\n";
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {

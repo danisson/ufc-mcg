@@ -38,14 +38,26 @@ void tnw::Raycast::generateRays() {
 			float pospixx = x+dx/2;
 			float pospixy = y-dy/2;
 
-			glm::vec3 a(pospixx, pospixy, camera.near);
-			glm::vec3 b(pospixx, pospixy, camera.far);
+			// std::cout << "untransf a: " << glm::to_string(glm::vec3(pospixx, pospixy, camera.near)) << " unstransf b: " << glm::to_string(glm::vec3(pospixx, pospixy, camera.far)) << std::endl;
+
+			glm::mat4 cameraMatrix;
+			cameraMatrix = glm::scale(glm::mat4(),{1/camera.scale,1/camera.scale,1/camera.scale}) * cameraMatrix;
+			cameraMatrix = glm::translate(glm::mat4(),-camera.pos) * cameraMatrix;
+			cameraMatrix = glm::inverse(tnw::isometric(camera.aspect, camera.near, camera.far, camera.positive_hor, camera.positive_ver)) * cameraMatrix;
+
+			// auto aM = glm::rotate(glm::mat4(), glm::radians(-45.0f), glm::vec3(0.0,1.0,0.0));
+			// auto bM = glm::rotate(glm::mat4(), -std::asin(std::tan(glm::radians(30.0f))), glm::vec3(1.0,0.0,0.0));
+			// cameraMatrix = aM*bM*cameraMatrix;
+
+			glm::vec4 a = cameraMatrix * glm::vec4(pospixx, pospixy, camera.near, 1.0f);
+			glm::vec4 b = cameraMatrix * glm::vec4(pospixx, pospixy, camera.far, 1.0f);
+
 			// std::cout << "i: " << i << " j: " << j << "\n";
 			// std::cout << "a: " << glm::to_string(a) << "b: " << glm::to_string(b) << std::endl;
 
 			// tnw::Ray r = tnw::Ray(a,b);
 			// rays[i][j] = r;
-			rays[i].push_back(tnw::Ray(a,b));
+			rays[i].push_back(tnw::Ray(glm::vec3(a),glm::vec3(b)));
 		}
 	}
 }

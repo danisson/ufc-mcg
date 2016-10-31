@@ -64,9 +64,10 @@ Color tnw::Octree::intersect_point(const glm::vec3& x) const {
 }
 
 IntersectionList tnw::Octree::intersect_ray(const Ray& r) const {
+	return tnw::Box({0,0,0},1,1,1).intersect_ray(r);
 	// return tnw::SquarePyramid({0,0,0},1,1).intersect_ray(r);
 	// return tnw::Sphere({0,0,0},1).intersect_ray(r);
-	return tnw::Cilinder({0,-1,0}, 1, 0.5).intersect_ray(r);
+	// return tnw::Cilinder({0,-1,0}, 1, 0.5).intersect_ray(r);
 }
 
 // Boolean operations

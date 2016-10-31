@@ -33,6 +33,7 @@ class Ray {
 public:
 	Ray(glm::vec3 _a, glm::vec3 _b);
 	float length() const;
+	void transform(glm::mat4 &transform);
 
 	//Um raio começa no a e termina no b
 	glm::vec3 a, b;
