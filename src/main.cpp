@@ -70,6 +70,17 @@ int main(void) {
 	// camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
 
+	std::cout << "PYRAMID TEST\n";
+	tnw::SquarePyramid s({0,0,0}, 1, 0.5);
+	tnw::Ray r({0,1,10}, {0,1,-10});
+	tnw::IntersectionList il = s.intersect_ray(r);
+	for (std::tuple<tnw::Color, float> ilel : il) {
+		tnw::Color c;
+		float f;
+		std::tie(c,f) = ilel;
+		std::cout << "color: " << (int)c << " length: " << f << std::endl;
+	}
+
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();

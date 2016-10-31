@@ -528,9 +528,11 @@ IntersectionList tnw::SquarePyramid::intersect_ray(const Ray& ray) const {
 		//t < tamanho do raio, t > 0
 		//u < 1 e u > 0
 		//v < 1 e v > 0
+		//u + v <= 1
 		if (interResult1[0] <= rayLength && interResult1[0] >= 0.0 &&
 			interResult1[1] <= 1.0 && interResult1[1] >= 0.0 &&
-			interResult1[2] <= 1.0 && interResult1[2] >= 0.0) {
+			interResult1[2] <= 1.0 && interResult1[2] >= 0.0 &&
+			interResult1[1] + interResult1[2] <= 1.0) {
 			intersectionCount1++;
 			if (interResult1[0] < minDist1) {
 				minDist1 = interResult1[0];
@@ -538,7 +540,8 @@ IntersectionList tnw::SquarePyramid::intersect_ray(const Ray& ray) const {
 		}
 		if (interResult2[0] <= rayLength && interResult2[0] >= 0.0 &&
 			interResult2[1] <= 1.0 && interResult2[1] >= 0.0 &&
-			interResult2[2] <= 1.0 && interResult2[2] >= 0.0) {
+			interResult2[2] <= 1.0 && interResult2[2] >= 0.0 &&
+			interResult2[1] + interResult2[2] <= 1.0) {
 			intersectionCount2++;
 			if (interResult2[0] < minDist2) {
 				minDist2 = interResult2[0];
