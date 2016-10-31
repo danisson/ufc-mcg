@@ -292,6 +292,7 @@ Color tnw::Cilinder::intersect_box(const BoundingBox& bb) const{
 
 IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const {
 	IntersectionList ilist;
+	// std::cout << "ray a: " << glm::to_string(ray.a) << " ray b: " << glm::to_string(ray.b) << std::endl;
 	const float rayLength = glm::length(ray.b-ray.a);
 	// std::cout << "rayLength: " << rayLength << "\n";
 	const glm::vec3 superiorPoint = inferiorPoint + glm::vec3(0,height,0);
@@ -304,12 +305,14 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const {
 	const float epsilon = 0.000001;
 	float s1, s2, s3, s4;
 
-	//Se o vetor é menor que um certo epsilon
+	//Se o vetor é menor que um certo epsilon, então o cross
+	//product é zero e eles são paralelos
 	const glm::vec3 nabs = glm::abs(n);
 	// std::cout << "nabs: " << glm::to_string(nabs) << "\n";
 	if ((nabs[0] < epsilon) && (nabs[1] < epsilon) && (nabs[2] < epsilon)) {
 		// std::cout << "calculating seg to seg dist\n";
-		dSqr = seg_to_seg_dist(ray.a, ray.b, inferiorPoint, superiorPoint);
+		float segSegDist = seg_to_seg_dist(ray.a, ray.b, inferiorPoint, superiorPoint);
+		dSqr = segSegDist*segSegDist;
 		// std::cout << "dSqr: " << dSqr << "\n";
 		if (dSqr <= radius*radius) {
 			const double rayMaxY = std::fmax(ray.a.y, ray.b.y);
@@ -322,7 +325,6 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const {
 				ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
 				return removeZeroIntersections(ilist);
 			} else {
-
 				const float dist1 = std::abs(inferiorPoint.y-rayMinY),
 					  dist2 = std::abs(rayMaxY-superiorPoint.y),
 					  inferiorDist = std::fmin(dist1, dist2),
@@ -346,7 +348,8 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const {
 			}
 		}
 	} else {
-		dSqr = glm::dot(inferiorPoint-ray.a, n)/normNSqr;
+		float infdotN = glm::dot(inferiorPoint-ray.a, n);
+		dSqr = (infdotN*infdotN)/normNSqr;
 	}
 	// std::cout << "dSqr: " << dSqr << "\n";
 	if (dSqr > radius*radius) {
@@ -358,7 +361,7 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const {
 	const float l2 = glm::dot(superiorPoint-inferiorPoint, superiorPoint-ray.a)/glm::dot(superiorPoint-inferiorPoint, ray.b-ray.a);
 	s3 = std::fmin(l1,l2);
 	s4 = std::fmax(l1,l2);
-	//Direção do raio é normal à direção do eixo do cilindro
+	// Direção do raio é normal à direção do eixo do cilindro
 	if (std::isinf(s3) && std::isinf(s4)) {
 		if (ray.a.y >= inferiorPoint.y && ray.a.y <= superiorPoint.y && ray.b.y >= inferiorPoint.y && ray.b.y <= superiorPoint.y) {
 			s3 = 0; s4 = 1;
