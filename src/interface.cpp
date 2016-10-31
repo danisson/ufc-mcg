@@ -43,20 +43,12 @@ void MainMenu::errorDialog(char* name, char* msg) {
 
 void MainMenu::renderWindow(const GLuint& t, size_t w, size_t h, bool& should_close) {
 	ImGui::SetNextWindowSize(ImVec2(w+15,h+35), ImGuiSetCond_FirstUseEver);
-	if (!ImGui::Begin("Vector Window##", &should_close)) {
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize;
+	if (!ImGui::Begin("Vector Window##", &should_close, flags)) {
 		ImGui::End();
 		return;
 	}
 	
-	// glBindTexture(GL_TEXTURE_2D, t);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	// tnw::Image img(w,h);
-	// for (size_t i = 0; i < w; ++i)
-	// for (size_t j = 0; j < h; ++j)
-	// if (j==i) img(i,j) = std::make_tuple(0,1,1);
-	// else img(i,j) = std::make_tuple(1,1,1);
-	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_FLOAT, img);
 	ImGui::Image((void*)(t), ImVec2(w, h), ImVec2(0,0), ImVec2(1,1), ImColor(255,255,255,255), ImColor(255,255,255,128));
 	ImGui::End();
 }
@@ -64,11 +56,13 @@ void MainMenu::renderWindow(const GLuint& t, size_t w, size_t h, bool& should_cl
 void MainMenu::draw() {
 	ImGui::Begin("Menu");
 
-	if (render_show) renderWindow(tex,200,200,render_show);
+	if (render_show) renderWindow(tex,raycast_width,raycast_height,render_show);
 
 	if (ImGui::CollapsingHeader("Arquivo")) {
+		ImGui::InputInt("render width", &raycast_width);
+		ImGui::InputInt("render height", &raycast_height);
 		if (ImGui::Button("Render") && !render_show) {
-			tnw::Raycast rc(models,camera,200,200,tex);
+			tnw::Raycast rc(models,camera,raycast_width,raycast_height,tex);
 			render_show = true;
 		}
 		if (ImGui::Button("Abrir"))

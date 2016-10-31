@@ -15,7 +15,7 @@ namespace csg {
 		virtual Color intersect_point(const glm::vec3&) const = 0;
 		virtual Color intersect_box(const BoundingBox&) const = 0;
 		IntersectionList intersect_ray(const Ray& ray) const override;
-		double volume() const; // TODO
+		double volume() const;
 		virtual std::string serialize() const = 0;
 		BoundingBox boundingBox() const = 0;
 	};
