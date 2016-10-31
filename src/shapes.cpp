@@ -199,7 +199,7 @@ bool tnw::Box::clip_line(int d, const Ray& ray, float& f_low, float& f_high) con
 }
 
 IntersectionList tnw::Box::intersect_ray(const Ray& ray) const {
-
+	std::cout << "length: " << length << " height: " << height << " depth: " << depth << "\n";
 	IntersectionList ilist;
 
 	float f_low = 0,

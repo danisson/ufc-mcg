@@ -23,6 +23,7 @@ class MainMenu {
 	std::vector<std::unique_ptr<tnw::Model>>& models;
 	std::vector<std::string> model_names;
 	IsometricCamera& camera;
+	IsometricCamera raycastCamera;
 	uint8_t rot = 0;
 	const uint8_t rots[4] = {3,1,0,2};
 	int md = 4, red = 0, green = 0, blue = 0;

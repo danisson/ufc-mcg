@@ -1,6 +1,9 @@
 #include "csgtree.h"
 #include "shapes.h"
 #include <random>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <iostream>
 
 using namespace tnw;
 using std::array;
@@ -59,8 +62,6 @@ double tnw::csg::Node::volume() const {
 	return bounding_volume * points_inside/double(samples);
 }
 
-IntersectionList tnw::csg::Node::intersect_ray(const Ray& ray) const {return tnw::Sphere({0,0,-3}, 1).intersect_ray(ray); }
-
 //---------------------------------------------------------------------------//
 tnw::csg::AndNode::AndNode(unique_ptr<Shape>&& a, unique_ptr<Shape>&& b) {
 	children[0] = move(a);
@@ -77,6 +78,10 @@ Color tnw::csg::AndNode::intersect_box(const BoundingBox& x) const {
 	auto c1 = children[0]->intersect_box(x);
 	auto c2 = children[1]->intersect_box(x);
 	return and_color(c1,c2);
+}
+
+IntersectionList tnw::csg::AndNode::intersect_ray(const Ray& x) const {
+	return IntersectionList();
 }
 
 BoundingBox tnw::csg::AndNode::boundingBox() const {
@@ -104,6 +109,10 @@ Color tnw::csg::OrNode::intersect_box(const BoundingBox& x) const {
 	return or_color(c1,c2);
 }
 
+IntersectionList tnw::csg::OrNode::intersect_ray(const Ray& x) const {
+	return IntersectionList();
+}
+
 BoundingBox tnw::csg::OrNode::boundingBox() const {
 	const auto b1 = children[0]->boundingBox();
 	const auto b2 = children[1]->boundingBox();
@@ -126,6 +135,13 @@ Color tnw::csg::ScaleNode::intersect_box(const BoundingBox& x) const {
 	return child->intersect_box(x2);
 }
 
+IntersectionList tnw::csg::ScaleNode::intersect_ray(const Ray& x) const {
+	Ray transformedRay = x.getTransformedRay(glm::scale(glm::mat4(1.0f), {1.f/dv, 1.f/dv, 1.f/dv}));
+	// std::cout << "a: " << glm::to_string(transformedRay.a) << " b: " << glm::to_string(transformedRay.b) << " norm: " << glm::length(transformedRay.dir) << "\n"; 
+	// auto transformedRay = x.getTransformedRay(glm::mat4(1));
+	return child->intersect_ray(transformedRay);	
+}
+
 BoundingBox tnw::csg::ScaleNode::boundingBox() const {
 	auto b = child->boundingBox();
 	b.scale(dv);
@@ -146,6 +162,11 @@ Color tnw::csg::TranslateNode::intersect_box(const BoundingBox& x) const {
 	auto x2 = x;
 	x2.translate(-dx);
 	return child->intersect_box(x2);
+}
+
+IntersectionList tnw::csg::TranslateNode::intersect_ray(const Ray& x) const {
+	Ray transformedRay = x.getTransformedRay(glm::translate(glm::mat4(1.0f), -dx));
+	return child->intersect_ray(transformedRay);
 }
 
 BoundingBox tnw::csg::TranslateNode::boundingBox() const {
@@ -188,8 +209,8 @@ Color tnw::CSGTree::intersect_box(const BoundingBox& x) const {
 	return root->intersect_box(x);
 }
 
-IntersectionList tnw::CSGTree::intersect_ray(const Ray& ray) const {
-	return tnw::Box({0.25,0,-0.5}, 1,1,1).intersect_ray(ray);
+IntersectionList tnw::CSGTree::intersect_ray(const Ray& x) const {
+	return root->intersect_ray(x);
 }
 
 BoundingBox tnw::CSGTree::boundingBox() const {

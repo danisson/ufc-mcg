@@ -3,6 +3,7 @@
 #include "interface.h"
 #include "shapes.h"
 #include "raycast.h"
+#include "csgtree.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -34,7 +35,8 @@ IsometricCamera camera;
 int main(void) {
 	GLFWwindow* window;
 	std::vector<std::unique_ptr<tnw::Model>> models;
-
+	auto shapeTest = new tnw::Box({0.f,0.f,0.f}, 0.5, 0.5, 0.5);
+	models.push_back(std::make_unique<tnw::CSGTree>(shapeTest));
 	// Initialize the library
 	if (!glfwInit())
 		return 1;
@@ -67,7 +69,7 @@ int main(void) {
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	// camera.aspect = 480/640.;
+	camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
 
 	// Loop until the user closes the window

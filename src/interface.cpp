@@ -62,7 +62,8 @@ void MainMenu::draw() {
 		ImGui::InputInt("render width", &raycast_width);
 		ImGui::InputInt("render height", &raycast_height);
 		if (ImGui::Button("Render") && !render_show) {
-			tnw::Raycast rc(models,camera,raycast_width,raycast_height,tex);
+			raycastCamera.aspect = float(raycast_height)/raycast_width;
+			tnw::Raycast rc(models,raycastCamera,raycast_width,raycast_height,tex);
 			render_show = true;
 		}
 		if (ImGui::Button("Abrir"))

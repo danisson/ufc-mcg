@@ -12,9 +12,6 @@ namespace tnw {
 namespace csg {
 	class Node : public Shape {
 	public:
-		virtual Color intersect_point(const glm::vec3&) const = 0;
-		virtual Color intersect_box(const BoundingBox&) const = 0;
-		IntersectionList intersect_ray(const Ray& ray) const override;
 		double volume() const;
 		virtual std::string serialize() const = 0;
 		BoundingBox boundingBox() const = 0;
@@ -26,6 +23,7 @@ namespace csg {
 		AndNode(unique_ptr<Shape>&&, unique_ptr<Shape>&&);
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
+		IntersectionList intersect_ray(const Ray&) const override;
 		std::string serialize() const override;
 		BoundingBox boundingBox() const override;
 	};
@@ -36,6 +34,7 @@ namespace csg {
 		OrNode(unique_ptr<Shape>&&, unique_ptr<Shape>&&);
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
+		IntersectionList intersect_ray(const Ray&) const override;
 		std::string serialize() const override;
 		BoundingBox boundingBox() const override;
 	};
@@ -47,6 +46,7 @@ namespace csg {
 		ScaleNode(unique_ptr<Shape>&&,float);
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
+		IntersectionList intersect_ray(const Ray&) const override;
 		std::string serialize() const override;
 		BoundingBox boundingBox() const override;
 	};
@@ -58,6 +58,7 @@ namespace csg {
 		TranslateNode(unique_ptr<Shape>&&,glm::vec3);
 		Color intersect_point(const glm::vec3&) const override;
 		Color intersect_box(const BoundingBox&) const override;
+		IntersectionList intersect_ray(const Ray&) const override;
 		std::string serialize() const override;
 		BoundingBox boundingBox() const override;
 	};

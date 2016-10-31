@@ -22,8 +22,10 @@ tnw::Raycast::Raycast(std::vector<unique_ptr<Model>>& _models, IsometricCamera &
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, image);
+	std::cout << "================================================\n";
 	generateRays();
 	paintImage();
+	std::cout << "================================================\n";
 }
 
 void tnw::Raycast::generateRays() {
@@ -40,17 +42,17 @@ void tnw::Raycast::generateRays() {
 
 			// std::cout << "untransf a: " << glm::to_string(glm::vec3(pospixx, pospixy, camera.near)) << " unstransf b: " << glm::to_string(glm::vec3(pospixx, pospixy, camera.far)) << std::endl;
 
-			glm::mat4 cameraMatrix;
-			cameraMatrix = glm::scale(glm::mat4(),{1/camera.scale,1/camera.scale,1/camera.scale}) * cameraMatrix;
-			cameraMatrix = glm::translate(glm::mat4(),-camera.pos) * cameraMatrix;
-			cameraMatrix = glm::inverse(tnw::isometric(camera.aspect, -camera.near, -camera.far, camera.positive_hor, camera.positive_ver)) * cameraMatrix;
+			// glm::mat4 cameraMatrix::Iden;
+			// cameraMatrix = glm::scale(glm::mat4(),{1/camera.scale,1/camera.scale,1/camera.scale}) * cameraMatrix;
+			// cameraMatrix = glm::translate(glm::mat4(),-camera.pos) * cameraMatrix;
+			// cameraMatrix = glm::inverse(tnw::isometric(camera.aspect, -camera.near, -camera.far, camera.positive_hor, camera.positive_ver)) * cameraMatrix;
 
 			// auto aM = glm::rotate(glm::mat4(), glm::radians(-45.0f), glm::vec3(0.0,1.0,0.0));
 			// auto bM = glm::rotate(glm::mat4(), -std::asin(std::tan(glm::radians(30.0f))), glm::vec3(1.0,0.0,0.0));
 			// cameraMatrix = aM*bM*cameraMatrix;
 
-			glm::vec4 a = cameraMatrix * glm::vec4(pospixx, pospixy, camera.near, 1.0f);
-			glm::vec4 b = cameraMatrix * glm::vec4(pospixx, pospixy, camera.far, 1.0f);
+			glm::vec4 a = /*cameraMatrix */ glm::vec4(pospixx, pospixy, camera.near, 1.0f);
+			glm::vec4 b = /*cameraMatrix */ glm::vec4(pospixx, pospixy, camera.far, 1.0f);
 
 			// std::cout << "i: " << i << " j: " << j << "\n";
 			// std::cout << "a: " << glm::to_string(a) << "b: " << glm::to_string(b) << std::endl;
@@ -68,10 +70,11 @@ void tnw::Raycast::paintImage() {
 		for (size_t i = 0; i < width; ++i) {
 			PaintColor paintColor = {0.0, 0.0, 0.0};
 			float maxDist = glm::length(rays[i][j].dir);
+			// std::cout << "maxDist: " << maxDist << "\n";
 			std::tuple<tnw::Color, float> minInter = std::make_tuple(tnw::Color::white, maxDist);
 			size_t model = 999;
 			for (size_t k = 0; k < models.size(); k++) {
-				std::cout << "a: " << glm::to_string(rays[i][j].a) << "b: " << glm::to_string(rays[i][j].b) << std::endl;
+				// std::cout << "a: " << glm::to_string(rays[i][j].a) << "b: " << glm::to_string(rays[i][j].b) << std::endl;
 				
 				// std::cout << "minInter: " << minInter << "\n";
 				tnw::IntersectionList ilist = models[k]->intersect_ray(rays[i][j]);
@@ -110,7 +113,8 @@ void tnw::Raycast::paintImage() {
 				// 	}
 				// }
 			}
-			std::cout << "model: " << model << "\n";
+			// std::cout << "model: " << model << "\n";
+			// std::cout << "minInter: " << std::get<1>(minInter) << "\n";
 			image(i,j) = std::make_tuple(paintColor[0], paintColor[1], paintColor[2]);
 			// image(i,j) = std::make_tuple(0.0,1.0,0.0);
 		}
