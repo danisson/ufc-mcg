@@ -13,8 +13,8 @@ tnw::Raycast::Raycast(std::vector<unique_ptr<Model>>& _models, IsometricCamera &
 	for (size_t i = 0; i < width; i++) {
 		rays[i].reserve(height);
 	}
-	for (int j = 0; j < height; j++) {
-		for (int i = 0; i < width; i++) {
+	for (size_t j = 0; j < height; j++) {
+		for (size_t i = 0; i < width; i++) {
 			image(i,j) = std::make_tuple(0,0,1);
 		}		
 	}

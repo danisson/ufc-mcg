@@ -69,7 +69,6 @@ int main(void) {
 
 	// camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
-	std::cout << glm::to_string(glm::ortho(-1,1,-1,1,1,-1)) << "\n";
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
