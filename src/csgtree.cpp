@@ -81,7 +81,7 @@ Color tnw::csg::AndNode::intersect_box(const BoundingBox& x) const {
 }
 
 IntersectionList tnw::csg::AndNode::intersect_ray(const Ray& x) const {
-	return IntersectionList();
+	throw 0;
 }
 
 BoundingBox tnw::csg::AndNode::boundingBox() const {
@@ -91,6 +91,12 @@ BoundingBox tnw::csg::AndNode::boundingBox() const {
 }
 
 std::string tnw::csg::AndNode::serialize() const {throw 0;}
+
+owner_ptr<Shape> tnw::csg::AndNode::clone() const {
+	auto m1 = unique_ptr<Shape>(children[0]->clone());
+	auto m2 = unique_ptr<Shape>(children[1]->clone());
+	return new csg::AndNode(move(m1),move(m2));
+}
 //---------------------------------------------------------------------------//
 tnw::csg::OrNode::OrNode(unique_ptr<Shape>&& a, unique_ptr<Shape>&& b) {
 	children[0] = move(a);
@@ -110,7 +116,7 @@ Color tnw::csg::OrNode::intersect_box(const BoundingBox& x) const {
 }
 
 IntersectionList tnw::csg::OrNode::intersect_ray(const Ray& x) const {
-	return IntersectionList();
+	throw 0;
 }
 
 BoundingBox tnw::csg::OrNode::boundingBox() const {
@@ -120,6 +126,12 @@ BoundingBox tnw::csg::OrNode::boundingBox() const {
 }
 
 std::string tnw::csg::OrNode::serialize() const {throw 0;}
+
+owner_ptr<Shape> tnw::csg::OrNode::clone() const {
+	auto m1 = unique_ptr<Shape>(children[0]->clone());
+	auto m2 = unique_ptr<Shape>(children[1]->clone());
+	return new csg::OrNode(move(m1),move(m2));
+}
 //---------------------------------------------------------------------------//
 tnw::csg::ScaleNode::ScaleNode(unique_ptr<Shape>&& child, float dv)
 : child(move(child)), dv(dv) {}
@@ -136,10 +148,12 @@ Color tnw::csg::ScaleNode::intersect_box(const BoundingBox& x) const {
 }
 
 IntersectionList tnw::csg::ScaleNode::intersect_ray(const Ray& x) const {
-	Ray transformedRay = x.getTransformedRay(glm::scale(glm::mat4(1.0f), {1.f/dv, 1.f/dv, 1.f/dv}));
-	// std::cout << "a: " << glm::to_string(transformedRay.a) << " b: " << glm::to_string(transformedRay.b) << " norm: " << glm::length(transformedRay.dir) << "\n"; 
-	// auto transformedRay = x.getTransformedRay(glm::mat4(1));
-	return child->intersect_ray(transformedRay);	
+	auto transformedRay = x.getTransformedRay(glm::scale(glm::mat4(1.0f), {1.f/dv, 1.f/dv, 1.f/dv}));
+	auto ilist = child->intersect_ray(transformedRay);
+	for (auto&& x : ilist) {
+		x = std::make_tuple(std::get<0>(x),std::get<1>(x)*dv);
+	}
+	return ilist;
 }
 
 BoundingBox tnw::csg::ScaleNode::boundingBox() const {
@@ -149,6 +163,11 @@ BoundingBox tnw::csg::ScaleNode::boundingBox() const {
 }
 
 std::string tnw::csg::ScaleNode::serialize() const {throw 0;}
+
+owner_ptr<Shape> tnw::csg::ScaleNode::clone() const {
+	auto m1 = unique_ptr<Shape>(child->clone());
+	return new csg::ScaleNode(move(m1),dv);
+}
 //---------------------------------------------------------------------------//
 tnw::csg::TranslateNode::TranslateNode(unique_ptr<Shape>&& child, glm::vec3 dx)
 : child(move(child)), dx(dx) {}
@@ -176,6 +195,11 @@ BoundingBox tnw::csg::TranslateNode::boundingBox() const {
 }
 
 std::string tnw::csg::TranslateNode::serialize() const {throw 0;}
+
+owner_ptr<Shape> tnw::csg::TranslateNode::clone() const {
+	auto m1 = unique_ptr<Shape>(child->clone());
+	return new csg::TranslateNode(move(m1),dx);
+}
 //---------------------------------------------------------------------------//
 void tnw::CSGTree::rdraw() {
 	if (should_update) {
@@ -200,6 +224,18 @@ tnw::CSGTree::CSGTree(unique_ptr<Shape>&& s) : root(new csg::ScaleNode(move(s),1
 }
 
 tnw::CSGTree::CSGTree(owner_ptr<Shape> s) : CSGTree(unique_ptr<Shape>(s)) {}
+
+tnw::CSGTree::CSGTree(owner_ptr<csg::Node> x) : root(x), render_model(BoundingBox({0,0,0},1)) {
+	should_update = true;
+	std::random_device r;
+	std::default_random_engine gen(r());
+
+	std::uniform_real_distribution<> dis(0,1);
+
+	for (int i = 0; i < 3; ++i) {
+		color[i] = dis(gen);
+	}
+}
 
 Color tnw::CSGTree::intersect_point(const glm::vec3& x) const {
 	return root->intersect_point(x);
@@ -255,6 +291,10 @@ void tnw::CSGTree::setColor(const float c[3]) {
 		color[i] = c[i];
 }
 
-PaintColor tnw::CSGTree::getColor() const {std::array<float, 3> color = {1,0,0}; return color;}
+PaintColor tnw::CSGTree::getColor() const {
+	return {color[0],color[1],color[2]};
+}
 
-owner_ptr<Model> tnw::CSGTree::clone() const {throw 0;}
+owner_ptr<Model> tnw::CSGTree::clone() const {
+	return new CSGTree(root->clone());
+}

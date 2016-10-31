@@ -18,7 +18,9 @@ void tnw::Ray::transform(const glm::mat4 &transform) {
 }
 
 tnw::Ray tnw::Ray::getTransformedRay(const glm::mat4 &transform) const {
-	glm::vec3 aT = glm::vec3(transform * glm::vec4(a.x, a.y, a.z, 1.0)),
-			  bT = glm::vec3(transform * glm::vec4(b.x, b.y, b.z, 1.0));
-	return tnw::Ray(aT, bT); 
+	glm::vec3 a2(a[0],a[1],a[2]);
+	glm::vec3 b2(b[0],b[1],b[2]);
+	auto x = Ray(a2,b2);
+	x.transform(transform);
+	return x;
 }

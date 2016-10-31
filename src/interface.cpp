@@ -44,11 +44,11 @@ void MainMenu::errorDialog(char* name, char* msg) {
 void MainMenu::renderWindow(const GLuint& t, size_t w, size_t h, bool& should_close) {
 	ImGui::SetNextWindowSize(ImVec2(w+15,h+35), ImGuiSetCond_FirstUseEver);
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize;
-	if (!ImGui::Begin("Vector Window##", &should_close, flags)) {
+	if (!ImGui::Begin("Render Window##", &should_close, flags)) {
 		ImGui::End();
 		return;
 	}
-	
+
 	ImGui::Image((void*)(t), ImVec2(w, h), ImVec2(0,0), ImVec2(1,1), ImColor(255,255,255,255), ImColor(255,255,255,128));
 	ImGui::End();
 }

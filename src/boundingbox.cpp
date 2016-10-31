@@ -261,3 +261,7 @@ tnw::BoundingBox tnw::BoundingBox::least_boundingbox(const tnw::BoundingBox& bb)
 tnw::BoundingBox tnw::BoundingBox::boundingBox() const {
 	return *this;
 }
+
+tnw::owner_ptr<tnw::Shape> tnw::BoundingBox::clone() const {
+	return new tnw::BoundingBox(*this);
+}

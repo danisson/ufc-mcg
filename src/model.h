@@ -52,6 +52,8 @@ public:
 	// Geometric analysis
 	virtual BoundingBox boundingBox() const = 0;
 	virtual double volume() const = 0;
+
+	virtual owner_ptr<Shape> clone() const = 0;
 };
 
 struct BoundingBox : public Shape {
@@ -75,6 +77,8 @@ struct BoundingBox : public Shape {
 	BoundingBox least_boundingbox(const BoundingBox& bb) const;
 	bool operator==(const BoundingBox& s) const;
 	bool operator!=(const BoundingBox& s) const;
+
+	owner_ptr<Shape> clone() const override;
 };
 
 class Model : public Shape {

@@ -105,7 +105,7 @@ float tnw::seg_to_seg_dist(glm::vec3 s0, glm::vec3 s1, glm::vec3 t0, glm::vec3 t
 		}
 	}
 
-	sc = (std::abs(sN) < epsilon)? 0.0 : (sN/sD); 
+	sc = (std::abs(sN) < epsilon)? 0.0 : (sN/sD);
 	tc = (std::abs(tN) < epsilon)? 0.0 : (tN/tD);
 	glm::vec3 dP = w + sc*u - tc*w;
 
@@ -132,13 +132,14 @@ bool tnw::ray_on_plane(const tnw::Ray& ray, const glm::vec3 &v0, const glm::vec3
 }
 
 tnw::IntersectionList tnw::removeZeroIntersections(const tnw::IntersectionList& ilist) {
-	IntersectionList r;
-	for (unsigned i = 0; i < ilist.size(); i++) {
-		if (std::abs(0.0 - std::get<1>(ilist[i])) > 0.0000001) {
-			r.push_back(ilist[i]);
-		}
-	}
-	return r;
+	// IntersectionList r;
+	// for (unsigned i = 0; i < ilist.size(); i++) {
+	// 	if (std::abs(0.0 - std::get<1>(ilist[i])) > 0.0000001) {
+	// 		r.push_back(ilist[i]);
+	// 	}
+	// }
+	// return r;
+	return ilist;
 }
 
 void tnw::draw_axis(){

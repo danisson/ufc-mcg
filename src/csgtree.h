@@ -14,7 +14,6 @@ namespace csg {
 	public:
 		double volume() const;
 		virtual std::string serialize() const = 0;
-		BoundingBox boundingBox() const = 0;
 	};
 
 	class AndNode : public Node {
@@ -26,6 +25,7 @@ namespace csg {
 		IntersectionList intersect_ray(const Ray&) const override;
 		std::string serialize() const override;
 		BoundingBox boundingBox() const override;
+		owner_ptr<Shape> clone() const override;
 	};
 
 	class OrNode : public Node {
@@ -37,6 +37,7 @@ namespace csg {
 		IntersectionList intersect_ray(const Ray&) const override;
 		std::string serialize() const override;
 		BoundingBox boundingBox() const override;
+		owner_ptr<Shape> clone() const override;
 	};
 
 	class ScaleNode : public Node {
@@ -49,6 +50,7 @@ namespace csg {
 		IntersectionList intersect_ray(const Ray&) const override;
 		std::string serialize() const override;
 		BoundingBox boundingBox() const override;
+		owner_ptr<Shape> clone() const override;
 	};
 
 	class TranslateNode : public Node {
@@ -61,6 +63,7 @@ namespace csg {
 		IntersectionList intersect_ray(const Ray&) const override;
 		std::string serialize() const override;
 		BoundingBox boundingBox() const override;
+		owner_ptr<Shape> clone() const override;
 	};
 
 } // namespace tnw::csg
@@ -72,6 +75,8 @@ class CSGTree : public tnw::Model {
 
 	Octree render_model;
 	bool should_update;
+
+	CSGTree(owner_ptr<csg::Node>);
 public:
 	CSGTree(unique_ptr<Shape>&&);
 	CSGTree(owner_ptr<Shape>);

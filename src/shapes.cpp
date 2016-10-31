@@ -93,6 +93,10 @@ IntersectionList tnw::Sphere::intersect_ray(const Ray& ray) const {
 	return ilist;
 }
 
+tnw::owner_ptr<tnw::Shape> tnw::Sphere::clone() const {
+	return new tnw::Sphere(*this);
+}
+
 // ------------------------------------------------------------------------- //
 tnw::Box::Box(glm::vec3 center, float length, float depth, float height) : center(center), length(length), depth(depth), height(height){}
 
@@ -199,7 +203,7 @@ bool tnw::Box::clip_line(int d, const Ray& ray, float& f_low, float& f_high) con
 }
 
 IntersectionList tnw::Box::intersect_ray(const Ray& ray) const {
-	std::cout << "length: " << length << " height: " << height << " depth: " << depth << "\n";
+	// std::cout << "length: " << length << " height: " << height << " depth: " << depth << "\n";
 	IntersectionList ilist;
 
 	float f_low = 0,
@@ -240,6 +244,10 @@ IntersectionList tnw::Box::intersect_ray(const Ray& ray) const {
 	ilist.push_back(std::make_tuple(tnw::Color::white, tot_length - inter_max_length));
 
 	return removeZeroIntersections(ilist);
+}
+
+tnw::owner_ptr<tnw::Shape> tnw::Box::clone() const {
+	return new tnw::Box(*this);
 }
 
 // ------------------------------------------------------------------------- //
@@ -331,7 +339,7 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const {
 					  superiorDist = std::fmax(dist1, dist2);
 
 				tnw::Color midColor = tnw::Color::black;
-				
+
 				const glm::vec3 extremePointBegin = ray.a + inferiorDist*glm::normalize(ray.dir),
 						  	    extremePointEnd = ray.a + (rayLength-superiorDist)*glm::normalize(ray.dir);
 				const glm::vec2 centerXZ(inferiorPoint.x, inferiorPoint.z);
@@ -388,7 +396,7 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const {
 		ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
 		return removeZeroIntersections(ilist);
 	}
-	//Temos duas listas [s1,s2] e [s3, s4] que se intersectam. Temos 4 casos possíveis:	
+	//Temos duas listas [s1,s2] e [s3, s4] que se intersectam. Temos 4 casos possíveis:
 	const float ab = glm::length(ray.b-ray.a);
 	float sbegin, send;
 
@@ -424,6 +432,10 @@ IntersectionList tnw::Cilinder::intersect_ray(const Ray& ray) const {
 	ilist.push_back(std::make_tuple(midColor, (send-sbegin)*ab));
 	ilist.push_back(std::make_tuple(tnw::Color::white, ab - send*ab));
 	return removeZeroIntersections(ilist);
+}
+
+tnw::owner_ptr<tnw::Shape> tnw::Cilinder::clone() const {
+	return new tnw::Cilinder(*this);
 }
 
 // ------------------------------------------------------------------------- //
@@ -566,6 +578,10 @@ IntersectionList tnw::SquarePyramid::intersect_ray(const Ray& ray) const {
 		ilist.push_back(std::make_tuple(tnw::Color::white, rayLength));
 	}
 	return removeZeroIntersections(ilist);
+}
+
+tnw::owner_ptr<tnw::Shape> tnw::SquarePyramid::clone() const {
+	return new tnw::SquarePyramid(*this);
 }
 
 // ------------------------------------------------------------------------- //

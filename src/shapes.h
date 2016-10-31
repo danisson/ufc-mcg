@@ -14,6 +14,8 @@ namespace tnw {
 
 		BoundingBox boundingBox() const override;
 		double volume() const override;
+
+		owner_ptr<Shape> clone() const override;
 	private:
 		glm::vec3 center;
 		float radius;
@@ -29,6 +31,8 @@ namespace tnw {
 
 		BoundingBox boundingBox() const override;
 		double volume() const override;
+
+		owner_ptr<Shape> clone() const override;
 	private:
 		glm::vec3 center;
 		float length, depth, height;
@@ -43,6 +47,8 @@ namespace tnw {
 
 		BoundingBox boundingBox() const override;
 		double volume() const override;
+
+		owner_ptr<Shape> clone() const override;
 	private:
 		glm::vec3 inferiorPoint;
 		float height, radius;
@@ -57,6 +63,8 @@ namespace tnw {
 
 		BoundingBox boundingBox() const override;
 		double volume() const override;
+
+		owner_ptr<Shape> clone() const override;
 	private:
 		glm::vec3 inferiorPoint;
 		float height, basis;
