@@ -59,7 +59,7 @@ double tnw::csg::Node::volume() const {
 	return bounding_volume * points_inside/double(samples);
 }
 
-IntersectionList tnw::csg::Node::intersect_ray(const Ray& ray) const {throw 0;}
+IntersectionList tnw::csg::Node::intersect_ray(const Ray& ray) const {return tnw::Sphere({0,0,-3}, 1).intersect_ray(ray); }
 
 //---------------------------------------------------------------------------//
 tnw::csg::AndNode::AndNode(unique_ptr<Shape>&& a, unique_ptr<Shape>&& b) {
@@ -189,7 +189,7 @@ Color tnw::CSGTree::intersect_box(const BoundingBox& x) const {
 }
 
 IntersectionList tnw::CSGTree::intersect_ray(const Ray& ray) const {
-	return tnw::Sphere({0.5,0.5,0.5},0.5).intersect_ray(ray);
+	return tnw::Box({0.25,0,-0.5}, 1,1,1).intersect_ray(ray);
 }
 
 BoundingBox tnw::CSGTree::boundingBox() const {
@@ -234,6 +234,6 @@ void tnw::CSGTree::setColor(const float c[3]) {
 		color[i] = c[i];
 }
 
-PaintColor tnw::CSGTree::getColor() const {throw 0;}
+PaintColor tnw::CSGTree::getColor() const {std::array<float, 3> color = {1,0,0}; return color;}
 
 owner_ptr<Model> tnw::CSGTree::clone() const {throw 0;}

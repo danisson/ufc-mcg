@@ -43,7 +43,7 @@ void tnw::Raycast::generateRays() {
 			glm::mat4 cameraMatrix;
 			cameraMatrix = glm::scale(glm::mat4(),{1/camera.scale,1/camera.scale,1/camera.scale}) * cameraMatrix;
 			cameraMatrix = glm::translate(glm::mat4(),-camera.pos) * cameraMatrix;
-			cameraMatrix = glm::inverse(tnw::isometric(camera.aspect, camera.near, camera.far, camera.positive_hor, camera.positive_ver)) * cameraMatrix;
+			cameraMatrix = glm::inverse(tnw::isometric(camera.aspect, -camera.near, -camera.far, camera.positive_hor, camera.positive_ver)) * cameraMatrix;
 
 			// auto aM = glm::rotate(glm::mat4(), glm::radians(-45.0f), glm::vec3(0.0,1.0,0.0));
 			// auto bM = glm::rotate(glm::mat4(), -std::asin(std::tan(glm::radians(30.0f))), glm::vec3(1.0,0.0,0.0));
@@ -69,9 +69,9 @@ void tnw::Raycast::paintImage() {
 			PaintColor paintColor = {0.0, 0.0, 0.0};
 			float maxDist = glm::length(rays[i][j].dir);
 			std::tuple<tnw::Color, float> minInter = std::make_tuple(tnw::Color::white, maxDist);
-
+			size_t model = 999;
 			for (size_t k = 0; k < models.size(); k++) {
-				// std::cout << "a: " << glm::to_string(rays[i][j].a) << "b: " << glm::to_string(rays[i][j].b) << std::endl;
+				std::cout << "a: " << glm::to_string(rays[i][j].a) << "b: " << glm::to_string(rays[i][j].b) << std::endl;
 				
 				// std::cout << "minInter: " << minInter << "\n";
 				tnw::IntersectionList ilist = models[k]->intersect_ray(rays[i][j]);
@@ -81,16 +81,17 @@ void tnw::Raycast::paintImage() {
 					case tnw::Color::gray:
 						if (std::get<1>(minInter) > std::get<1>(ilist[0])) {
 							minInter = ilist[0];
+							model = k;
 							paintColor = models[k]->getColor();
 						}
 						break;
 					case tnw::Color::white:
 						if (std::get<1>(ilist[0]) < maxDist && std::get<1>(minInter) > std::get<1>(ilist[0])) {
 							minInter = ilist[0];
+							model = k;
 							paintColor = models[k]->getColor();
 						}
 				}
-
 				// for (size_t l = 0; l < ilist.size(); l++) {
 				// 	tnw::Color modelColor = std::get<0>(ilist[l]);
 				// 	// std::cout << "modelColor: " << (int)modelColor << "\n";
@@ -109,7 +110,7 @@ void tnw::Raycast::paintImage() {
 				// 	}
 				// }
 			}
-
+			std::cout << "model: " << model << "\n";
 			image(i,j) = std::make_tuple(paintColor[0], paintColor[1], paintColor[2]);
 			// image(i,j) = std::make_tuple(0.0,1.0,0.0);
 		}
