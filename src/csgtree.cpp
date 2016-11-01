@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
+#include <typeinfo>
 
 using namespace tnw;
 using std::array;
@@ -124,7 +125,12 @@ BoundingBox tnw::csg::AndNode::boundingBox() const {
 	return b1.least_boundingbox(b2);
 }
 
-std::string tnw::csg::AndNode::serialize() const {throw 0;}
+std::string tnw::csg::AndNode::serialize() const {
+	// std::string s1 = children[0]->serialize(),
+				// s2 = children[1]->serialize();
+	// return s1.append(s2).append("AndNode");
+	throw 0;
+}
 
 owner_ptr<Shape> tnw::csg::AndNode::clone() const {
 	auto m1 = unique_ptr<Shape>(children[0]->clone());
@@ -218,7 +224,12 @@ BoundingBox tnw::csg::OrNode::boundingBox() const {
 	return b1.least_boundingbox(b2);
 }
 
-std::string tnw::csg::OrNode::serialize() const {throw 0;}
+std::string tnw::csg::OrNode::serialize() const {
+	// std::string s1 = children[0]->serialize(),
+		// s2 = children[1]->serialize();
+		// return s1.append(s2).append("OrNode");
+	throw 0;
+}
 
 owner_ptr<Shape> tnw::csg::OrNode::clone() const {
 	auto m1 = unique_ptr<Shape>(children[0]->clone());
@@ -255,7 +266,11 @@ BoundingBox tnw::csg::ScaleNode::boundingBox() const {
 	return b;
 }
 
-std::string tnw::csg::ScaleNode::serialize() const {throw 0;}
+std::string tnw::csg::ScaleNode::serialize() const {
+	// std::string s1 = child->serialize();
+		// return s1.append("ScaleNode");
+	throw 0;
+}
 
 owner_ptr<Shape> tnw::csg::ScaleNode::clone() const {
 	auto m1 = unique_ptr<Shape>(child->clone());
@@ -287,7 +302,11 @@ BoundingBox tnw::csg::TranslateNode::boundingBox() const {
 	return b;
 }
 
-std::string tnw::csg::TranslateNode::serialize() const {throw 0;}
+std::string tnw::csg::TranslateNode::serialize() const {
+	// std::string s1 = child->serialize();
+		// return s1.append("TranslateNode");
+	throw 0;
+}
 
 owner_ptr<Shape> tnw::csg::TranslateNode::clone() const {
 	auto m1 = unique_ptr<Shape>(child->clone());
@@ -359,12 +378,17 @@ tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) {
 				}
 				case 'C': {
 					fscanf(f, "%f %f %f %f %f", &cx, &cy, &cz, &r, &h);
-					stack.push_back(new tnw::Cilinder(glm::vec3(cx,cy,cz),r,h));
+					stack.push_back(new tnw::Cilinder(glm::vec3(cx,cy,cz),h,r));
 					break;
 				}
 				case 'O': {
 					stack.push_back(new tnw::Octree(f));
 					break;
+				}
+				case 'P': {
+					fscanf(f, "%f %f %f %f %f", &cx, &cy, &cz, &r, &h);
+					stack.push_back(new tnw::SquarePyramid(glm::vec3(cx,cy,cz),h,r));
+					break;	
 				}
 				case 't': {
 					fscanf(f, "%f %f %f", &dx, &dy, &dz);
@@ -425,6 +449,16 @@ tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) {
 	auto stackRoot = std::move(stack.back());
 	auto nodeTree = new csg::ScaleNode(unique_ptr<Shape>(stackRoot), 1.0);
 	root = unique_ptr<csg::Node>(nodeTree);
+
+	should_update = true;
+	std::random_device r2;
+	std::default_random_engine gen(r2());
+
+	std::uniform_real_distribution<> dis(0,1);
+
+	for (int i = 0; i < 3; ++i) {
+		color[i] = dis(gen);
+	}
 }
 
 Color tnw::CSGTree::intersect_point(const glm::vec3& x) const {
@@ -476,6 +510,7 @@ std::string tnw::CSGTree::serialize() const {
 	return root->serialize();
 }
 void tnw::CSGTree::setColor(const float c[3]) {
+	should_update = true;
 	render_model.setColor(color);
 	for (size_t i = 0; i < 3; ++i)
 		color[i] = c[i];

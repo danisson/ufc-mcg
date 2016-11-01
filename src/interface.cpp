@@ -72,7 +72,7 @@ void MainMenu::draw() {
 		if (ImGui::Button("Salvar"))
 			ImGui::OpenPopup("##salvar_arq");
 
-		if (ImGui::BeginPopupModal("##abrir_arq", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal("##abrir_arq")) {
 			ImGui::Text("Caminho para o arquivo");
 			ImGui::PushItemWidth(-1);
 			ImGui::InputText("path",buffer,1000);
@@ -117,6 +117,7 @@ void MainMenu::draw() {
 					std::stringstream ss;
 					fscanf(f,"%zu\n",&size);
 					for (size_t i = 0; i < size; ++i) {
+						// std::cout << "teste " << std::make_unique<tnw::CSGTree>(f)->root->child[0]->child[1]->dx[0] << "\n";
 						models.push_back(std::make_unique<tnw::CSGTree>(f));
 						ss << "Árvore " << (count+i) << "[ARQUIVO]";
 						model_names.push_back(ss.str());
@@ -684,6 +685,7 @@ void MainMenu::draw() {
 			camera.positive_hor = (rots[rot]>>0)&1;
 			camera.positive_ver = (rots[rot]>>1)&1;
 		}
+		raycastCamera = camera;
 	}
 
 	ImGui::End();
