@@ -67,7 +67,7 @@ void tnw::Raycast::paintImage() {
 
 	for (size_t j = 0; j < height; ++j) {
 		for (size_t i = 0; i < width; ++i) {
-			PaintColor paintColor = {0.0, 0.0, 0.0};
+			PaintColor paintColor = {1, 1, 1};
 			float maxDist = glm::length(rays[i][j].dir);
 			// std::cout << "maxDist: " << maxDist << "\n";
 			std::tuple<tnw::Color, float> minInter = std::make_tuple(tnw::Color::white, maxDist);

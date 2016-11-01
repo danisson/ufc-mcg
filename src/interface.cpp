@@ -9,10 +9,10 @@
 #include "raycast.h"
 
 MainMenu::MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera& c) : models(m), camera(c) {
-	unsigned int m_size = m.size();
-	for (unsigned int i = 0; i < m_size; i++) {
+	const size_t m_size = m.size();
+	for (size_t i = 0; i < m_size; i++) {
 		std::stringstream ss;
-		ss << "Árvore " << model_names.size();
+		ss << "Modelo " << model_names.size();
 		model_names.push_back(ss.str());
 	}
 
