@@ -72,22 +72,24 @@ void tnw::Raycast::paintImage() {
 			// std::cout << "maxDist: " << maxDist << "\n";
 			std::tuple<tnw::Color, float> minInter = std::make_tuple(tnw::Color::white, maxDist);
 			// printf("%zu,%zu\n",i,j);
-			for (size_t k = 0; k < models.size(); k++) {
-				tnw::IntersectionList ilist = models[k]->intersect_ray(rays[i][j]);
+			for (auto&& model : models) {
+				if (!model->visible) continue;
 
+				tnw::IntersectionList ilist = model->intersect_ray(rays[i][j]);
 				assert(ilist.size() > 0);
+
 				switch (std::get<0>(ilist[0])) {
 					case tnw::Color::black:
 					case tnw::Color::gray:
 						if (std::get<1>(minInter) > std::get<1>(ilist[0])) {
 							minInter = ilist[0];
-							paintColor = models[k]->getColor();
+							paintColor = model->getColor();
 						}
 						break;
 					case tnw::Color::white:
 						if (std::get<1>(ilist[0]) < maxDist && std::get<1>(minInter) > std::get<1>(ilist[0])) {
 							minInter = ilist[0];
-							paintColor = models[k]->getColor();
+							paintColor = model->getColor();
 						}
 				}
 			}
