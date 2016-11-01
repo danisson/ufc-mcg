@@ -19,7 +19,7 @@ MainMenu::MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera&
 	glGenTextures(1, &tex);
 }
 
-void MainMenu::errorDialog(const char* name,const char* msg) {
+void MainMenu::errorDialog(const char* name, const char* msg) {
 	if (ImGui::BeginPopupModal(name)) {
 		ImVec2 buttonSize = ImVec2(0,0);
 		float margin = ImGui::GetStyle().ItemSpacing.x;
