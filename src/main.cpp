@@ -35,7 +35,7 @@ IsometricCamera camera;
 int main(void) {
 	GLFWwindow* window;
 	std::vector<std::unique_ptr<tnw::Model>> models;
-	auto shapeTest = new tnw::Box({0.f,0.f,0.f}, 0.5, 0.5, 0.5);
+	auto shapeTest = new tnw::BoundingBox({0,0,0}, 0.5);
 	models.push_back(std::make_unique<tnw::CSGTree>(shapeTest));
 	// Initialize the library
 	if (!glfwInit())

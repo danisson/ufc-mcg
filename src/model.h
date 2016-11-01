@@ -74,6 +74,7 @@ struct BoundingBox : public Shape {
 	Color intersect_point(const glm::vec3&) const override;
 	Color intersect_box(const BoundingBox&) const override;
 	IntersectionList intersect_ray(const Ray&) const override;
+	bool clip_line(int, const Ray&, float&, float&) const;
 	BoundingBox least_boundingbox(const BoundingBox& bb) const;
 	bool operator==(const BoundingBox& s) const;
 	bool operator!=(const BoundingBox& s) const;

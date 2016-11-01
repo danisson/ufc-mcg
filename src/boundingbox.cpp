@@ -232,10 +232,6 @@ tnw::Color tnw::BoundingBox::intersect_point(const glm::vec3& x) const {
 	return tnw::Color::white;
 }
 
-tnw::IntersectionList tnw::BoundingBox::intersect_ray(const tnw::Ray&) const {
-	throw 0;
-}
-
 tnw::BoundingBox tnw::BoundingBox::least_boundingbox(const tnw::BoundingBox& bb) const {
 
 	using std::min;
@@ -264,4 +260,73 @@ tnw::BoundingBox tnw::BoundingBox::boundingBox() const {
 
 tnw::owner_ptr<tnw::Shape> tnw::BoundingBox::clone() const {
 	return new tnw::BoundingBox(*this);
+}
+
+bool tnw::BoundingBox::clip_line(int d, const Ray& ray, float& f_low, float& f_high) const {
+	float f_dim_low, f_dim_high, f_aux;
+
+	f_dim_low = (minPoint()[d] - ray.a[d])/(ray.b[d]-ray.a[d]);
+	f_dim_high = (maxPoint()[d] - ray.a[d])/(ray.b[d]-ray.a[d]);
+
+	if (f_dim_high < f_dim_low) {
+		f_aux = f_dim_high;
+		f_dim_high = f_dim_low;
+		f_dim_low = f_aux;
+	}
+
+	if (f_dim_high < f_low) {
+		return false;
+	}
+
+	if (f_dim_low > f_high) {
+		return false;
+	}
+
+	f_low = std::fmax(f_low, f_dim_low);
+	f_high = std::fmin(f_high, f_dim_high);
+	if (f_low > f_high) {
+		return false;
+	}
+
+	return true;
+}
+
+// Olhar tnw::Box::intersect_ray em Shapes.cpp
+tnw::IntersectionList tnw::BoundingBox::intersect_ray(const tnw::Ray& ray) const {
+	tnw::IntersectionList ilist;
+
+	float f_low = 0,
+	      f_high = 1;
+	const float tot_length = ray.length();
+
+	if (!clip_line(0, ray, f_low, f_high)) {
+		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
+		return removeZeroIntersections(ilist);
+	}
+	if (!clip_line(1, ray, f_low, f_high)) {
+		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
+		return removeZeroIntersections(ilist);
+	}
+	if (!clip_line(2, ray, f_low, f_high)) {
+		ilist.push_back(std::make_tuple(tnw::Color::white, tot_length));
+		return removeZeroIntersections(ilist);
+	}
+
+	const float inter_min_length = f_low * tot_length;
+	const float inter_max_length = f_high * tot_length;
+
+	ilist.push_back(std::make_tuple(tnw::Color::white, inter_min_length));
+	tnw::Color mid_color = tnw::Color::black;
+
+	size_t perp_axis_count = 0;
+	if (!glm::dot(ray.dir, glm::vec3(1,0,0))) { perp_axis_count++; }
+	if (!glm::dot(ray.dir, glm::vec3(0,1,0))) { perp_axis_count++; }
+	if (!glm::dot(ray.dir, glm::vec3(0,0,1))) { perp_axis_count++; }
+
+	if (perp_axis_count >= 2) { mid_color = tnw::Color::gray; }
+	ilist.push_back(std::make_tuple(mid_color, inter_max_length - inter_min_length));
+
+	ilist.push_back(std::make_tuple(tnw::Color::white, tot_length - inter_max_length));
+
+	return removeZeroIntersections(ilist);
 }
