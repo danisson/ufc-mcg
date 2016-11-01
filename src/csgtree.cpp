@@ -350,7 +350,7 @@ tnw::CSGTree::CSGTree(owner_ptr<csg::Node> x) : root(x), render_model(BoundingBo
 }
 
 tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) { 
-	std::cout << "called\n";
+	// std::cout << "called\n";
 	char c;
 	bool eof = false;
 	float cx,cy,cz,w,h,d,r,dx,dy,dz,ds;
@@ -363,12 +363,12 @@ tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) {
 		if ((c == '\n') || (c == EOF)) {
 			eof = true;
 		} else {
-			std::cout << "c: " << c << "\n";
+			// std::cout << "c: " << c << "\n";
 			switch (c) {
 				case 'B': {
 					fscanf(f, "%f %f %f %f %f %f", &cx, &cy, &cz, &w, &h, &d);
 					// auto bx =
-					stack.push_back(new tnw::Box(glm::vec3(cx,cy,cz),w,h,d));
+					stack.push_back(new tnw::Box(glm::vec3(cx,cy,cz),w,d,h));
 					break;
 				}
 				case 'S': {

@@ -78,7 +78,7 @@ void MainMenu::draw() {
 			ImGui::InputText("path",buffer,1000);
 			ImGui::PopItemWidth();
 			ImVec2 buttonSize = ImVec2(0,0);
-			float halfWidth = ImGui::GetWindowContentRegionMax().x*.3f;
+			float halfWidth = ImGui::GetWindowContentRegionMax().x*.4f;
 			float margin = ImGui::GetStyle().ItemSpacing.x;
 			buttonSize.x = halfWidth-margin;
 			if (ImGui::Button("Carregar Octree",buttonSize)) {
@@ -117,7 +117,6 @@ void MainMenu::draw() {
 					std::stringstream ss;
 					fscanf(f,"%zu\n",&size);
 					for (size_t i = 0; i < size; ++i) {
-						// std::cout << "teste " << std::make_unique<tnw::CSGTree>(f)->root->child[0]->child[1]->dx[0] << "\n";
 						models.push_back(std::make_unique<tnw::CSGTree>(f));
 						ss << "Árvore " << (count+i) << "[ARQUIVO]";
 						model_names.push_back(ss.str());
