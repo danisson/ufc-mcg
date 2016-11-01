@@ -59,13 +59,6 @@ void MainMenu::draw() {
 	if (render_show) renderWindow(tex,raycast_width,raycast_height,render_show);
 
 	if (ImGui::CollapsingHeader("Arquivo")) {
-		ImGui::InputInt("render width", &raycast_width);
-		ImGui::InputInt("render height", &raycast_height);
-		if (ImGui::Button("Render") && !render_show) {
-			raycastCamera.aspect = float(raycast_height)/raycast_width;
-			tnw::Raycast rc(models,raycastCamera,raycast_width,raycast_height,tex);
-			render_show = true;
-		}
 		if (ImGui::Button("Abrir"))
 			ImGui::OpenPopup("##abrir_arq");
 		ImGui::SameLine();
@@ -685,6 +678,16 @@ void MainMenu::draw() {
 			camera.positive_ver = (rots[rot]>>1)&1;
 		}
 		raycastCamera = camera;
+	}
+
+	if (ImGui::CollapsingHeader("Raycast")) {
+		ImGui::InputInt("render width", &raycast_width);
+		ImGui::InputInt("render height", &raycast_height);
+		if (ImGui::Button("Render") && !render_show) {
+			raycastCamera.aspect = float(raycast_height)/raycast_width;
+			tnw::Raycast rc(models,raycastCamera,raycast_width,raycast_height,tex);
+			render_show = true;
+		}
 	}
 
 	ImGui::End();
