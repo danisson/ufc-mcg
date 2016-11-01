@@ -12,6 +12,9 @@ endif
 #  -Wall     ativa a maioria dos erros de compilação
 #  -std=c+14 usa o standard mais recente
 CFLAGS = -g -Wall -std=c++14 -L lib -L bin -I inc -fdiagnostics-color=always
+ifeq "$(opt)" "full"
+CFLAGS = -O3 -march=native -funsafe-math-optimizations -std=c++14 -L lib -L bin -I inc
+endif
 LINK = -lm -l:imgui.a $(LINKGL)
 
 default: bin/main
