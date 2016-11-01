@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
+#include <sstream>
 #include <typeinfo>
 
 using namespace tnw;
@@ -126,10 +127,11 @@ BoundingBox tnw::csg::AndNode::boundingBox() const {
 }
 
 std::string tnw::csg::AndNode::serialize() const {
-	// std::string s1 = children[0]->serialize(),
-				// s2 = children[1]->serialize();
-	// return s1.append(s2).append("AndNode");
-	throw 0;
+	std::string s1 = children[0]->serialize(),
+				s2 = children[1]->serialize();
+	
+	return s1.append(" ").append(s2).append(" i");
+	// throw 0;
 }
 
 owner_ptr<Shape> tnw::csg::AndNode::clone() const {
@@ -225,10 +227,10 @@ BoundingBox tnw::csg::OrNode::boundingBox() const {
 }
 
 std::string tnw::csg::OrNode::serialize() const {
-	// std::string s1 = children[0]->serialize(),
-		// s2 = children[1]->serialize();
-		// return s1.append(s2).append("OrNode");
-	throw 0;
+	std::string s1 = children[0]->serialize(),
+			    s2 = children[1]->serialize();
+	return s1.append(" ").append(s2).append(" u");
+	// throw 0;
 }
 
 owner_ptr<Shape> tnw::csg::OrNode::clone() const {
@@ -267,9 +269,9 @@ BoundingBox tnw::csg::ScaleNode::boundingBox() const {
 }
 
 std::string tnw::csg::ScaleNode::serialize() const {
-	// std::string s1 = child->serialize();
-		// return s1.append("ScaleNode");
-	throw 0;
+	std::string s1 = child->serialize();
+	return s1.append(" s ").append(std::to_string(dv));
+	// throw 0;
 }
 
 owner_ptr<Shape> tnw::csg::ScaleNode::clone() const {
@@ -303,9 +305,11 @@ BoundingBox tnw::csg::TranslateNode::boundingBox() const {
 }
 
 std::string tnw::csg::TranslateNode::serialize() const {
-	// std::string s1 = child->serialize();
-		// return s1.append("TranslateNode");
-	throw 0;
+	std::string s1 = child->serialize();
+	std::stringstream s;
+	s << " t " << dx[0] << " " << dx[1] << " " << dx[2]; 
+	return s1.append(s.str());
+	// throw 0;
 }
 
 owner_ptr<Shape> tnw::csg::TranslateNode::clone() const {

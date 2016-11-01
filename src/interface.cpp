@@ -578,7 +578,7 @@ void MainMenu::draw() {
 				ImGui::InputFloat("profundidade", &d);
 
 				if (ImGui::Button("OK", ImVec2(120,0))) {
-					auto bb = new tnw::Box({x,y,z}, l, h, d);
+					auto bb = new tnw::Box({x,y,z}, l, d, h);
 					models.push_back(std::make_unique<tnw::CSGTree>(bb));
 					std::stringstream ss;
 					ss << "CSG " << model_names.size() << "[CAIXA]";
