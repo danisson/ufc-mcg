@@ -5,6 +5,7 @@
 #include <cmath>
 #include <limits>
 #include <glm/gtx/string_cast.hpp>
+#include <sstream>
 
 using tnw::Color;
 using tnw::IntersectionList;
@@ -95,6 +96,12 @@ IntersectionList tnw::Sphere::intersect_ray(const Ray& ray) const {
 
 tnw::owner_ptr<tnw::Shape> tnw::Sphere::clone() const {
 	return new tnw::Sphere(*this);
+}
+
+std::string tnw::Sphere::serialize() const {
+	std::stringstream s;
+	s << "S " << center[0] << " " << center[1] << " " << center[2] << " " << radius;
+	return s.str();
 }
 
 // ------------------------------------------------------------------------- //
@@ -250,6 +257,11 @@ tnw::owner_ptr<tnw::Shape> tnw::Box::clone() const {
 	return new tnw::Box(*this);
 }
 
+std::string tnw::Box::serialize() const {
+	std::stringstream s;
+	s << "B " << center[0] << " " << center[1] << " " << center[2] << " " << length << " " << height << " " << depth;
+	return s.str();
+}
 // ------------------------------------------------------------------------- //
 tnw::Cilinder::Cilinder(glm::vec3 inferiorPoint, float height, float radius) : inferiorPoint(inferiorPoint), height(height), radius(radius) {}
 
@@ -438,6 +450,11 @@ tnw::owner_ptr<tnw::Shape> tnw::Cilinder::clone() const {
 	return new tnw::Cilinder(*this);
 }
 
+std::string tnw::Cilinder::serialize() const {
+	std::stringstream s;
+	s << "C " << inferiorPoint[0] << " " << inferiorPoint[1] << " " << inferiorPoint[2] << " " << radius << " " << height;
+	return s.str();
+}
 // ------------------------------------------------------------------------- //
 tnw::SquarePyramid::SquarePyramid(glm::vec3 inferiorPoint, float height, float basis) : inferiorPoint(inferiorPoint), height(height), basis(basis) {}
 
@@ -584,4 +601,9 @@ tnw::owner_ptr<tnw::Shape> tnw::SquarePyramid::clone() const {
 	return new tnw::SquarePyramid(*this);
 }
 
+std::string tnw::SquarePyramid::serialize() const {
+	std::stringstream s;
+	s << "P " << inferiorPoint[0] << " " << inferiorPoint[1] << " " << inferiorPoint[2] << " " << basis << " " << height;
+	return s.str();
+}
 // ------------------------------------------------------------------------- //

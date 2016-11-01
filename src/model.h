@@ -54,6 +54,7 @@ public:
 	virtual double volume() const = 0;
 
 	virtual owner_ptr<Shape> clone() const = 0;
+	virtual std::string serialize() const = 0;
 };
 
 struct BoundingBox : public Shape {
@@ -80,6 +81,7 @@ struct BoundingBox : public Shape {
 	bool operator!=(const BoundingBox& s) const;
 
 	owner_ptr<Shape> clone() const override;
+	std::string serialize() const override;
 };
 
 class Model : public Shape {

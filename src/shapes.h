@@ -16,6 +16,7 @@ namespace tnw {
 		double volume() const override;
 
 		owner_ptr<Shape> clone() const override;
+		std::string serialize() const override;
 	private:
 		glm::vec3 center;
 		float radius;
@@ -33,6 +34,7 @@ namespace tnw {
 		double volume() const override;
 
 		owner_ptr<Shape> clone() const override;
+		std::string serialize() const override;
 	private:
 		glm::vec3 center;
 		float length, depth, height;
@@ -49,6 +51,7 @@ namespace tnw {
 		double volume() const override;
 
 		owner_ptr<Shape> clone() const override;
+		std::string serialize() const override;
 	private:
 		glm::vec3 inferiorPoint;
 		float height, radius;
@@ -65,6 +68,7 @@ namespace tnw {
 		double volume() const override;
 
 		owner_ptr<Shape> clone() const override;
+		std::string serialize() const override;
 	private:
 		glm::vec3 inferiorPoint;
 		float height, basis;

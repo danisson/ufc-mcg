@@ -13,7 +13,7 @@ namespace csg {
 	class Node : public Shape {
 	public:
 		double volume() const;
-		virtual std::string serialize() const = 0;
+		// virtual std::string serialize() const = 0;
 	};
 
 	class AndNode : public Node {

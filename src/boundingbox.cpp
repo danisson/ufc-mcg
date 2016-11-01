@@ -3,6 +3,7 @@
 #include <GL/gl.h>
 #include <glm/glm.hpp>
 #include <array>
+#include <sstream>
 
 tnw::BoundingBox::BoundingBox(glm::vec3 _corner, float _depth) : corner(_corner), depth(_depth){}
 
@@ -329,4 +330,10 @@ tnw::IntersectionList tnw::BoundingBox::intersect_ray(const tnw::Ray& ray) const
 	ilist.push_back(std::make_tuple(tnw::Color::white, tot_length - inter_max_length));
 
 	return removeZeroIntersections(ilist);
+}
+
+std::string tnw::BoundingBox::serialize() const {
+	std::stringstream s;
+	s << corner[0] << " " << corner[1] << " " << corner[2] << " " << depth << " ";
+	return s.str();
 }
