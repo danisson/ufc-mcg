@@ -80,6 +80,7 @@ class CSGTree : public tnw::Model {
 public:
 	CSGTree(unique_ptr<Shape>&&);
 	CSGTree(owner_ptr<Shape>);
+	CSGTree(FILE *f);
 	// Shape
 	// Geometric operations
 	Color intersect_point(const glm::vec3&) const override;

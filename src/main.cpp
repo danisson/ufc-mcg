@@ -35,6 +35,12 @@ IsometricCamera camera;
 int main(void) {
 	GLFWwindow* window;
 	std::vector<std::unique_ptr<tnw::Model>> models;
+	// FILE* f = fopen("bin/main/taca.txt","r");
+	// if (!f) {
+	// 	std::cout << "Não abriu\n";
+	// 	exit(0);
+	// }
+	// models.push_back(std::make_unique<tnw::CSGTree>(f));
 	auto shapeTest = new tnw::BoundingBox({0,0,0}, 0.5);
 	models.push_back(std::make_unique<tnw::CSGTree>(shapeTest));
 	// Initialize the library

@@ -241,6 +241,103 @@ tnw::CSGTree::CSGTree(owner_ptr<csg::Node> x) : root(x), render_model(BoundingBo
 	}
 }
 
+tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) { 
+	std::cout << "called\n";
+	char c;
+	bool eof = false;
+	float cx,cy,cz,w,h,d,r,dx,dy,dz,ds;
+	tnw::Shape* frontStack1, *frontStack2;
+	// unique_ptr<tnw::Shape> frontStack1, frontStack2;
+	// std::vector<unique_ptr<tnw::Shape>> stack;
+	std::vector<tnw::Shape*> stack;
+	while (!eof) {
+		c = fgetc(f);
+		if ((c == '\n') || (c == EOF)) {
+			eof = true;
+		} else {
+			std::cout << "c: " << c << "\n";
+			switch (c) {
+				case 'B': {
+					fscanf(f, "%f %f %f %f %f %f", &cx, &cy, &cz, &w, &h, &d);
+					// auto bx =
+					stack.push_back(new tnw::Box(glm::vec3(cx,cy,cz),w,h,d));
+					break;
+				}
+				case 'S': {
+					fscanf(f, "%f %f %f %f", &cx, &cy, &cz, &r);
+					stack.push_back(new tnw::Sphere(glm::vec3(cx,cy,cz),r));
+					break;
+				}
+				case 'C': {
+					fscanf(f, "%f %f %f %f %f", &cx, &cy, &cz, &r, &h);
+					stack.push_back(new tnw::Cilinder(glm::vec3(cx,cy,cz),r,h));
+					break;
+				}
+				case 'O': {
+					stack.push_back(new tnw::Octree(f));
+					break;
+				}
+				case 't': {
+					fscanf(f, "%f %f %f", &dx, &dy, &dz);
+					frontStack1 = std::move(stack.back());
+					stack.pop_back();
+					// stack.push_back(make_unique<tnw::csg::TranslateNode>(frontStack1, glm::vec3(dx,dy,dz)));
+					stack.push_back(new tnw::csg::TranslateNode(unique_ptr<tnw::Shape>(frontStack1), glm::vec3(dx,dy,dz)));
+					break;
+				}
+				case 's': {
+					fscanf(f, "%f", &ds);
+					frontStack1 = std::move(stack.back());
+					stack.pop_back();
+					stack.push_back(new tnw::csg::ScaleNode(unique_ptr<tnw::Shape>(frontStack1), ds));
+					break;
+				}
+				case 'u': {
+					frontStack1 = std::move(stack.back());
+					stack.pop_back();
+					frontStack2 = std::move(stack.back());
+					stack.pop_back();
+					stack.push_back(new tnw::csg::OrNode(unique_ptr<tnw::Shape>(frontStack1), unique_ptr<tnw::Shape>(frontStack2)));
+					break;
+				}
+				case 'i': {
+					frontStack1 = std::move(stack.back());
+					stack.pop_back();
+					frontStack2 = std::move(stack.back());
+					stack.pop_back();
+					stack.push_back(new tnw::csg::AndNode(unique_ptr<tnw::Shape>(frontStack1), unique_ptr<tnw::Shape>(frontStack2)));
+					break;
+				}
+				case ' ': 
+					break;
+				//Não implementados
+				case 'd':
+				case 'r': {
+					frontStack1 = std::move(stack.back());
+					stack.push_back(new tnw::csg::TranslateNode(unique_ptr<tnw::Shape>(frontStack1),glm::vec3(0,0,0)));
+					break;
+				}
+				default: {
+					if (std::isupper(c)) {
+						//Primitiva
+						stack.push_back(new tnw::Box(glm::vec3(0,0,0),1,1,1));
+					} else {
+						//Transformação
+						auto frontStack = std::move(stack.back());
+						stack.push_back(new tnw::csg::TranslateNode(unique_ptr<tnw::Shape>(frontStack),glm::vec3(0,0,0)));
+					}
+					break;
+				}			
+			}
+		}
+	}
+
+	// CSGTree(unique_ptr<Shape>(std::move(stack.back())));
+	auto stackRoot = std::move(stack.back());
+	auto nodeTree = new csg::ScaleNode(unique_ptr<Shape>(stackRoot), 1.0);
+	root = unique_ptr<csg::Node>(nodeTree);
+}
+
 Color tnw::CSGTree::intersect_point(const glm::vec3& x) const {
 	return root->intersect_point(x);
 }

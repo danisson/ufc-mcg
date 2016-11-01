@@ -72,16 +72,16 @@ void MainMenu::draw() {
 		if (ImGui::Button("Salvar"))
 			ImGui::OpenPopup("##salvar_arq");
 
-		if (ImGui::BeginPopupModal("##abrir_arq")) {
+		if (ImGui::BeginPopupModal("##abrir_arq", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 			ImGui::Text("Caminho para o arquivo");
 			ImGui::PushItemWidth(-1);
 			ImGui::InputText("path",buffer,1000);
 			ImGui::PopItemWidth();
 			ImVec2 buttonSize = ImVec2(0,0);
-			float halfWidth = ImGui::GetWindowContentRegionMax().x*.5f;
+			float halfWidth = ImGui::GetWindowContentRegionMax().x*.3f;
 			float margin = ImGui::GetStyle().ItemSpacing.x;
 			buttonSize.x = halfWidth-margin;
-			if (ImGui::Button("Carregar",buttonSize)) {
+			if (ImGui::Button("Carregar Octree",buttonSize)) {
 				FILE* f = nullptr;
 				if (strcmp(buffer,"##stdin") == 0) f = stdin;
 				else f = fopen(buffer,"r");
@@ -95,6 +95,29 @@ void MainMenu::draw() {
 					fscanf(f,"%zu\n",&size);
 					for (size_t i = 0; i < size; ++i) {
 						models.push_back(std::make_unique<tnw::Octree>(f));
+						ss << "Árvore " << (count+i) << "[ARQUIVO]";
+						model_names.push_back(ss.str());
+						ss.str(std::string());ss.clear();
+					}
+					fclose(f);
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Carregar CSG",buttonSize)) {
+				FILE* f = nullptr;
+				if (strcmp(buffer,"##stdin") == 0) f = stdin;
+				else f = fopen(buffer,"r");
+
+				if(!f) {
+					ImGui::OpenPopup("Falha Arquivo##1");
+				} else {
+					size_t size = 0;
+					size_t count = model_names.size();
+					std::stringstream ss;
+					fscanf(f,"%zu\n",&size);
+					for (size_t i = 0; i < size; ++i) {
+						models.push_back(std::make_unique<tnw::CSGTree>(f));
 						ss << "Árvore " << (count+i) << "[ARQUIVO]";
 						model_names.push_back(ss.str());
 						ss.str(std::string());ss.clear();
