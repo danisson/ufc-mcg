@@ -81,7 +81,66 @@ Color tnw::csg::AndNode::intersect_box(const BoundingBox& x) const {
 }
 
 IntersectionList tnw::csg::AndNode::intersect_ray(const Ray& x) const {
-	throw 0;
+	IntersectionList ilistA = children[0]->intersect_ray(x);
+	IntersectionList ilistB = children[1]->intersect_ray(x);
+	IntersectionList ilistC, ilistD;
+
+	auto currA = ilistA[0];
+	ilistA.erase(ilistA.begin());
+
+	auto currB = ilistB[0];
+	ilistB.erase(ilistB.begin());
+
+	// std::tuple<tnw::Color, float> currC;
+	float size;
+	do {
+		if (std::get<1>(currA) < std::get<1>(currB)) {
+			size = std::get<1>(currA);
+			auto currC = std::make_tuple(and_color(std::get<0>(currA), std::get<0>(currB)), size);
+			ilistC.push_back(currC);
+
+			std::get<1>(currB) -= size;
+			if (!ilistA.empty()) {
+				currA = ilistA[0];
+				ilistA.erase(ilistA.begin());
+			} 
+
+		} else if (std::get<1>(currB) < std::get<1>(currA)) {
+			size = std::get<1>(currB);
+			auto currC = std::make_tuple(and_color(std::get<0>(currA), std::get<0>(currB)), size);
+			ilistC.push_back(currC);
+			
+			std::get<1>(currA) -= size;
+			if (!ilistB.empty()) {
+				currB = ilistB[0];
+				ilistB.erase(ilistB.begin());
+			}
+		} else {
+			size = std::get<1>(currA);
+			auto currC = std::make_tuple(and_color(std::get<0>(currA), std::get<0>(currB)), size);
+			ilistC.push_back(currC);
+			
+			if (!ilistA.empty() && !ilistB.empty()) { 
+				currA = ilistA[0];
+				ilistA.erase(ilistA.begin());
+				currB = ilistB[0];
+				ilistB.erase(ilistB.begin());
+			}
+		}
+
+	} while (!ilistA.empty() && !ilistB.empty()); 
+
+	//Agora que tem a lista, tem que unir os elementos adjacentes da lista que tem a mesma cor
+	float acumSize = 0;
+	for (int i = 0; i < ilistC.size()-1; i++) {
+		acumSize += std::get<1>(ilistC[i]);
+		if (std::get<0>(ilistC[i+1]) != std::get<0>(ilistC[i])) {
+			ilistD.push_back(std::make_tuple(std::get<0>(ilistC[i]), acumSize));
+			acumSize = 0;
+		} 
+	}
+	ilistD.push_back(ilistC[ilistC.size()-1]);
+	return ilistD;
 }
 
 BoundingBox tnw::csg::AndNode::boundingBox() const {
@@ -116,7 +175,66 @@ Color tnw::csg::OrNode::intersect_box(const BoundingBox& x) const {
 }
 
 IntersectionList tnw::csg::OrNode::intersect_ray(const Ray& x) const {
-	throw 0;
+	IntersectionList ilistA = children[0]->intersect_ray(x);
+	IntersectionList ilistB = children[1]->intersect_ray(x);
+	IntersectionList ilistC, ilistD;
+
+	auto currA = ilistA[0];
+	ilistA.erase(ilistA.begin());
+
+	auto currB = ilistB[0];
+	ilistB.erase(ilistB.begin());
+
+	// std::tuple<tnw::Color, float> currC;
+	float size;
+	do {
+		if (std::get<1>(currA) < std::get<1>(currB)) {
+			size = std::get<1>(currA);
+			auto currC = std::make_tuple(or_color(std::get<0>(currA), std::get<0>(currB)), size);
+			ilistC.push_back(currC);
+
+			std::get<1>(currB) -= size;
+			if (!ilistA.empty()) {
+				currA = ilistA[0];
+				ilistA.erase(ilistA.begin());
+			} 
+
+		} else if (std::get<1>(currB) < std::get<1>(currA)) {
+			size = std::get<1>(currB);
+			auto currC = std::make_tuple(or_color(std::get<0>(currA), std::get<0>(currB)), size);
+			ilistC.push_back(currC);
+			
+			std::get<1>(currA) -= size;
+			if (!ilistB.empty()) {
+				currB = ilistB[0];
+				ilistB.erase(ilistB.begin());
+			}
+		} else {
+			size = std::get<1>(currA);
+			auto currC = std::make_tuple(or_color(std::get<0>(currA), std::get<0>(currB)), size);
+			ilistC.push_back(currC);
+			
+			if (!ilistA.empty() && !ilistB.empty()) { 
+				currA = ilistA[0];
+				ilistA.erase(ilistA.begin());
+				currB = ilistB[0];
+				ilistB.erase(ilistB.begin());
+			}
+		}
+
+	} while (!ilistA.empty() && !ilistB.empty()); 
+
+	//Agora que tem a lista, tem que unir os elementos adjacentes da lista que tem a mesma cor
+	float acumSize = 0;
+	for (int i = 0; i < ilistC.size()-1; i++) {
+		acumSize += std::get<1>(ilistC[i]);
+		if (std::get<0>(ilistC[i+1]) != std::get<0>(ilistC[i])) {
+			ilistD.push_back(std::make_tuple(std::get<0>(ilistC[i]), acumSize));
+			acumSize = 0;
+		} 
+	}
+	ilistD.push_back(ilistC[ilistC.size()-1]);
+	return ilistD;
 }
 
 BoundingBox tnw::csg::OrNode::boundingBox() const {
