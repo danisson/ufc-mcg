@@ -64,7 +64,8 @@ Color tnw::Octree::intersect_point(const glm::vec3& x) const {
 }
 
 IntersectionList tnw::Octree::intersect_ray(const Ray& r) const {
-	throw 0;
+	// TODO intersecção em octree
+	return IntersectionList({std::make_tuple(Color::white,r.length())});
 }
 
 // Boolean operations
