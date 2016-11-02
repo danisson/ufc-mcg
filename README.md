@@ -1,6 +1,6 @@
-Primeiro Trabalho de Modelagem em CG: Modelador de Octree
-=========================================================
-Equipe: 
+Segundo Trabalho de Modelagem em CG: Modelador em CSG
+=====================================================
+Equipe:
 * Carolina Herbster (354044)
 * Daniel Augusto (354047)
 
@@ -13,6 +13,6 @@ Compilação & Execução
 * Chamar o makefile
 * Executável se localiza em bin/main
 
-Carregar os modelos 
+Carregar os modelos
 * Colocar o caminho relativo dos modelos no diálogo de abrir modelos
 * Exemplos estão na pasta "models", carregar usando o caminho "./models/nome_do_modelo.txt"
