@@ -59,13 +59,6 @@ void MainMenu::draw() {
 	if (render_show) renderWindow(tex,raycast_width,raycast_height,render_show);
 
 	if (ImGui::CollapsingHeader("Arquivo")) {
-		ImGui::InputInt("render width", &raycast_width);
-		ImGui::InputInt("render height", &raycast_height);
-		if (ImGui::Button("Render") && !render_show) {
-			raycastCamera.aspect = float(raycast_height)/raycast_width;
-			tnw::Raycast rc(models,raycastCamera,raycast_width,raycast_height,tex);
-			render_show = true;
-		}
 		if (ImGui::Button("Abrir"))
 			ImGui::OpenPopup("##abrir_arq");
 		ImGui::SameLine();
@@ -315,7 +308,7 @@ void MainMenu::draw() {
 		}
 
 
-		buttonSize.x = fullWidth/3-margin;
+		buttonSize.x = fullWidth/4-margin;
 		if (ImGui::Button("Cor",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
 			ImGui::OpenPopup("Parâmetros de Cor");
 		}
@@ -353,6 +346,11 @@ void MainMenu::draw() {
 		if (ImGui::Button("Remover",buttonSize) && isSelected) {
 			models.erase(models.begin() + curr_item);
 			model_names.erase(model_names.begin() + curr_item);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Duplicar",buttonSize) && isSelected) {
+			models.push_back(unique_ptr<tnw::Model>((*(models.begin() + curr_item))->clone()));
+			model_names.push_back("Clone " + std::to_string(model_names.size()));
 		}
 
 		ImGui::PushID("Octree");
@@ -685,6 +683,16 @@ void MainMenu::draw() {
 			camera.positive_ver = (rots[rot]>>1)&1;
 		}
 		raycastCamera = camera;
+	}
+
+	if (ImGui::CollapsingHeader("Raycast")) {
+		ImGui::InputInt("render width", &raycast_width);
+		ImGui::InputInt("render height", &raycast_height);
+		if (ImGui::Button("Render") && !render_show) {
+			raycastCamera.aspect = float(raycast_height)/raycast_width;
+			tnw::Raycast rc(models,raycastCamera,raycast_width,raycast_height,tex);
+			render_show = true;
+		}
 	}
 
 	ImGui::End();

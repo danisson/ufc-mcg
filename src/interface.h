@@ -33,7 +33,7 @@ class MainMenu {
 
 	double volumeCache;
 	bool open_type_error_popup = false, open_bb_mismatch_error_popup = false;
-	char buffer[1000];
+	char buffer[1000] = "./models/igreja.csg";
 	const char *esconder_text = "Esconder##toggle";
 	const char *mostrar_text = "Mostrar##toggle";
 
