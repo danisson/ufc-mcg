@@ -158,66 +158,39 @@ Color tnw::csg::OrNode::intersect_box(const BoundingBox& x) const {
 }
 
 IntersectionList tnw::csg::OrNode::intersect_ray(const Ray& x) const {
-	IntersectionList ilistA = children[0]->intersect_ray(x);
-	IntersectionList ilistB = children[1]->intersect_ray(x);
-	IntersectionList ilistC, ilistD;
+	IntersectionList a = children[0]->intersect_ray(x);
+	IntersectionList b = children[1]->intersect_ray(x);
+	IntersectionList c;
 
-	auto currA = ilistA[0];
-	ilistA.erase(ilistA.begin());
+	if (get<1>(b[0]) > get<1>(a[0]))
+		std::swap(a,b);
 
-	auto currB = ilistB[0];
-	ilistB.erase(ilistB.begin());
-
-	// std::tuple<tnw::Color, float> currC;
-	float size;
-	do {
-		if (std::get<1>(currA) < std::get<1>(currB)) {
-			size = std::get<1>(currA);
-			auto currC = std::make_tuple(or_color(std::get<0>(currA), std::get<0>(currB)), size);
-			ilistC.push_back(currC);
-
-			std::get<1>(currB) -= size;
-			if (!ilistA.empty()) {
-				currA = ilistA[0];
-				ilistA.erase(ilistA.begin());
-			}
-
-		} else if (std::get<1>(currB) < std::get<1>(currA)) {
-			size = std::get<1>(currB);
-			auto currC = std::make_tuple(or_color(std::get<0>(currA), std::get<0>(currB)), size);
-			ilistC.push_back(currC);
-
-			std::get<1>(currA) -= size;
-			if (!ilistB.empty()) {
-				currB = ilistB[0];
-				ilistB.erase(ilistB.begin());
-			}
-		} else {
-			size = std::get<1>(currA);
-			auto currC = std::make_tuple(or_color(std::get<0>(currA), std::get<0>(currB)), size);
-			ilistC.push_back(currC);
-
-			if (!ilistA.empty() && !ilistB.empty()) {
-				currA = ilistA[0];
-				ilistA.erase(ilistA.begin());
-				currB = ilistB[0];
-				ilistB.erase(ilistB.begin());
-			}
-		}
-
-	} while (!ilistA.empty() && !ilistB.empty());
-
-	//Agora que tem a lista, tem que unir os elementos adjacentes da lista que tem a mesma cor
-	float acumSize = 0;
-	for (int i = 0; i < ilistC.size()-1; i++) {
-		acumSize += std::get<1>(ilistC[i]);
-		if (std::get<0>(ilistC[i+1]) != std::get<0>(ilistC[i])) {
-			ilistD.push_back(std::make_tuple(std::get<0>(ilistC[i]), acumSize));
-			acumSize = 0;
-		}
+	if (get<0>(a[0]) == Color::black) {
+		c.push_back(a[0]);
+		return c;
 	}
-	ilistD.push_back(ilistC[ilistC.size()-1]);
-	return ilistD;
+
+	if (get<0>(b[0]) == Color::black) {
+		c.push_back(b[0]);
+		return c;
+	}
+
+	if (get<0>(b[0]) == get<0>(a[0])) {
+		c.push_back(b[0]);
+		return c;
+	}
+
+	if (get<0>(a[0]) == Color::gray) {
+		c.push_back(make_tuple(Color::gray,get<1>(b[0])));
+		return c;
+	}
+
+	if (get<0>(a[0]) == Color::white) {
+		c.push_back(make_tuple(Color::gray,get<1>(b[0])));
+		return c;
+	}
+
+	return c;
 }
 
 BoundingBox tnw::csg::OrNode::boundingBox() const {
