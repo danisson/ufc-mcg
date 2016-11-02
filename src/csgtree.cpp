@@ -129,7 +129,7 @@ BoundingBox tnw::csg::AndNode::boundingBox() const {
 std::string tnw::csg::AndNode::serialize() const {
 	std::string s1 = children[0]->serialize(),
 				s2 = children[1]->serialize();
-	
+
 	return s1.append(" ").append(s2).append(" i");
 	// throw 0;
 }
@@ -307,7 +307,7 @@ BoundingBox tnw::csg::TranslateNode::boundingBox() const {
 std::string tnw::csg::TranslateNode::serialize() const {
 	std::string s1 = child->serialize();
 	std::stringstream s;
-	s << " t " << dx[0] << " " << dx[1] << " " << dx[2]; 
+	s << " t " << dx[0] << " " << dx[1] << " " << dx[2];
 	return s1.append(s.str());
 	// throw 0;
 }
@@ -353,7 +353,7 @@ tnw::CSGTree::CSGTree(owner_ptr<csg::Node> x) : root(x), render_model(BoundingBo
 	}
 }
 
-tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) { 
+tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) {
 	// std::cout << "called\n";
 	char c;
 	bool eof = false;
@@ -392,7 +392,7 @@ tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) {
 				case 'P': {
 					fscanf(f, "%f %f %f %f %f", &cx, &cy, &cz, &r, &h);
 					stack.push_back(new tnw::SquarePyramid(glm::vec3(cx,cy,cz),h,r));
-					break;	
+					break;
 				}
 				case 't': {
 					fscanf(f, "%f %f %f", &dx, &dy, &dz);
@@ -425,7 +425,7 @@ tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) {
 					stack.push_back(new tnw::csg::AndNode(unique_ptr<tnw::Shape>(frontStack1), unique_ptr<tnw::Shape>(frontStack2)));
 					break;
 				}
-				case ' ': 
+				case ' ':
 					break;
 				//Não implementados
 				case 'd':
@@ -444,7 +444,7 @@ tnw::CSGTree::CSGTree(FILE *f) : render_model(BoundingBox({0,0,0},1)) {
 						stack.push_back(new tnw::csg::TranslateNode(unique_ptr<tnw::Shape>(frontStack),glm::vec3(0,0,0)));
 					}
 					break;
-				}			
+				}
 			}
 		}
 	}
