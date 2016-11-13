@@ -167,6 +167,20 @@ int main(void) {
 	}
 	std::cout << "\n---\n";
 
+	std::vector<WEdge*> be = a->adjedge();
+	std::cout << "Edge a adj edge\n";
+	for (WEdge*& we : be) {
+		std::cout << we->id << " ";
+	}
+	std::cout << "\n---\n";
+
+	std::vector<WEdge*> ce = A->adjedge();
+	std::cout << "Vertex A adj edge\n";
+	for (WEdge*& we : ce) {
+		std::cout << we->id << " ";
+	}
+	std::cout << "\n---\n";
+
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();

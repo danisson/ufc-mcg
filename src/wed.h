@@ -11,6 +11,7 @@ namespace tnw {
 namespace wed {
 
 	struct WEdge;
+	struct Loop;
 
 	struct Vertex {
 		//Identifier
@@ -20,6 +21,13 @@ namespace wed {
 		//Incident edge
 		WEdge *iedge;
 		Vertex(size_t _id, glm::vec3 _position, WEdge* _iedge);
+
+		//Returns the list of adjacent edges
+		std::vector<WEdge*> adjedge();
+		//Returns the list of adjacent vertices
+		std::vector<Vertex*> adjvertex();
+		//Returns the list of adjacent faces
+		std::vector<Loop*> adjloop();
 
 		// void draw();
 	};
@@ -59,6 +67,12 @@ namespace wed {
 		//Initialize with all info
 		WEdge(size_t _id, Vertex* _vstart, Vertex* _vend, Loop* _lloop, Loop* _rloop, WEdge* _lpred, WEdge* _lsucc, WEdge* _rpred, WEdge* _rsucc);
 	
+		//Returns the list of adjacent edges
+		std::vector<WEdge*> adjedge();
+		//Returns the list of adjacent vertices
+		std::vector<Vertex*> adjvertex();
+		//Returns the list of adjacent faces
+		std::vector<Loop*> adjloop();
 
 		// void draw();
 	};

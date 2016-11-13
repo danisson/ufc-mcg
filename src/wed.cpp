@@ -15,6 +15,40 @@ tnw::wed::WEdge::WEdge(size_t _id, tnw::wed::Vertex* _vstart, tnw::wed::Vertex* 
 
 tnw::wed::Loop::Loop(size_t _id, tnw::wed::WEdge* _iedge) : id(_id), iedge(_iedge) {};
 
+
+
+std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
+	WEdge* curredge = iedge; 
+	std::vector<WEdge*> adjedgev;
+
+	//Escolhe uma direção pra percorrer as arestas
+	do {
+		adjedgev.push_back(curredge);
+		//Checa se é vstart ou vend
+		if (curredge->vstart == this) {
+			curredge = curredge->rpred;
+		} else {
+			curredge = curredge->lpred;
+		}
+
+	} while (curredge != iedge);
+
+
+	return adjedgev;
+}
+std::vector<tnw::wed::Vertex*> tnw::wed::Vertex::adjvertex() {
+	WEdge* curredge = iedge; 
+	std::vector<Vertex*> adjvertexv;
+
+	return adjvertexv;
+}
+std::vector<tnw::wed::Loop*> tnw::wed::Vertex::adjloop() {
+	WEdge* curredge = iedge; 
+	std::vector<Loop*> adjloopv;
+
+	return adjloopv;
+}
+
 std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
 	WEdge* curredge = iedge; 
 	std::vector<WEdge*> adjedgev;
@@ -77,4 +111,32 @@ std::vector<tnw::wed::Loop*> tnw::wed::Loop::adjloop() {
 	} while (curredge != iedge);
 
 	return adjloopv;	
+}
+
+
+std::vector<WEdge*> tnw::wed::WEdge::adjedge() {
+	std::vector<WEdge*> adjedgev;
+
+	adjedgev.push_back(lpred);
+	adjedgev.push_back(lsucc);
+	adjedgev.push_back(rpred);
+	adjedgev.push_back(rsucc);
+	
+	return adjedgev;
+}
+std::vector<Vertex*> tnw::wed::WEdge::adjvertex() {
+	std::vector<Vertex*> adjvertexv;
+
+	adjvertexv.push_back(vstart);
+	adjvertexv.push_back(vend);
+
+	return adjvertexv;
+}
+std::vector<Loop*> tnw::wed::WEdge::adjloop() {
+	std::vector<Loop*> adjloopv;
+
+	adjloopv.push_back(lloop);
+	adjloopv.push_back(rloop);
+
+	return adjloopv;
 }
