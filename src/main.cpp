@@ -4,6 +4,7 @@
 #include "shapes.h"
 #include "raycast.h"
 #include "csgtree.h"
+#include "wed.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -20,7 +21,7 @@
 #include <sstream>
 #include <limits>
 #include <glm/gtx/string_cast.hpp>
-
+using namespace tnw::wed;
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #undef near
 #undef far
@@ -69,6 +70,102 @@ int main(void) {
 
 	camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
+
+	WEdge *a = new WEdge(1);
+	WEdge *b = new WEdge(2);
+	WEdge *c = new WEdge(3);
+	WEdge *d = new WEdge(4);
+	WEdge *e = new WEdge(5);
+	WEdge *f = new WEdge(6);
+
+
+	Vertex *A = new Vertex(1, {0,0,0}, a);
+	Vertex *B = new Vertex(2, {1,0,1}, b);
+	Vertex *C = new Vertex(3, {2,0,0}, e);
+	Vertex *D = new Vertex(4, {1,1,0}, e);
+
+	Loop *l1 = new Loop(1, a);
+	Loop *l2 = new Loop(2, c);
+	Loop *l3 = new Loop(3, a);
+	Loop *l4 = new Loop(4, b);
+
+	a->vstart = A;
+	a->vend = D;
+	a->lloop = l3;
+	a->rloop = l1;
+	a->lpred = e;
+	a->lsucc = f;
+	a->rpred = b;
+	a->rsucc = c;
+
+	b->vstart = A;
+	b->vend = B;
+	b->lloop = l1;
+	b->rloop = l4;
+	b->lpred = c;
+	b->lsucc = a;
+	b->rpred = f;
+	b->rsucc = d;
+
+	c->vstart = B;
+	c->vend = D;
+	c->lloop = l1;
+	c->rloop = l2;
+	c->lpred = a;
+	c->lsucc = b;
+	c->rpred = d;
+	c->rsucc = e;
+
+	d->vstart = B;
+	d->vend = C;
+	d->lloop = l2;
+	d->rloop = l4;
+	d->lpred = e;
+	d->lsucc = c;
+	d->rpred = b;
+	d->rsucc = f;
+
+	e->vstart = C;
+	e->vend = D;
+	e->lloop = l2;
+	e->rloop = l3;
+	e->lpred = c;
+	e->lsucc = d;
+	e->rpred = f;
+	e->rsucc = a;
+
+	f->vstart = A;
+	f->vend = C;
+	f->lloop = l4;
+	f->rloop = l3;
+	f->lpred = d;
+	f->lsucc = b;
+	f->rpred = a;
+	f->rsucc = c;
+
+	std::vector<WEdge*> ae = l1->adjedge();
+
+	std::cout << "Face 1 adj edges\n";
+	for (WEdge*& we : ae) {
+		std::cout << we->id << " ";
+	}
+	std::cout << "\n---\n";
+
+	std::vector<Vertex*> av = l1->adjvertex();
+
+	std::cout << "Face 1 adj vertex\n";
+	for (Vertex*& wv : av) {
+		std::cout << wv->id << " ";
+	}
+	std::cout << "\n---\n";
+
+	std::vector<Loop*> al = l1->adjloop();
+
+	std::cout << "Face 1 adj loop\n";
+	for (Loop*& wl : al) {
+		std::cout << wl->id << " ";
+	}
+	std::cout << "\n---\n";
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {

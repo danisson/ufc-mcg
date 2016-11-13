@@ -19,8 +19,8 @@ LINK = -lm -l:imgui.a $(LINKGL)
 
 default: bin/main
 
-bin/main: src/main.cpp bin/imgui.a bin/ray.o bin/tree.o bin/octree.o bin/boundingbox.o bin/shapes.o bin/helper.o bin/raycast.o bin/interface.o bin/csgtree.o
-	$(CC) $(CFLAGS) bin/interface.o bin/ray.o bin/raycast.o bin/tree.o bin/octree.o bin/boundingbox.o bin/shapes.o bin/helper.o bin/csgtree.o src/main.cpp -o bin/main $(LINK)
+bin/main: src/main.cpp bin/imgui.a bin/ray.o bin/tree.o bin/octree.o bin/boundingbox.o bin/shapes.o bin/helper.o bin/raycast.o bin/interface.o bin/csgtree.o bin/wed.o
+	$(CC) $(CFLAGS) bin/interface.o bin/ray.o bin/raycast.o bin/tree.o bin/octree.o bin/boundingbox.o bin/shapes.o bin/helper.o bin/csgtree.o bin/wed.o src/main.cpp -o bin/main $(LINK)
 
 bin/imgui.a: lib/imgui/*.cpp
 	$(CC) $(CFLAGS) -c lib/imgui/imgui.cpp -o bin/imgui.o
@@ -56,6 +56,9 @@ bin/interface.o: src/interface.cpp src/interface.h
 
 bin/ray.o: src/ray.cpp src/model.h
 	$(CC) $(CFLAGS) -c src/ray.cpp -o bin/ray.o
+
+bin/wed.o: src/wed.cpp src/wed.h
+	$(CC) $(CFLAGS) -c src/wed.cpp -o bin/wed.o
 
 clear:
 	rm -f bin/main{,.exe} bin/*.o
