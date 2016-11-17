@@ -181,6 +181,20 @@ int main(void) {
 	}
 	std::cout << "\n---\n";
 
+	std::vector<Vertex*> cv = A->adjvertex();
+	std::cout << "Vertex A adj vertex\n";
+	for (Vertex*& we : cv) {
+		std::cout << we->id << " ";
+	}
+	std::cout << "\n---\n";
+
+	std::vector<Loop*> cl = A->adjloop();
+	std::cout << "Vertex A adj loop\n";
+	for (Loop*& we : cl) {
+		std::cout << we->id << " ";
+	}
+	std::cout << "\n---\n";
+
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();
