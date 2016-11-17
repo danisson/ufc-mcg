@@ -1,5 +1,7 @@
 #include "wed.h"
 #include <iostream>
+#include <set>
+#include <algorithm>
 
 using namespace tnw;
 using namespace tnw::wed;
@@ -21,7 +23,6 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
 	WEdge* curredge = iedge; 
 	std::vector<WEdge*> adjedgev;
 
-	//Escolhe uma direção pra percorrer as arestas
 	do {
 		adjedgev.push_back(curredge);
 		//Checa se é vstart ou vend
@@ -33,18 +34,48 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
 
 	} while (curredge != iedge);
 
-
 	return adjedgev;
 }
 std::vector<tnw::wed::Vertex*> tnw::wed::Vertex::adjvertex() {
 	WEdge* curredge = iedge; 
 	std::vector<Vertex*> adjvertexv;
 
+	do {
+		//Checa se é vstart ou vend
+		if (curredge->vstart == this) {
+			curredge = curredge->rpred;
+			adjvertexv.push_back(curredge->vend);
+		} else {
+			curredge = curredge->lpred;
+			adjvertexv.push_back(curredge->vend);
+		}
+
+	} while (curredge != iedge);
+
 	return adjvertexv;
 }
 std::vector<tnw::wed::Loop*> tnw::wed::Vertex::adjloop() {
 	WEdge* curredge = iedge; 
 	std::vector<Loop*> adjloopv;
+	//Como a gente pode encontrar faces repetidas, adicionamos em um set para 
+	//garantir que são únicas
+	std::set<Loop*> adjloops;
+	do {
+
+		adjloops.insert(curredge->rloop);
+		adjloops.insert(curredge->lloop);
+		
+		//Checa se é vstart ou vend
+		if (curredge->vstart == this) {
+			curredge = curredge->rpred;
+		} else {
+			curredge = curredge->lpred;
+		}
+
+	} while (curredge != iedge);	
+
+	//Copia os valores para um vetor	
+	std::copy(adjloops.begin(), adjloops.end(), std::back_inserter(adjloopv));
 
 	return adjloopv;
 }
