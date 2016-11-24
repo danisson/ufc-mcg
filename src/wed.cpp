@@ -9,18 +9,18 @@ using namespace tnw::wed;
 using std::cout;
 using std::endl;
 
-tnw::wed::Vertex::Vertex(size_t _id, glm::vec3 _position, tnw::wed::WEdge* _iedge) : id(_id), position(_position), iedge(_iedge) { }
+tnw::wed::Vertex::Vertex(size_t id, glm::vec3 position, tnw::wed::WEdge* iedge) : id(id), position(position), iedge(iedge) {}
 
-tnw::wed::WEdge::WEdge(size_t _id) : id(_id) { };
+tnw::wed::WEdge::WEdge(size_t id) : id(id) {};
 
-tnw::wed::WEdge::WEdge(size_t _id, tnw::wed::Vertex* _vstart, tnw::wed::Vertex* _vend, tnw::wed::Loop* _lloop, tnw::wed::Loop* _rloop, tnw::wed::WEdge* _lpred, tnw::wed::WEdge* _lsucc, tnw::wed::WEdge* _rpred, tnw::wed::WEdge* _rsucc) : id(_id), vstart(_vstart), vend(_vend), lloop(_lloop), rloop(_rloop), lpred(_lpred), lsucc(_lsucc), rpred(_rpred), rsucc(_rsucc) { };
+tnw::wed::WEdge::WEdge(size_t id, Vertex* vstart, Vertex* vend, Loop* lloop, Loop* rloop, WEdge* lpred, WEdge* lsucc, WEdge* rpred, WEdge* rsucc) : id(id), vstart(vstart), vend(vend), lloop(lloop), rloop(rloop), lpred(lpred), lsucc(lsucc), rpred(rpred), rsucc(rsucc) {};
 
-tnw::wed::Loop::Loop(size_t _id, tnw::wed::WEdge* _iedge) : id(_id), iedge(_iedge) {};
+tnw::wed::Loop::Loop(size_t id, WEdge* iedge) : id(id), iedge(iedge) {};
 
 
 
 std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
-	WEdge* curredge = iedge; 
+	WEdge* curredge = iedge;
 	std::vector<WEdge*> adjedgev;
 
 	do {
@@ -37,7 +37,7 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
 	return adjedgev;
 }
 std::vector<tnw::wed::Vertex*> tnw::wed::Vertex::adjvertex() {
-	WEdge* curredge = iedge; 
+	WEdge* curredge = iedge;
 	std::vector<Vertex*> adjvertexv;
 
 	do {
@@ -55,16 +55,17 @@ std::vector<tnw::wed::Vertex*> tnw::wed::Vertex::adjvertex() {
 	return adjvertexv;
 }
 std::vector<tnw::wed::Loop*> tnw::wed::Vertex::adjloop() {
-	WEdge* curredge = iedge; 
+	WEdge* curredge = iedge;
 	std::vector<Loop*> adjloopv;
-	//Como a gente pode encontrar faces repetidas, adicionamos em um set para 
+	//Como a gente pode encontrar faces repetidas, adicionamos em um set para
 	//garantir que são únicas
-	std::set<Loop*> adjloops;
+	auto less = [](auto* a, auto* b){return a->id < b->id;};
+	std::set<Loop*,decltype(less)> adjloops(less);
 	do {
 
 		adjloops.insert(curredge->rloop);
 		adjloops.insert(curredge->lloop);
-		
+
 		//Checa se é vstart ou vend
 		if (curredge->vstart == this) {
 			curredge = curredge->rpred;
@@ -72,16 +73,16 @@ std::vector<tnw::wed::Loop*> tnw::wed::Vertex::adjloop() {
 			curredge = curredge->lpred;
 		}
 
-	} while (curredge != iedge);	
+	} while (curredge != iedge);
 
-	//Copia os valores para um vetor	
+	//Copia os valores para um vetor
 	std::copy(adjloops.begin(), adjloops.end(), std::back_inserter(adjloopv));
 
 	return adjloopv;
 }
 
 std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
-	WEdge* curredge = iedge; 
+	WEdge* curredge = iedge;
 	std::vector<WEdge*> adjedgev;
 
 	do {
@@ -101,12 +102,12 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
 }
 
 std::vector<tnw::wed::Vertex*> tnw::wed::Loop::adjvertex() {
-	WEdge* curredge = iedge; 
+	WEdge* curredge = iedge;
 	std::vector<Vertex*> adjvertexv;
-	
+
 	do {
 		cout << "curredge: " << curredge->id << endl;
-		
+
 		//Primeiro, descobre se é rloop ou lloop
 		//Se for rloop, coloca o vend, se for lloop, coloca vbegin
 		if (curredge->rloop == this) {
@@ -124,13 +125,13 @@ std::vector<tnw::wed::Vertex*> tnw::wed::Loop::adjvertex() {
 
 std::vector<tnw::wed::Loop*> tnw::wed::Loop::adjloop() {
 
-	WEdge* curredge = iedge; 
+	WEdge* curredge = iedge;
 	std::vector<Loop*> adjloopv;
 
 	do {
 		cout << "curredge: " << curredge->id << endl;
-		
-		//Primeiro, descobre se é rloop ou lloop, 
+
+		//Primeiro, descobre se é rloop ou lloop,
 		if (curredge->rloop == this) {
 			adjloopv.push_back(curredge->lloop);
 			curredge = curredge->rsucc;
@@ -141,7 +142,7 @@ std::vector<tnw::wed::Loop*> tnw::wed::Loop::adjloop() {
 
 	} while (curredge != iedge);
 
-	return adjloopv;	
+	return adjloopv;
 }
 
 
@@ -152,7 +153,7 @@ std::vector<WEdge*> tnw::wed::WEdge::adjedge() {
 	adjedgev.push_back(lsucc);
 	adjedgev.push_back(rpred);
 	adjedgev.push_back(rsucc);
-	
+
 	return adjedgev;
 }
 std::vector<Vertex*> tnw::wed::WEdge::adjvertex() {

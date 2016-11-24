@@ -47,7 +47,7 @@ namespace wed {
 		//Returns the list of adjacent faces
 		std::vector<Loop*> adjloop();
 
-		// void draw();	
+		// void draw();
 	};
 
 	struct WEdge {
@@ -65,8 +65,12 @@ namespace wed {
 		//Initialize only with id, fill other info later
 		WEdge(size_t _id);
 		//Initialize with all info
-		WEdge(size_t _id, Vertex* _vstart, Vertex* _vend, Loop* _lloop, Loop* _rloop, WEdge* _lpred, WEdge* _lsucc, WEdge* _rpred, WEdge* _rsucc);
-	
+		WEdge(size_t id,
+		      Vertex* vstart, Vertex* vend,
+		      Loop* lloop, Loop* rloop,
+		      WEdge* lpred, WEdge* lsucc,
+		      WEdge* rpred, WEdge* rsucc);
+
 		//Returns the list of adjacent edges
 		std::vector<WEdge*> adjedge();
 		//Returns the list of adjacent vertices
@@ -77,8 +81,6 @@ namespace wed {
 		// void draw();
 	};
 
-};
-
-}
+}} // tnw::wed
 
 #endif
