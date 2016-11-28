@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
+#include <map>
+#include "model.h"
 
 using std::unique_ptr;
 
@@ -81,6 +83,38 @@ namespace wed {
 		// void draw();
 	};
 
-}} // tnw::wed
+} // tnw::wed
+
+class BRep : public Model {
+private:
+	std::map<size_t, wed::Vertex> vertices;
+	std::map<size_t, wed::WEdge> edges;
+	std::map<size_t, wed::Loop> loops;
+	void rdraw() override;
+public:
+	BRep();
+	// Geometric operations
+	// virtual Color intersect_point(const glm::vec3&) const = 0;
+	// virtual Color intersect_box(const BoundingBox&) const = 0;
+	// virtual IntersectionList intersect_ray(const Ray&) const = 0;
+	// virtual void translate(const glm::vec3& dv) = 0;
+	// virtual void scale(const float dx) = 0;
+	// Geometric analysis
+	// virtual BoundingBox boundingBox() const = 0;
+	// virtual double volume() const = 0;
+	// Boolean operations
+	// virtual BooleanErrorCodes bool_and(const Model& y) = 0;
+	// virtual BooleanErrorCodes bool_or(const Model& y) = 0;
+	//Serialize
+	// virtual std::string serialize() const = 0;
+	//Set color
+	// virtual void setColor(const float c[3]) = 0;
+	// virtual PaintColor getColor() const = 0;
+	// Misc
+	// virtual std::string serialize() const = 0;
+	// virtual owner_ptr<Model> clone() const = 0;
+};
+
+} // tnw
 
 #endif

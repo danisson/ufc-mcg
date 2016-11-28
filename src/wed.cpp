@@ -2,6 +2,8 @@
 #include <iostream>
 #include <set>
 #include <algorithm>
+#include <GL/gl.h>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace tnw;
 using namespace tnw::wed;
@@ -16,8 +18,6 @@ tnw::wed::WEdge::WEdge(size_t id) : id(id) {};
 tnw::wed::WEdge::WEdge(size_t id, Vertex* vstart, Vertex* vend, Loop* lloop, Loop* rloop, WEdge* lpred, WEdge* lsucc, WEdge* rpred, WEdge* rsucc) : id(id), vstart(vstart), vend(vend), lloop(lloop), rloop(rloop), lpred(lpred), lsucc(lsucc), rpred(rpred), rsucc(rsucc) {};
 
 tnw::wed::Loop::Loop(size_t id, WEdge* iedge) : id(id), iedge(iedge) {};
-
-
 
 std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
 	WEdge* curredge = iedge;
@@ -171,4 +171,22 @@ std::vector<Loop*> tnw::wed::WEdge::adjloop() {
 	adjloopv.push_back(rloop);
 
 	return adjloopv;
+}
+
+// Desenha wireframe do BRep
+void tnw::BRep::rdraw() {
+	glColor3f(.5,.5,.5);
+	glLineWidth(0.5);
+	glBegin(GL_LINES);
+	for (auto&& i : edges) {
+		const auto e = std::get<1>(i);
+		const auto& vstart = *e.vstart;
+		const auto& vend = *e.vend;
+		// const auto& vstart = vertices[e.vstart];
+		// const auto& vend = vertices[e.vend];
+		glVertex3fv(glm::value_ptr(vstart.position));
+		glVertex3fv(glm::value_ptr(vend.position));
+	}
+	glEnd();
+	glLineWidth(1);
 }
