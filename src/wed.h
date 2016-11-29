@@ -87,9 +87,9 @@ namespace wed {
 
 class BRep : public Model {
 private:
-	std::map<size_t, wed::Vertex> vertices;
-	std::map<size_t, wed::WEdge> edges;
-	std::map<size_t, wed::Loop> loops;
+	std::vector<wed::Vertex> vertices;
+	std::vector<wed::WEdge> edges;
+	std::vector<wed::Loop> loops;
 	void rdraw() override;
 public:
 	BRep();
@@ -113,6 +113,9 @@ public:
 	// Misc
 	// virtual std::string serialize() const = 0;
 	// virtual owner_ptr<Model> clone() const = 0;
+	wed::Loop& getLoop(size_t id);
+	wed::WEdge& getWEdge(size_t id);
+	wed::Vertex& getVertex(size_t id);
 };
 
 } // tnw
