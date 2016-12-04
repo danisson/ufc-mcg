@@ -178,8 +178,8 @@ void tnw::BRep::rdraw() {
 	glColor3f(.5,.5,.5);
 	glLineWidth(0.5);
 	glBegin(GL_LINES);
-	for (auto&& i : edges) {
-		const auto e = std::get<1>(i);
+	for (auto&& e : edges) {
+		// const auto e = std::get<1>(i);
 		const auto& vstart = *e.vstart;
 		const auto& vend = *e.vend;
 		// const auto& vstart = vertices[e.vstart];
@@ -209,7 +209,7 @@ void tnw::BRep::mvfs(glm::vec3 position) {
 	e->rpred = e;
 	e->rsucc = e;
 
-	vertices.insert(std::pair<size_t, Vertex>(V->id, *V));
-	edges.insert(std::pair<size_t, WEdge>(e->id, *e));
-	loops.insert(std::pair<size_t, Loop>(l->id, *l));
+	vertices.push_back(*V);
+	edges.push_back(*e);
+	loops.push_back(*l);
 }

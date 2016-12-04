@@ -87,9 +87,9 @@ namespace wed {
 
 class BRep : public Model {
 private:
-	std::map<size_t, wed::Vertex> vertices;
-	std::map<size_t, wed::WEdge> edges;
-	std::map<size_t, wed::Loop> loops;
+	std::vector<wed::Vertex> vertices;
+	std::vector<wed::WEdge> edges;
+	std::vector<wed::Loop> loops;
 	void rdraw() override;
 
 	//We will need this to assign ids to new objects
@@ -104,20 +104,31 @@ public:
 	// virtual IntersectionList intersect_ray(const Ray&) const = 0;
 	// virtual void translate(const glm::vec3& dv) = 0;
 	// virtual void scale(const float dx) = 0;
+	
 	// Geometric analysis
 	// virtual BoundingBox boundingBox() const = 0;
 	// virtual double volume() const = 0;
+	
 	// Boolean operations
 	// virtual BooleanErrorCodes bool_and(const Model& y) = 0;
 	// virtual BooleanErrorCodes bool_or(const Model& y) = 0;
+	
 	//Serialize
 	// virtual std::string serialize() const = 0;
+	
 	//Set color
 	// virtual void setColor(const float c[3]) = 0;
 	// virtual PaintColor getColor() const = 0;
+	
 	// Misc
 	// virtual std::string serialize() const = 0;
 	// virtual owner_ptr<Model> clone() const = 0;
+	
+	//Get operators
+	wed::Loop& getLoop(size_t id);
+	wed::WEdge& getWEdge(size_t id);
+	wed::Vertex& getVertex(size_t id);
+
 	//Euler operators
 	void mvfs(glm::vec3 position);
 };
