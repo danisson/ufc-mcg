@@ -91,6 +91,11 @@ private:
 	std::map<size_t, wed::WEdge> edges;
 	std::map<size_t, wed::Loop> loops;
 	void rdraw() override;
+
+	//We will need this to assign ids to new objects
+	size_t currVertexId = 0;
+	size_t currEdgeId = 0;
+	size_t currLoopId = 0;
 public:
 	BRep();
 	// Geometric operations
@@ -113,6 +118,8 @@ public:
 	// Misc
 	// virtual std::string serialize() const = 0;
 	// virtual owner_ptr<Model> clone() const = 0;
+	//Euler operators
+	void mvfs(glm::vec3 position);
 };
 
 } // tnw

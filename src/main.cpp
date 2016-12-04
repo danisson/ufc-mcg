@@ -195,6 +195,14 @@ int main(void) {
 	}
 	std::cout << "\n---\n";
 
+	//EULER OPERATORS TESTS
+	std::cout << "Euler operators\n";
+
+	std::cout << "MVFS:\n";
+
+	// tnw::BRep brep = tnw::BRep();
+	// brep.mvfs({0.1,0.1,0.1});
+
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfw_NewFrame();

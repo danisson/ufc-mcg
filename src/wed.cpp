@@ -190,3 +190,26 @@ void tnw::BRep::rdraw() {
 	glEnd();
 	glLineWidth(1);
 }
+
+//Euler operator: Make Vertex Face Shell
+void tnw::BRep::mvfs(glm::vec3 position) {
+	//Creates a "fake" vertex
+	WEdge* e = new WEdge(currEdgeId++);
+	//Creates a vertex with the assigned position and the fake incident edge
+	Vertex* V = new Vertex(currVertexId++, position, e);
+	//Creates a face
+	Loop* l = new Loop(currLoopId++, e);
+
+	e->vstart = V;
+	e->vend = nullptr;
+	e->lloop = l;
+	e->rloop = l;
+	e->lpred = e;
+	e->lsucc = e;
+	e->rpred = e;
+	e->rsucc = e;
+
+	vertices.insert(std::pair<size_t, Vertex>(V->id, *V));
+	edges.insert(std::pair<size_t, WEdge>(e->id, *e));
+	loops.insert(std::pair<size_t, Loop>(l->id, *l));
+}
