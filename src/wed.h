@@ -99,19 +99,22 @@ private:
 public:
 	BRep();
 	// Geometric operations
-	// virtual Color intersect_point(const glm::vec3&) const = 0;
-	// virtual Color intersect_box(const BoundingBox&) const = 0;
-	// virtual IntersectionList intersect_ray(const Ray&) const = 0;
-	// virtual void translate(const glm::vec3& dv) = 0;
-	// virtual void scale(const float dx) = 0;
+	//Intersections won't be implemented
+	Color intersect_point(const glm::vec3&) const override;
+	Color intersect_box(const BoundingBox&) const override;
+	IntersectionList intersect_ray(const Ray&) const override;
+	void translate(const glm::vec3& dv) override;
+	void scale(const float dx) override;
+	//Helper function to geometric transforms
+	void applyTransform(glm::mat4& t);
 	
 	// Geometric analysis
-	// virtual BoundingBox boundingBox() const = 0;
-	// virtual double volume() const = 0;
+	BoundingBox boundingBox() const override;
+	double volume() const override;
 	
-	// Boolean operations
-	// virtual BooleanErrorCodes bool_and(const Model& y) = 0;
-	// virtual BooleanErrorCodes bool_or(const Model& y) = 0;
+	// Boolean operations (Won't be implemented)
+	BooleanErrorCodes bool_and(const Model& y) override;
+	BooleanErrorCodes bool_or(const Model& y) override;
 	
 	//Serialize
 	// virtual std::string serialize() const = 0;

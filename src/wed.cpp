@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <GL/gl.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace tnw;
 using namespace tnw::wed;
@@ -212,4 +213,60 @@ void tnw::BRep::mvfs(glm::vec3 position) {
 	vertices.push_back(*V);
 	edges.push_back(*e);
 	loops.push_back(*l);
+}
+
+void tnw::BRep::translate(const glm::vec3& dv) {
+	glm::mat4 translateMatrix = glm::translate(glm::mat4(), dv);
+	applyTransform(translateMatrix);
+}
+
+void tnw::BRep::scale(const float dx) {
+	glm::mat4 scaleMatrix = glm::scale(glm::mat4(), {dx, dx, dx});
+	applyTransform(scaleMatrix);
+}
+
+void tnw::BRep::applyTransform(glm::mat4& t) {
+	for (Vertex& v : vertices) {
+		//Position of point in homogeneous coordinates
+		glm::vec4 homPosition(v.position, 1);
+		//Transformed position
+		glm::vec4 transHomPosition = t * homPosition;
+		//Transforms to common 3D coordinates again
+		v.position = glm::vec3(transHomPosition);
+	}
+}
+
+//Shouldn't be called!
+Color tnw::BRep::intersect_point(const glm::vec3&) const {
+	throw 1;
+}
+
+//Shouldn't be called!
+Color tnw::BRep::intersect_box(const BoundingBox&) const {
+	throw 1;
+}
+
+//Shouldn't be called!
+IntersectionList tnw::BRep::intersect_ray(const Ray&) const {
+	throw 1;
+}
+
+//Shouldn't be called!
+tnw::BoundingBox tnw::BRep::boundingBox() const {
+	throw 1;
+}
+
+//Shouldn't be called!
+double tnw::BRep::volume() const {
+	throw 1;
+}
+
+//Shouldn't be called!
+tnw::BooleanErrorCodes tnw::BRep::bool_and(const Model& y) {
+	return BooleanErrorCodes::unimplementedType;
+}
+
+//Shouldn't be called!
+tnw::BooleanErrorCodes tnw::BRep::bool_or(const Model& y) {
+	return BooleanErrorCodes::unimplementedType;
 }
