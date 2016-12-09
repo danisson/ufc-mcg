@@ -91,11 +91,16 @@ private:
 	std::vector<wed::WEdge> edges;
 	std::vector<wed::Loop> loops;
 	void rdraw() override;
+	//Helper function to geometric transforms
+	void applyTransform(const glm::mat4& t);
 
-	//We will need this to assign ids to new objects
+	// We will need this to assign ids to new objects
 	size_t currVertexId = 0;
 	size_t currEdgeId = 0;
 	size_t currLoopId = 0;
+
+	// Wireframe color
+	float color[3] = {.5,.5,.5};
 public:
 	BRep();
 	// Geometric operations
@@ -105,28 +110,26 @@ public:
 	IntersectionList intersect_ray(const Ray&) const override;
 	void translate(const glm::vec3& dv) override;
 	void scale(const float dx) override;
-	//Helper function to geometric transforms
-	void applyTransform(glm::mat4& t);
-	
+
 	// Geometric analysis
 	BoundingBox boundingBox() const override;
 	double volume() const override;
-	
+
 	// Boolean operations (Won't be implemented)
 	BooleanErrorCodes bool_and(const Model& y) override;
 	BooleanErrorCodes bool_or(const Model& y) override;
-	
+
 	//Serialize
 	// virtual std::string serialize() const = 0;
-	
+
 	//Set color
-	// virtual void setColor(const float c[3]) = 0;
-	// virtual PaintColor getColor() const = 0;
-	
+	void setColor(const float c[3]) override;
+	PaintColor getColor() const override;
+
 	// Misc
 	// virtual std::string serialize() const = 0;
 	// virtual owner_ptr<Model> clone() const = 0;
-	
+
 	//Get operators
 	wed::Loop& getLoop(size_t id);
 	wed::WEdge& getWEdge(size_t id);

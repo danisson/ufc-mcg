@@ -176,7 +176,7 @@ std::vector<Loop*> tnw::wed::WEdge::adjloop() {
 
 // Desenha wireframe do BRep
 void tnw::BRep::rdraw() {
-	glColor3f(.5,.5,.5);
+	glColor3fv(color);
 	glLineWidth(0.5);
 	glBegin(GL_LINES);
 	for (auto&& e : edges) {
@@ -216,21 +216,21 @@ void tnw::BRep::mvfs(glm::vec3 position) {
 }
 
 void tnw::BRep::translate(const glm::vec3& dv) {
-	glm::mat4 translateMatrix = glm::translate(glm::mat4(), dv);
+	const glm::mat4 translateMatrix = glm::translate(glm::mat4(), dv);
 	applyTransform(translateMatrix);
 }
 
 void tnw::BRep::scale(const float dx) {
-	glm::mat4 scaleMatrix = glm::scale(glm::mat4(), {dx, dx, dx});
+	const glm::mat4 scaleMatrix = glm::scale(glm::mat4(), {dx, dx, dx});
 	applyTransform(scaleMatrix);
 }
 
-void tnw::BRep::applyTransform(glm::mat4& t) {
+void tnw::BRep::applyTransform(const glm::mat4& t) {
 	for (Vertex& v : vertices) {
 		//Position of point in homogeneous coordinates
-		glm::vec4 homPosition(v.position, 1);
+		const glm::vec4 homPosition(v.position, 1);
 		//Transformed position
-		glm::vec4 transHomPosition = t * homPosition;
+		const glm::vec4 transHomPosition = t * homPosition;
 		//Transforms to common 3D coordinates again
 		v.position = glm::vec3(transHomPosition);
 	}
@@ -269,4 +269,15 @@ tnw::BooleanErrorCodes tnw::BRep::bool_and(const Model& y) {
 //Shouldn't be called!
 tnw::BooleanErrorCodes tnw::BRep::bool_or(const Model& y) {
 	return BooleanErrorCodes::unimplementedType;
+}
+
+void tnw::BRep::setColor(const float c[3]) {
+	for (int i = 0; i < 3; ++i)
+		color[i] = c[i];
+}
+PaintColor tnw::BRep::getColor() const {
+	PaintColor ret;
+	for (int i = 0; i < 3; ++i)
+		ret[i] = color[i];
+	return ret;
 }
