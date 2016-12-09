@@ -94,7 +94,6 @@ private:
 	//Helper function to geometric transforms
 	void applyTransform(const glm::mat4& t);
 
-	// We will need this to assign ids to new objects
 	size_t currVertexId = 0;
 	size_t currEdgeId = 0;
 	size_t currLoopId = 0;
@@ -128,7 +127,6 @@ public:
 	PaintColor getColor() const override;
 
 	// Misc
-	// virtual std::string serialize() const = 0;
 	// virtual owner_ptr<Model> clone() const = 0;
 
 	//Get operators
@@ -139,6 +137,7 @@ public:
 	//Euler operators
 	void mvfs(glm::vec3 position);
 	void smef(size_t fid, size_t v1id, size_t v2id);
+	void mvfs(size_t vid, size_t eid, size_t fid, glm::vec3 position);
 };
 
 } // tnw
