@@ -16,7 +16,7 @@ tnw::wed::Vertex::Vertex(size_t id, glm::vec3 position, tnw::wed::WEdge* iedge) 
 
 tnw::wed::WEdge::WEdge(size_t id) : id(id) {};
 
-tnw::wed::WEdge::WEdge(size_t id, Vertex* vstart, Vertex* vend, Loop* lloop, Loop* rloop, WEdge* lpred, WEdge* lsucc, WEdge* rpred, WEdge* rsucc) : id(id), vstart(vstart), vend(vend), lloop(lloop), rloop(rloop), lpred(lpred), lsucc(lsucc), rpred(rpred), rsucc(rsucc) {};
+tnw::wed::WEdge::WEdge(size_t id, Vertex* vstart, Vertex* vend, Loop* cwloop, Loop* ccwloop, WEdge* cwpred, WEdge* cwsucc, WEdge* ccwpred, WEdge* ccwsucc) : id(id), vstart(vstart), vend(vend), cwloop(cwloop), ccwloop(ccwloop), cwpred(cwpred), cwsucc(cwsucc), ccwpred(ccwpred), ccwsucc(ccwsucc) {};
 
 tnw::wed::Loop::Loop(size_t id, WEdge* iedge) : id(id), iedge(iedge) {};
 
@@ -28,9 +28,9 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
 		adjedgev.push_back(curredge);
 		//Checa se é vstart ou vend
 		if (curredge->vstart == this) {
-			curredge = curredge->rpred;
+			curredge = curredge->ccwpred;
 		} else {
-			curredge = curredge->lpred;
+			curredge = curredge->cwpred;
 		}
 
 	} while (curredge != iedge);
@@ -44,10 +44,10 @@ std::vector<tnw::wed::Vertex*> tnw::wed::Vertex::adjvertex() {
 	do {
 		//Checa se é vstart ou vend
 		if (curredge->vstart == this) {
-			curredge = curredge->rpred;
+			curredge = curredge->ccwpred;
 			adjvertexv.push_back(curredge->vend);
 		} else {
-			curredge = curredge->lpred;
+			curredge = curredge->cwpred;
 			adjvertexv.push_back(curredge->vend);
 		}
 
@@ -64,14 +64,14 @@ std::vector<tnw::wed::Loop*> tnw::wed::Vertex::adjloop() {
 	std::set<Loop*,decltype(less)> adjloops(less);
 	do {
 
-		adjloops.insert(curredge->rloop);
-		adjloops.insert(curredge->lloop);
+		adjloops.insert(curredge->ccwloop);
+		adjloops.insert(curredge->cwloop);
 
 		//Checa se é vstart ou vend
 		if (curredge->vstart == this) {
-			curredge = curredge->rpred;
+			curredge = curredge->ccwpred;
 		} else {
-			curredge = curredge->lpred;
+			curredge = curredge->cwpred;
 		}
 
 	} while (curredge != iedge);
@@ -90,11 +90,11 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
 		cout << "curredge: " << curredge->id << endl;
 		adjedgev.push_back(curredge);
 
-		//Primeiro, descobre se é rloop ou lloop
-		if (curredge->rloop == this) {
-			curredge = curredge->rsucc;
+		//Primeiro, descobre se é ccwloop ou cwloop
+		if (curredge->ccwloop == this) {
+			curredge = curredge->ccwsucc;
 		} else {
-			curredge = curredge->lsucc;
+			curredge = curredge->cwsucc;
 		}
 
 	} while (curredge != iedge);
@@ -109,14 +109,14 @@ std::vector<tnw::wed::Vertex*> tnw::wed::Loop::adjvertex() {
 	do {
 		cout << "curredge: " << curredge->id << endl;
 
-		//Primeiro, descobre se é rloop ou lloop
-		//Se for rloop, coloca o vend, se for lloop, coloca vbegin
-		if (curredge->rloop == this) {
+		//Primeiro, descobre se é ccwloop ou cwloop
+		//Se for ccwloop, coloca o vend, se for cwloop, coloca vbegin
+		if (curredge->ccwloop == this) {
 			adjvertexv.push_back(curredge->vend);
-			curredge = curredge->rsucc;
+			curredge = curredge->ccwsucc;
 		} else {
 			adjvertexv.push_back(curredge->vstart);
-			curredge = curredge->lsucc;
+			curredge = curredge->cwsucc;
 		}
 
 	} while (curredge != iedge);
@@ -132,13 +132,13 @@ std::vector<tnw::wed::Loop*> tnw::wed::Loop::adjloop() {
 	do {
 		cout << "curredge: " << curredge->id << endl;
 
-		//Primeiro, descobre se é rloop ou lloop,
-		if (curredge->rloop == this) {
-			adjloopv.push_back(curredge->lloop);
-			curredge = curredge->rsucc;
+		//Primeiro, descobre se é ccwloop ou cwloop,
+		if (curredge->ccwloop == this) {
+			adjloopv.push_back(curredge->cwloop);
+			curredge = curredge->ccwsucc;
 		} else {
-			adjloopv.push_back(curredge->rloop);
-			curredge = curredge->lsucc;
+			adjloopv.push_back(curredge->ccwloop);
+			curredge = curredge->cwsucc;
 		}
 
 	} while (curredge != iedge);
@@ -150,10 +150,10 @@ std::vector<tnw::wed::Loop*> tnw::wed::Loop::adjloop() {
 std::vector<WEdge*> tnw::wed::WEdge::adjedge() {
 	std::vector<WEdge*> adjedgev;
 
-	adjedgev.push_back(lpred);
-	adjedgev.push_back(lsucc);
-	adjedgev.push_back(rpred);
-	adjedgev.push_back(rsucc);
+	adjedgev.push_back(cwpred);
+	adjedgev.push_back(cwsucc);
+	adjedgev.push_back(ccwpred);
+	adjedgev.push_back(ccwsucc);
 
 	return adjedgev;
 }
@@ -168,8 +168,8 @@ std::vector<Vertex*> tnw::wed::WEdge::adjvertex() {
 std::vector<Loop*> tnw::wed::WEdge::adjloop() {
 	std::vector<Loop*> adjloopv;
 
-	adjloopv.push_back(lloop);
-	adjloopv.push_back(rloop);
+	adjloopv.push_back(cwloop);
+	adjloopv.push_back(ccwloop);
 
 	return adjloopv;
 }
@@ -180,13 +180,21 @@ void tnw::BRep::rdraw() {
 	glLineWidth(0.5);
 	glBegin(GL_LINES);
 	for (auto&& e : edges) {
-		// const auto e = std::get<1>(i);
+		bool is_marked = marked.count(std::make_tuple(e.id,1));
+		bool is_selected = (e.id == selected_edge);
 		const auto& vstart = *e.vstart;
 		const auto& vend = *e.vend;
-		// const auto& vstart = vertices[e.vstart];
-		// const auto& vend = vertices[e.vend];
+
+		// Set color if selected
+		if (is_marked)   glColor3f(0,1,0);
+		if (is_selected) glColor3f(1,0,1);
+
 		glVertex3fv(glm::value_ptr(vstart.position));
 		glVertex3fv(glm::value_ptr(vend.position));
+
+		// Reset color
+		if (is_marked || is_selected)
+			glColor3fv(color);
 	}
 	glEnd();
 	glLineWidth(1);
@@ -203,12 +211,12 @@ void tnw::BRep::mvfs(glm::vec3 position) {
 
 	e->vstart = V;
 	e->vend = nullptr;
-	e->lloop = l;
-	e->rloop = l;
-	e->lpred = e;
-	e->lsucc = e;
-	e->rpred = e;
-	e->rsucc = e;
+	e->cwloop = l;
+	e->ccwloop = l;
+	e->cwpred = e;
+	e->cwsucc = e;
+	e->ccwpred = e;
+	e->ccwsucc = e;
 
 	vertices.push_back(*V);
 	edges.push_back(*e);
@@ -216,11 +224,16 @@ void tnw::BRep::mvfs(glm::vec3 position) {
 }
 
 //Euler operator: special Make Edge Face
-void tnw::BRep::smef(size_t fid, size_t v1id, size_t v2id, size_t eid, size_t nfid) {
-	Loop*   f  = get_loop(fid);
-	Vertex* v1 = get_vertex(v1id);
-	Vertex* v2 = get_vertex(v2id);
-	Vertex* v2 = get_vertex(v2id);
+void tnw::BRep::smef(size_t fid, size_t v1id, size_t v2id) {
+	// Loop*   f  = get_loop(fid);
+	// Vertex* v1 = get_vertex(v1id);
+	// Vertex* v2 = get_vertex(v2id);
+
+	// Checar se v1 e v2 pertencem a f
+	// Criar face nova f2
+	// Criar aresta nova com faces f f2 e pontas v1,v2
+	// Colocar a aresta nova
+
 }
 
 void tnw::BRep::translate(const glm::vec3& dv) {

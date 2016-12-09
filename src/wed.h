@@ -3,7 +3,8 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
-#include <map>
+#include <set>
+#include <tuple>
 #include "model.h"
 
 using std::unique_ptr;
@@ -57,21 +58,21 @@ namespace wed {
 		size_t id;
 		//Start and end vertices
 		Vertex *vstart, *vend;
-		//Left and right faces
-		Loop *lloop, *rloop;
-		//Left predecessor and successor edges
-		WEdge *lpred, *lsucc;
-		//Right predecessor and successor edges
-		WEdge *rpred, *rsucc;
+		//Clockwise and Counterclockwise faces
+		Loop *cwloop, *ccwloop;
+		//Clockwise predecessor and successor edges
+		WEdge *cwpred, *cwsucc;
+		//Counterclockwise predecessor and successor edges
+		WEdge *ccwpred, *ccwsucc;
 
 		//Initialize only with id, fill other info later
 		WEdge(size_t _id);
 		//Initialize with all info
 		WEdge(size_t id,
 		      Vertex* vstart, Vertex* vend,
-		      Loop* lloop, Loop* rloop,
-		      WEdge* lpred, WEdge* lsucc,
-		      WEdge* rpred, WEdge* rsucc);
+		      Loop* cwloop, Loop* ccwloop,
+		      WEdge* cwpred, WEdge* cwsucc,
+		      WEdge* ccwpred, WEdge* ccwsucc);
 
 		//Returns the list of adjacent edges
 		std::vector<WEdge*> adjedge();
@@ -94,12 +95,14 @@ private:
 	//Helper function to geometric transforms
 	void applyTransform(const glm::mat4& t);
 
-	size_t currVertexId = 0;
-	size_t currEdgeId = 0;
-	size_t currLoopId = 0;
+	size_t currVertexId = 1;
+	size_t currEdgeId = 1;
+	size_t currLoopId = 1;
 
 	// Wireframe color
 	float color[3] = {.5,.5,.5};
+	std::set<std::tuple<size_t,char>> marked;
+	size_t selected_edge = 0;
 
 public:
 	BRep();
