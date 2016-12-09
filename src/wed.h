@@ -101,6 +101,7 @@ private:
 
 	// Wireframe color
 	float color[3] = {.5,.5,.5};
+
 public:
 	BRep();
 	// Geometric operations
@@ -137,6 +138,7 @@ public:
 
 	//Euler operators
 	void mvfs(glm::vec3 position);
+	void smef(size_t fid, size_t v1id, size_t v2id);
 };
 
 } // tnw

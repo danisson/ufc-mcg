@@ -215,6 +215,14 @@ void tnw::BRep::mvfs(glm::vec3 position) {
 	loops.push_back(*l);
 }
 
+//Euler operator: special Make Edge Face
+void tnw::BRep::smef(size_t fid, size_t v1id, size_t v2id, size_t eid, size_t nfid) {
+	Loop*   f  = get_loop(fid);
+	Vertex* v1 = get_vertex(v1id);
+	Vertex* v2 = get_vertex(v2id);
+	Vertex* v2 = get_vertex(v2id);
+}
+
 void tnw::BRep::translate(const glm::vec3& dv) {
 	const glm::mat4 translateMatrix = glm::translate(glm::mat4(), dv);
 	applyTransform(translateMatrix);
