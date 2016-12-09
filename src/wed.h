@@ -131,9 +131,9 @@ public:
 	// virtual owner_ptr<Model> clone() const = 0;
 
 	//Get operators
-	wed::Loop& getLoop(size_t id);
-	wed::WEdge& getWEdge(size_t id);
-	wed::Vertex& getVertex(size_t id);
+	wed::Loop* get_loop(size_t id);
+	wed::WEdge* get_wedge(size_t id);
+	wed::Vertex* get_vertex(size_t id);
 
 	//Euler operators
 	void mvfs(glm::vec3 position);

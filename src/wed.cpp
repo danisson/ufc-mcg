@@ -281,3 +281,21 @@ PaintColor tnw::BRep::getColor() const {
 		ret[i] = color[i];
 	return ret;
 }
+
+Loop* tnw::BRep::get_loop(size_t id) {
+	for (auto&& i : loops)
+		if (i.id == id) return &i;
+	return nullptr;
+}
+
+WEdge* tnw::BRep::get_wedge(size_t id) {
+	for (auto&& i : edges)
+		if (i.id == id) return &i;
+	return nullptr;
+}
+
+Vertex* tnw::BRep::get_vertex(size_t id) {
+	for (auto&& i : vertices)
+		if (i.id == id) return &i;
+	return nullptr;
+}
