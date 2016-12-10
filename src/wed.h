@@ -139,8 +139,8 @@ public:
 
 	//Euler operators
 	void mvfs(glm::vec3 position);
-	void smef(size_t fid, size_t v1id, size_t v2id);
-	void mvfs(size_t vid, size_t eid, size_t fid, glm::vec3 position);
+	void smef(size_t lid, size_t v1id, size_t v2id);
+	void smev(size_t lid, size_t vid_start, glm::vec3 position);
 };
 
 } // tnw

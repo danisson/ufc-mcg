@@ -224,8 +224,8 @@ void tnw::BRep::mvfs(glm::vec3 position) {
 }
 
 //Euler operator: special Make Edge Face
-void tnw::BRep::smef(size_t fid, size_t v1id, size_t v2id) {
-	// Loop*   f  = get_loop(fid);
+void tnw::BRep::smef(size_t lid, size_t v1id, size_t v2id) {
+	// Loop*   f  = get_loop(lid);
 	// Vertex* v1 = get_vertex(v1id);
 	// Vertex* v2 = get_vertex(v2id);
 
@@ -233,6 +233,52 @@ void tnw::BRep::smef(size_t fid, size_t v1id, size_t v2id) {
 	// Criar face nova f2
 	// Criar aresta nova com faces f f2 e pontas v1,v2
 	// Colocar a aresta nova
+}
+
+//Euler operator: special Make Edge Vertex
+//Covers cases where we want to create a new vertex eid starting from vid_start in face fid
+void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
+	WEdge *e = new WEdge(currEdgeId++);
+	Vertex *v1 = get_vertex(vid_start);
+	Loop *l = get_loop(lid);
+
+	if (!v1 && !l) {
+		return;
+	}
+
+	Vertex *v2 = new Vertex(currVertexId++, position, e);
+
+	e->vstart = v1;
+	e->vend = v2;
+
+	/* Procura uma aresta na face que tenha o vstart no v1. Caso não exista vértice com vstart em v1
+	 * escolhe um vertice com vend em v1
+	 */
+	std::vector<WEdge*> ledges = l->adjedge();
+
+	for (WEdge*& we : ledges) {
+		if (we->vstart->id == v1->id) {
+			//Caso 1: we é um edge com vstart em v1
+			WEdge *weprev = we->ccwpred;
+
+			e->ccwsucc = e;
+			e->ccwpred = we->ccwpred;
+			e->cwsucc = e;
+			e->cwpred = we;
+
+			we->ccwpred = e;
+			we->cwsucc = e;
+
+			weprev->ccwsucc = e;
+			weprev->cwpred = e;
+
+			break;
+
+		} else {
+
+			break;
+		}
+	}
 
 }
 
