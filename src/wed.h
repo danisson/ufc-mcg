@@ -81,6 +81,12 @@ namespace wed {
 		//Returns the list of adjacent faces
 		std::vector<Loop*> adjloop();
 
+		//Returns the direction of the predecessor and successor edges
+		bool cwpred_dir();
+		bool cwsucc_dir();
+		bool ccwpred_dir();
+		bool ccwsucc_dir();
+
 		// void draw();
 	};
 
@@ -123,14 +129,14 @@ public:
 	BooleanErrorCodes bool_or(const Model& y) override;
 
 	//Serialize
-	// virtual std::string serialize() const = 0;
+	std::string serialize() const override;
 
 	//Set color
 	void setColor(const float c[3]) override;
 	PaintColor getColor() const override;
 
 	// Misc
-	// virtual owner_ptr<Model> clone() const = 0;
+	owner_ptr<Model> clone() const override;
 
 	//Get operators
 	wed::Loop* get_loop(size_t id);
@@ -141,6 +147,9 @@ public:
 	void mvfs(glm::vec3 position);
 	void smef(size_t lid, size_t v1id, size_t v2id);
 	void smev(size_t lid, size_t vid_start, glm::vec3 position);
+
+	//Dummy drawing function
+	void draw();
 };
 
 } // tnw

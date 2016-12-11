@@ -20,6 +20,34 @@ tnw::wed::WEdge::WEdge(size_t id, Vertex* vstart, Vertex* vend, Loop* cwloop, Lo
 
 tnw::wed::Loop::Loop(size_t id, WEdge* iedge) : id(id), iedge(iedge) {};
 
+bool tnw::wed::WEdge::cwpred_dir() {
+	if (cwpred->vend->id == this->vstart->id) {
+		return true;
+	}
+	return false;
+}
+
+bool tnw::wed::WEdge::cwsucc_dir() {
+	if (cwsucc->vstart->id == this->vend->id) {
+		return true;
+	}
+	return false;
+}
+
+bool tnw::wed::WEdge::ccwpred_dir() {
+	if (ccwpred->vend->id == this->vstart->id) {
+		return true;
+	}
+	return false;
+}
+
+bool tnw::wed::WEdge::ccwsucc_dir() {
+	if (ccwsucc->vstart->id == this->vend->id) {
+		return true;
+	}
+	return false;
+}
+
 std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
 	WEdge* curredge = iedge;
 	std::vector<WEdge*> adjedgev;
@@ -83,18 +111,33 @@ std::vector<tnw::wed::Loop*> tnw::wed::Vertex::adjloop() {
 }
 
 std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
-	WEdge* curredge = iedge;
+	WEdge *curredge = iedge, *prevedge = nullptr;
+	bool prev_positive_dir = false;
 	std::vector<WEdge*> adjedgev;
 
 	do {
+		// prevedge = curredge;
 		cout << "curredge: " << curredge->id << endl;
-		adjedgev.push_back(curredge);
+		cout << "prevedge: " << prevedge->id << endl;
 
 		//Primeiro, descobre se é ccwloop ou cwloop
 		if (curredge->ccwloop == this) {
-			curredge = curredge->ccwsucc;
+			//Se a aresta tá na direção correta
+			if (prev_positive_dir) {
+				curredge = curredge->ccwsucc;
+				prev_positive_dir = curredge->ccwsucc_dir();
+			}
+			//Se a aresta tá na direção oposta, inverte a direção 
+			else {
+				curredge = curredge->cwpred;
+			}
 		} else {
-			curredge = curredge->cwsucc;
+			//Se a aresta tá na direção correta
+			if (!prev_positive_dir) {
+				curredge = curredge->cwsucc;
+			} else {
+				curredge = curredge->ccwpred;
+			}
 		}
 
 	} while (curredge != iedge);
@@ -112,10 +155,10 @@ std::vector<tnw::wed::Vertex*> tnw::wed::Loop::adjvertex() {
 		//Primeiro, descobre se é ccwloop ou cwloop
 		//Se for ccwloop, coloca o vend, se for cwloop, coloca vbegin
 		if (curredge->ccwloop == this) {
-			adjvertexv.push_back(curredge->vend);
+			adjvertexv.push_back(curredge->vstart);
 			curredge = curredge->ccwsucc;
 		} else {
-			adjvertexv.push_back(curredge->vstart);
+			adjvertexv.push_back(curredge->vend);
 			curredge = curredge->cwsucc;
 		}
 
@@ -150,10 +193,15 @@ std::vector<tnw::wed::Loop*> tnw::wed::Loop::adjloop() {
 std::vector<WEdge*> tnw::wed::WEdge::adjedge() {
 	std::vector<WEdge*> adjedgev;
 
-	adjedgev.push_back(cwpred);
-	adjedgev.push_back(cwsucc);
-	adjedgev.push_back(ccwpred);
-	adjedgev.push_back(ccwsucc);
+	auto less = [](auto* a, auto* b){return a->id < b->id;};
+	std::set<Loop*,decltype(less)> adjedges(less);
+
+	adjedges.push_back(cwpred);
+	adjedges.push_back(cwsucc);
+	adjedges.push_back(ccwpred);
+	adjedges.push_back(ccwsucc);
+
+	std::copy(adjedges.begin(), adjedges.end(), std::back_inserter(adjedgev));
 
 	return adjedgev;
 }
@@ -161,7 +209,9 @@ std::vector<Vertex*> tnw::wed::WEdge::adjvertex() {
 	std::vector<Vertex*> adjvertexv;
 
 	adjvertexv.push_back(vstart);
-	adjvertexv.push_back(vend);
+	if (vstart->id != vend->id) {
+		adjvertexv.push_back(vend);
+	}
 
 	return adjvertexv;
 }
@@ -169,9 +219,15 @@ std::vector<Loop*> tnw::wed::WEdge::adjloop() {
 	std::vector<Loop*> adjloopv;
 
 	adjloopv.push_back(cwloop);
-	adjloopv.push_back(ccwloop);
+	if (cwloop->id != ccwloop->id) {
+		adjloopv.push_back(ccwloop);
+	}
 
 	return adjloopv;
+}
+
+tnw::BRep::BRep() {
+
 }
 
 // Desenha wireframe do BRep
@@ -203,7 +259,7 @@ void tnw::BRep::rdraw() {
 //Euler operator: Make Vertex Face Shell
 void tnw::BRep::mvfs(glm::vec3 position) {
 	//Creates a "fake" vertex
-	WEdge* e = new WEdge(currEdgeId++);
+	WEdge* e = new WEdge(-1);
 	//Creates a vertex with the assigned position and the fake incident edge
 	Vertex* V = new Vertex(currVertexId++, position, e);
 	//Creates a face
@@ -247,34 +303,61 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 	}
 
 	Vertex *v2 = new Vertex(currVertexId++, position, e);
+	std::cout << "created vertex v2\n";
 
 	e->vstart = v1;
 	e->vend = v2;
+	e->cwloop = l;
+	e->ccwloop = l;
+	std::cout << "set v2 basic parameters\n";
 
-	/* Procura uma aresta na face que tenha o vstart no v1. Caso não exista vértice com vstart em v1
-	 * escolhe um vertice com vend em v1
+	/* Procura uma aresta na face que tenha o vstart no v1, ou vend em v1.
 	 */
 	std::vector<WEdge*> ledges = l->adjedge();
 
-	for (WEdge*& we : ledges) {
-		if (we->vstart->id == v1->id) {
-			//Caso 1: we é um edge com vstart em v1
-			WEdge *weprev = we->ccwpred;
+	for (WEdge*& ebase : ledges) {
+		if (ebase->vstart->id == v1->id) {
+			std::cout << "choose edge with id " << ebase->id << "\n";
+			if (ebase->cwloop->id == l->id) {
+				//Case 1: Loop is clockwise loop of the edge
+				e->cwsucc = e;
+				e->cwpred = ebase;
+				e->ccwsucc = e;
+				e->ccwpred = ebase->cwsucc;
 
-			e->ccwsucc = e;
-			e->ccwpred = we->ccwpred;
-			e->cwsucc = e;
-			e->cwpred = we;
+				ebase->cwsucc = e;
+			} else {
+				//Case 2: Loop is counterclockwise loop of the edge
+				e->cwsucc = e;
+				e->cwpred = ebase;
+				e->ccwsucc = e;
+				e->ccwpred = ebase->ccwpred;
 
-			we->ccwpred = e;
-			we->cwsucc = e;
-
-			weprev->ccwsucc = e;
-			weprev->cwpred = e;
+				ebase->ccwpred = e;
+			}
 
 			break;
 
-		} else {
+		} else { //ebase->vend->id == v1->id
+			std::cout << "choose edge with id " << ebase->id << "\n";
+
+			if (ebase->cwloop->id == l->id) {
+				//Case 1: Loop is clockwise loop of the edge
+				e->cwsucc = e;
+				e->cwpred = ebase->cwpred;
+				e->ccwsucc = e;
+				e->ccwpred = e;
+
+				ebase->cwpred = e;
+			} else {
+				//Case 2: Loop is counterclockwise loop of the edge
+				e->cwsucc = e;
+				e->cwpred = ebase->ccwsucc;
+				e->ccwsucc = e;
+				e->ccwpred = ebase;
+
+				ebase->ccwsucc = e;
+			}
 
 			break;
 		}
@@ -365,4 +448,16 @@ Vertex* tnw::BRep::get_vertex(size_t id) {
 	for (auto&& i : vertices)
 		if (i.id == id) return &i;
 	return nullptr;
+}
+
+std::string tnw::BRep::serialize() const {
+	throw 1;
+}
+
+owner_ptr<Model> tnw::BRep::clone() const {
+	throw 1;
+}
+
+void tnw::BRep::draw() {
+	rdraw();
 }

@@ -91,57 +91,57 @@ int main(void) {
 
 	a->vstart = A;
 	a->vend = D;
-	a->lloop = l3;
-	a->rloop = l1;
-	a->lpred = e;
-	a->lsucc = f;
-	a->rpred = b;
-	a->rsucc = c;
+	a->cwloop = l3;
+	a->ccwloop = l1;
+	a->cwpred = e;
+	a->cwsucc = f;
+	a->ccwpred = b;
+	a->ccwsucc = c;
 
 	b->vstart = A;
 	b->vend = B;
-	b->lloop = l1;
-	b->rloop = l4;
-	b->lpred = c;
-	b->lsucc = a;
-	b->rpred = f;
-	b->rsucc = d;
+	b->cwloop = l1;
+	b->ccwloop = l4;
+	b->cwpred = c;
+	b->cwsucc = a;
+	b->ccwpred = f;
+	b->ccwsucc = d;
 
 	c->vstart = B;
 	c->vend = D;
-	c->lloop = l1;
-	c->rloop = l2;
-	c->lpred = a;
-	c->lsucc = b;
-	c->rpred = d;
-	c->rsucc = e;
+	c->cwloop = l1;
+	c->ccwloop = l2;
+	c->cwpred = a;
+	c->cwsucc = b;
+	c->ccwpred = d;
+	c->ccwsucc = e;
 
 	d->vstart = B;
 	d->vend = C;
-	d->lloop = l2;
-	d->rloop = l4;
-	d->lpred = e;
-	d->lsucc = c;
-	d->rpred = b;
-	d->rsucc = f;
+	d->cwloop = l2;
+	d->ccwloop = l4;
+	d->cwpred = e;
+	d->cwsucc = c;
+	d->ccwpred = b;
+	d->ccwsucc = f;
 
 	e->vstart = C;
 	e->vend = D;
-	e->lloop = l2;
-	e->rloop = l3;
-	e->lpred = c;
-	e->lsucc = d;
-	e->rpred = f;
-	e->rsucc = a;
+	e->cwloop = l2;
+	e->ccwloop = l3;
+	e->cwpred = c;
+	e->cwsucc = d;
+	e->ccwpred = f;
+	e->ccwsucc = a;
 
 	f->vstart = A;
 	f->vend = C;
-	f->lloop = l4;
-	f->rloop = l3;
-	f->lpred = d;
-	f->lsucc = b;
-	f->rpred = a;
-	f->rsucc = c;
+	f->cwloop = l4;
+	f->ccwloop = l3;
+	f->cwpred = d;
+	f->cwsucc = b;
+	f->ccwpred = a;
+	f->ccwsucc = c;
 
 	std::vector<WEdge*> ae = l1->adjedge();
 
@@ -195,13 +195,27 @@ int main(void) {
 	}
 	std::cout << "\n---\n";
 
+	tnw::BRep* brep = new tnw::BRep();
+
 	//EULER OPERATORS TESTS
 	std::cout << "Euler operators\n";
 
 	std::cout << "MVFS:\n";
+	brep->mvfs(glm::vec3(0,0,0));
+	
+	std::cout << "SMEVs:\n";
+	brep->smev(1,1,glm::vec3(0.5,0,0.5));
+	brep->smev(1,1,glm::vec3(1,0,0)); 
 
-	// tnw::BRep brep = tnw::BRep();
-	// brep.mvfs({0.1,0.1,0.1});
+	std::vector<Vertex*> adjv = brep->get_vertex(1)->adjvertex();
+	std::cout << "Vertex 1 adj vertex\n";
+	std::cout << "How many adjvertex: " << adjv.size() << "\n";
+	for (Vertex*& we : adjv) {
+		std::cout << we->id << " ";
+	}
+	std::cout << "\n---\n";
+	
+	std::cout << "All operators done.\n";
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
@@ -218,6 +232,9 @@ int main(void) {
 		glLoadMatrixf(glm::value_ptr(view));
 
 		tnw::draw_axis();
+
+		// brep->draw();
+
 		for (auto&& model : models)
 			model->draw();
 
