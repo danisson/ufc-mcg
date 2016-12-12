@@ -86,17 +86,18 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
 	WEdge* curredge = iedge;
 	std::vector<WEdge*> adjedgev;
 
+	// Qual loop eu sou?
+	bool ccwtravel = (iedge->cwloop == this);
+
 	do {
 		cout << "curredge: " << curredge->id << endl;
 		adjedgev.push_back(curredge);
-
-		//Primeiro, descobre se é ccwloop ou cwloop
-		if (curredge->ccwloop == this) {
+		if (ccwtravel)
 			curredge = curredge->ccwsucc;
-		} else {
+		else
 			curredge = curredge->cwsucc;
-		}
-
+		if (curredge->vstart == curredge->cwsucc->vstart)
+			ccwtravel = !ccwtravel;
 	} while (curredge != iedge);
 
 	return adjedgev;
