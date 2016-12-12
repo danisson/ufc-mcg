@@ -21,7 +21,6 @@
 #include <sstream>
 #include <limits>
 #include <glm/gtx/string_cast.hpp>
-using namespace tnw::wed;
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #undef near
 #undef far
@@ -71,18 +70,34 @@ int main(void) {
 	camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
 
-	WEdge *a = new WEdge(1);
-	WEdge *b = new WEdge(2);
-	WEdge *c = new WEdge(3);
-	WEdge *d = new WEdge(4);
-	WEdge *e = new WEdge(5);
-	WEdge *f = new WEdge(6);
+	models.push_back(std::make_unique<tnw::BRep>());
+	auto mdl = (tnw::BRep*)models[0].get();
+
+	using namespace tnw::wed;
+	// mdl->edges.reserve(6);
+	mdl->edges.emplace_front(1);
+	WEdge *a = &mdl->edges.front();
+	mdl->edges.emplace_front(2);
+	WEdge *b = &mdl->edges.front();
+	mdl->edges.emplace_front(3);
+	WEdge *c = &mdl->edges.front();
+	mdl->edges.emplace_front(4);
+	WEdge *d = &mdl->edges.front();
+	mdl->edges.emplace_front(5);
+	WEdge *e = &mdl->edges.front();
+	mdl->edges.emplace_front(6);
+	WEdge *f = &mdl->edges.front();
 
 
-	Vertex *A = new Vertex(1, {0,0,0}, a);
-	Vertex *B = new Vertex(2, {1,0,1}, b);
-	Vertex *C = new Vertex(3, {2,0,0}, e);
-	Vertex *D = new Vertex(4, {1,1,0}, e);
+	// mdl->vertices.reserve(4);
+	mdl->vertices.emplace_front(1, glm::vec3{0,0,0}, a);
+	Vertex *A = &mdl->vertices.front();
+	mdl->vertices.emplace_front(2, glm::vec3{1,0,1}, b);
+	Vertex *B = &mdl->vertices.front();
+	mdl->vertices.emplace_front(3, glm::vec3{2,0,0}, e);
+	Vertex *C = &mdl->vertices.front();
+	mdl->vertices.emplace_front(4, glm::vec3{1,1,0}, e);
+	Vertex *D = &mdl->vertices.front();
 
 	Loop *l1 = new Loop(1, a);
 	Loop *l2 = new Loop(2, c);
