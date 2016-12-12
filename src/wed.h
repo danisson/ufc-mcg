@@ -126,14 +126,14 @@ public:
 	BooleanErrorCodes bool_or(const Model& y) override;
 
 	//Serialize
-	std::string serialize() const override {throw 0;};
+	std::string serialize() const override override;
 
 	//Set color
 	void setColor(const float c[3]) override;
 	PaintColor getColor() const override;
 
 	// Misc
-	owner_ptr<Model> clone() const {throw 0;};
+	owner_ptr<Model> clone() const override;
 
 	//Get operators
 	wed::Loop* get_loop(size_t id);

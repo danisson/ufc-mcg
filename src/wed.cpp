@@ -339,6 +339,14 @@ tnw::BooleanErrorCodes tnw::BRep::bool_or(const Model& y) {
 	return BooleanErrorCodes::unimplementedType;
 }
 
+std::string tnw::BRep::serialize() const {
+	throw 0;
+}
+
+tnw::owner_ptr<tnw::Model> tnw::BRep::clone() const {
+	throw 0;
+}
+
 void tnw::BRep::setColor(const float c[3]) {
 	for (int i = 0; i < 3; ++i)
 		color[i] = c[i];
