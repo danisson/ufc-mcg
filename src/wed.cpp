@@ -443,11 +443,11 @@ Vertex* tnw::BRep::get_vertex(size_t id) {
 void tnw::BRep::print_info() const {
 	printf("v { ");
 	for (auto&& v : vertices) {
-		printf("\nv [%lu] iedge [%lu] pos [%f,%f,%f]", v.id, v.iedge->id, v.position[0], v.position[1], v.position[2]);
+		printf("\n[%lu] iedge [%lu] pos [%f,%f,%f]", v.id, v.iedge->id, v.position[0], v.position[1], v.position[2]);
 	}
 	printf("\n}\ne {");
 	for (auto&& e : edges) {
-		printf("\ne [%zu] vs [%zu,%zu] loop [%zu,%zu] succ [%zu,%zu] pred [%zu,%zu]", e.id,e.vstart->id,e.vend?e.vend->id:0,e.cwloop->id,e.ccwloop->id,e.cwsucc->id,e.ccwsucc->id,e.cwpred->id,e.ccwpred->id);
+		printf("\n[%zu] vs [%zu,%zu] loop [%zu,%zu] succ [%zu,%zu] pred [%zu,%zu]", e.id,e.vstart->id,e.vend?e.vend->id:0,e.cwloop->id,e.ccwloop->id,e.cwsucc->id,e.ccwsucc->id,e.cwpred->id,e.ccwpred->id);
 	}
 	printf("\n}\n");
 }
