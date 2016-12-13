@@ -160,7 +160,7 @@ int main(void) {
 	// f->cwpred = d;
 	// f->cwsucc = b;
 	// f->ccwpred = a;
-	// f->ccwsucc = c;
+	// f->ccwsucc = c;	
 
 	// std::vector<WEdge*> ae = l1->adjedge();
 
@@ -222,8 +222,31 @@ int main(void) {
 	//EULER OPERATORS TESTS
 	// std::cout << "Euler operators\n";
 
-	// models.push_back(std::make_unique<tnw::BRep>());
-	// auto brep = (tnw::BRep*)models[0].get();
+	models.push_back(std::make_unique<tnw::BRep>());
+	auto mdl = (tnw::BRep*)models[0].get();
+
+	using namespace tnw::wed;
+	mdl->edges.emplace_front(1);
+	WEdge *a = &mdl->edges.front();
+	mdl->edges.emplace_front(2);
+	WEdge *b = &mdl->edges.front();
+	mdl->edges.emplace_front(3);
+	WEdge *c = &mdl->edges.front();
+	mdl->edges.emplace_front(4);
+	WEdge *d = &mdl->edges.front();
+
+
+	mdl->vertices.emplace_front(1, glm::vec3{0,0,0}, a);
+	Vertex *A = &mdl->vertices.front();
+	mdl->vertices.emplace_front(2, glm::vec3{0,1,0}, b);
+	Vertex *B = &mdl->vertices.front();
+	mdl->vertices.emplace_front(3, glm::vec3{1,1,0}, c);
+	Vertex *C = &mdl->vertices.front();
+	mdl->vertices.emplace_front(4, glm::vec3{1,0,0}, d);
+	Vertex *D = &mdl->vertices.front();
+
+	mdl->loops.emplace_front(1,a);
+	Loop *l1 = &mdl->loops.front();
 	
 	// std::cout << "MVFS:\n";
 	// brep->mvfs({1,0,0});

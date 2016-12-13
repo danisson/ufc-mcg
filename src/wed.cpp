@@ -248,6 +248,108 @@ void tnw::BRep::smef(size_t lid, size_t v1id, size_t v2id) {
 	// Colocar a aresta nova
 }
 
+//Euler operator: Make Edge Face
+//Given the edges from v1 to v2 and from v3 to v4 incident to loop f1, subdivides the loop with an edge from v1 to v3, creating a new loop f2. The edge v1v2 will be assigned to the new loop
+void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4id) {
+	Vertex *v1 = get_vertex(v1id);
+	Vertex *v2 = get_vertex(v2id);
+	Vertex *v3 = get_vertex(v3id);
+	Vertex *v4 = get_vertex(v4id);
+
+	Loop *l1 = get_loop(lid);
+
+	if (!v1 || !v2 || !v3 || !v4 || !l1) {
+		return;
+	}
+
+	std::vector<WEdge*> ledges = l1->adjedge();
+	WEdge *a = nullptr, *b = nullptr;
+	//Get correct edges
+	for (WEdge *adjedge : ledges) {
+		if (adjedge->vstart && adjedge->vstart->id == v1->id && adjedge->vend && adjedge->vend->id == v2->id) {
+			a = adjedge;
+		} else if (adjedge->vstart && adjedge->vstart->id == v3->id && adjedge->vend && adjedge->vend->id == v4->id) {
+			b = adjedge;
+		}
+	}
+
+	if (!a || !b) {
+		return;
+	}
+
+	edges.emplace_front(currEdgeId++);
+	WEdge *e = &edges.front();
+
+	loops.emplace_front(currLoopId++, e);
+	Loop *l2 = &loops.front();
+
+	if (a->ccwloop->id == l1->id) {
+		a->ccwsucc = e;
+	}
+	if (a->cwloop->id == l1->id) {
+		a->cwsucc = e;
+	}
+
+	//Starting to walk backwards through the edges that will be transferred to l1
+	WEdge *curredge = nullptr, *nextedge = a;
+	do {
+		curredge = nextedge;
+
+		if (curredge->ccwloop->id == l1->id) {
+			curredge->ccwloop = l2;
+			nextedge = curredge->ccwpred;
+		}
+		if (curredge->cwloop->id == l1->id) {
+			curredge->cwloop = l2;
+			nextedge = curredge->cwpred;
+		}
+
+	} while (nextedge->id != b->id);
+
+	if (curredge->ccwloop->id == l1->id) {
+		curredge->ccwpred = e;
+	}
+	if (curredge->cwloop->id == l1->id) {
+		curredge->cwpred = e;
+	}
+
+	e->ccwloop = l2;
+	e->ccwsucc = curredge;
+	e->ccwpred = a;
+
+	if (b->ccwloop->id == l1->id) {
+		b->ccwsucc = e;
+	}
+	if (b->cwloop->id == l1->id) {
+		b->cwsucc = e;
+	}
+	//Walking backwards from the v3v4 edge
+	curredge = nullptr, nextedge = b;
+
+	do {
+		curredge = nextedge;
+
+		if (curredge->ccwloop->id == l1->id) {
+			nextedge = curredge->ccwpred;
+		}
+		if (curredge->cwloop->id == l1->id) {
+			nextedge = curredge->cwpred;
+		}
+
+	} while (nextedge->id != a->id);
+
+	if (curredge->ccwloop->id == l1->id) {
+		curredge->ccwpred = e;
+	}
+	if (curredge->cwloop->id == l1->id) {
+		curredge->cwpred = e;
+	}
+
+	e->cwloop = l1;
+	e->cwsucc = curredge;
+	e->cwpred = b;		
+}
+
 //Euler operator: special Make Edge Vertex
 //Covers cases where we want to create a new vertex eid starting from vid_start in face fid
 void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
