@@ -99,10 +99,14 @@ int main(void) {
 	mdl->vertices.emplace_front(4, glm::vec3{1,1,0}, e);
 	Vertex *D = &mdl->vertices.front();
 
-	Loop *l1 = new Loop(1, a);
-	Loop *l2 = new Loop(2, c);
-	Loop *l3 = new Loop(3, a);
-	Loop *l4 = new Loop(4, b);
+	mdl->loops.emplace_front(1,a);
+	Loop *l1 = &mdl->vertices.front();
+	mdl->loops.emplace_front(2,c);
+	Loop *l2 = &mdl->vertices.front();
+	mdl->loops.emplace_front(3,a);
+	Loop *l3 = &mdl->vertices.front();
+	mdl->loops.emplace_front(4,b);
+	Loop *l4 = &mdl->vertices.front();
 
 	a->vstart = A;
 	a->vend = D;
@@ -158,62 +162,67 @@ int main(void) {
 	f->ccwpred = a;
 	f->ccwsucc = c;
 
-	std::vector<WEdge*> ae = l1->adjedge();
+	// std::vector<WEdge*> ae = l1->adjedge();
 
-	std::cout << "Face 1 adj edges\n";
-	for (WEdge*& we : ae) {
-		std::cout << we->id << " ";
-	}
-	std::cout << "\n---\n";
+	// std::cout << "Face 1 adj edges\n";
+	// for (WEdge*& we : ae) {
+		// std::cout << we->id << " ";
+		// mdl->marked.emplace(we->id,1);
+	// }
+	// std::cout << "\n---\n";
 
-	std::vector<Vertex*> av = l1->adjvertex();
+	// std::vector<Vertex*> av = l1->adjvertex();
 
-	std::cout << "Face 1 adj vertex\n";
-	for (Vertex*& wv : av) {
-		std::cout << wv->id << " ";
-	}
-	std::cout << "\n---\n";
+	// std::cout << "Face 1 adj vertex\n";
+	// for (Vertex*& wv : av) {
+	// 	std::cout << wv->id << " ";
+	// }
+	// std::cout << "\n---\n";
 
-	std::vector<Loop*> al = l1->adjloop();
+	// std::vector<Loop*> al = l1->adjloop();
 
-	std::cout << "Face 1 adj loop\n";
-	for (Loop*& wl : al) {
-		std::cout << wl->id << " ";
-	}
-	std::cout << "\n---\n";
+	// std::cout << "Face 1 adj loop\n";
+	// for (Loop*& wl : al) {
+	// 	std::cout << wl->id << " ";
+	// }
+	// std::cout << "\n---\n";
 
-	std::vector<WEdge*> be = a->adjedge();
-	std::cout << "Edge a adj edge\n";
-	for (WEdge*& we : be) {
-		std::cout << we->id << " ";
-	}
-	std::cout << "\n---\n";
+	// std::vector<WEdge*> be = a->adjedge();
+	// std::cout << "Edge a adj edge\n";
+	// mdl->selected_edge = a->id;
+	// for (WEdge*& we : be) {
+	// 	std::cout << we->id << " ";
+		// mdl->marked.emplace(we->id,1);
+	// }
+	// std::cout << "\n---\n";
 
-	std::vector<WEdge*> ce = A->adjedge();
-	std::cout << "Vertex A adj edge\n";
-	for (WEdge*& we : ce) {
-		std::cout << we->id << " ";
-	}
-	std::cout << "\n---\n";
+	// std::vector<WEdge*> ce = B->adjedge();
+	// std::cout << "Vertex A adj edge\n";
+	// mdl->marked.emplace(B->id,0);
+	// for (WEdge*& we : ce) {
+	// 	std::cout << we->id << " ";
+	// 	mdl->marked.emplace(we->id,1);
+	// }
+	// std::cout << "\n---\n";
 
-	std::vector<Vertex*> cv = A->adjvertex();
-	std::cout << "Vertex A adj vertex\n";
-	for (Vertex*& we : cv) {
-		std::cout << we->id << " ";
-	}
-	std::cout << "\n---\n";
+	// std::vector<Vertex*> cv = A->adjvertex();
+	// std::cout << "Vertex A adj vertex\n";
+	// for (Vertex*& we : cv) {
+	// 	std::cout << we->id << " ";
+	// }
+	// std::cout << "\n---\n";
 
-	std::vector<Loop*> cl = A->adjloop();
-	std::cout << "Vertex A adj loop\n";
-	for (Loop*& we : cl) {
-		std::cout << we->id << " ";
-	}
-	std::cout << "\n---\n";
+	// std::vector<Loop*> cl = A->adjloop();
+	// std::cout << "Vertex A adj loop\n";
+	// for (Loop*& we : cl) {
+	// 	std::cout << we->id << " ";
+	// }
+	// std::cout << "\n---\n";
 
 	//EULER OPERATORS TESTS
-	std::cout << "Euler operators\n";
+	// std::cout << "Euler operators\n";
 
-	std::cout << "MVFS:\n";
+	// std::cout << "MVFS:\n";
 
 	// tnw::BRep brep = tnw::BRep();
 	// brep.mvfs({0.1,0.1,0.1});
