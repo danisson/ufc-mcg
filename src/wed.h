@@ -109,6 +109,7 @@ public:
 	size_t selected_edge = 0;
 	// Blá
 	BRep() = default;
+	BRep(size_t vi, size_t ei, size_t li);
 	// Geometric operations
 	//Intersections won't be implemented
 	Color intersect_point(const glm::vec3&) const override;
@@ -131,6 +132,9 @@ public:
 	//Set color
 	void setColor(const float c[3]) override;
 	PaintColor getColor() const override;
+	void mark_edge(size_t id);
+	void mark_vertex(size_t id);
+	void clear_marks();
 
 	// Misc
 	owner_ptr<Model> clone() const override;

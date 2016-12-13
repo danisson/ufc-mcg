@@ -188,9 +188,67 @@ void MainMenu::draw() {
 		if (isBRep) {
 			auto* m = (tnw::BRep*)models[curr_item].get();
 			buttonSize.x = fullWidth/3-margin;
-			if (ImGui::Button("Adjacencia",buttonSize) && !!m->vertices.size())
-				ImGui::OpenPopup("Parâmetros das Adjacencias");
+			if (ImGui::Button("Adjacencia",buttonSize) && !!m->vertices.size()){
+				m->clear_marks();
+				ImGui::OpenPopup("Adjacencias");
+			}
 			ImGui::SameLine();
+			if (ImGui::BeginPopupModal("Adjacencias", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+				ImVec2 buttonSize = ImVec2(0,0);
+				const float margin = ImGui::GetStyle().ItemSpacing.x;
+				const float width = ImGui::GetWindowContentRegionMax().x;
+
+				ImGui::Text("id:");
+				ImGui::InputInt("id##loop", (int*)&brep_ids[0]);
+				ImGui::Separator();
+
+				buttonSize.x = width/2.0-margin;
+				if (ImGui::Button("LV", buttonSize)) {
+					auto l = m->get_loop(brep_ids[0]);
+					if (!l) goto failGet;
+					for (auto x : l->adjvertex()) {
+						m->mark_vertex(x->id);
+					}
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("LE", buttonSize)) {
+					auto l = m->get_loop(brep_ids[0]);
+					if (!l) goto failGet;
+					for (auto x : l->adjedge()) {
+						m->mark_edge(x->id);
+					}
+					ImGui::CloseCurrentPopup();
+				}
+				buttonSize.x = width/2.0-margin;
+				if (ImGui::Button("EV", buttonSize)) {
+					m->print_info();
+					auto l = m->get_wedge(brep_ids[0]);
+					if (!l) goto failGet;
+					m->selected_edge = l->id;
+					for (auto x : l->adjvertex()) {
+						m->mark_vertex(x->id);
+					}
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("EE", buttonSize)) {
+					auto l = m->get_wedge(brep_ids[0]);
+					if (!l) goto failGet;
+					m->selected_edge = l->id;
+					for (auto x : l->adjedge()) {
+						m->mark_edge(x->id);
+					}
+					ImGui::CloseCurrentPopup();
+				}
+				buttonSize.x = width-margin;
+				if (ImGui::Button("Cancel", buttonSize)) {
+					m->print_info();
+					ImGui::CloseCurrentPopup();
+				}
+				failGet:
+				ImGui::EndPopup();
+			}
 		}
 
 		if (ImGui::Button("Translação",buttonSize) && isSelected) {
@@ -292,6 +350,29 @@ void MainMenu::draw() {
 			ImGui::SameLine();
 			if (ImGui::Button("MEF",buttonSize) && !!m->vertices.size()) {
 				ImGui::OpenPopup("MEF##2");
+			}
+			if (ImGui::BeginPopupModal("MEF##2", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+				ImVec2 buttonSize = ImVec2(0,0);
+				float halfWidth = ImGui::GetWindowContentRegionMax().x*.5f;
+				float margin = ImGui::GetStyle().ItemSpacing.x;
+				buttonSize.x = halfWidth-margin;
+
+				ImGui::Text("loop:");
+				ImGui::InputInt("id##loop", (int*)&brep_ids[0]);
+				ImGui::Separator();
+				ImGui::Text("vértices:");
+				ImGui::InputInt4("id##vertice", &brep_ids[1]);
+				ImGui::Separator();
+
+				if (ImGui::Button("OK", buttonSize)) {
+					m->mef(brep_ids[0],brep_ids[1],brep_ids[2],brep_ids[3],brep_ids[4]);
+					m->print_info();
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", buttonSize))
+					ImGui::CloseCurrentPopup();
+				ImGui::EndPopup();
 			}
 		} else {
 			buttonSize.x = fullWidth/2-margin;
@@ -795,7 +876,7 @@ void MainMenu::draw() {
 
 			ImGui::SameLine();
 			if (ImGui::Button("Tetraedro")) {
-				models.push_back(std::make_unique<tnw::BRep>());
+				models.push_back(std::make_unique<tnw::BRep>(5,7,4));
 				std::stringstream ss;
 				ss << "BRep " << model_names.size() << "[TETRA]";
 				model_names.push_back(ss.str());
@@ -823,11 +904,11 @@ void MainMenu::draw() {
 				mdl->vertices.emplace_front(4, glm::vec3{0,1,0}, e);
 				Vertex *D = &mdl->vertices.front();
 				Loop *l1 = &mdl->loops.front();
-				mdl->loops.emplace_front(2,c);
+				mdl->loops.emplace_front(1,c);
 				Loop *l2 = &mdl->loops.front();
-				mdl->loops.emplace_front(3,a);
+				mdl->loops.emplace_front(2,a);
 				Loop *l3 = &mdl->loops.front();
-				mdl->loops.emplace_front(4,b);
+				mdl->loops.emplace_front(3,b);
 				Loop *l4 = &mdl->loops.front();
 				a->vstart = A;
 				a->vend = D;

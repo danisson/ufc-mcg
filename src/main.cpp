@@ -68,161 +68,9 @@ int main(void) {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	camera.aspect = 480/640.;
+	models.push_back(std::make_unique<tnw::BRep>(5,5,3));
 	MainMenu mainMenu(models,camera);
 
-	// models.push_back(std::make_unique<tnw::BRep>());
-	// auto mdl = (tnw::BRep*)models[0].get();
-
-	// using namespace tnw::wed;
-	// mdl->edges.reserve(6);
-	// mdl->edges.emplace_front(1);
-	// WEdge *a = &mdl->edges.front();
-	// mdl->edges.emplace_front(2);
-	// WEdge *b = &mdl->edges.front();
-	// mdl->edges.emplace_front(3);
-	// WEdge *c = &mdl->edges.front();
-	// mdl->edges.emplace_front(4);
-	// WEdge *d = &mdl->edges.front();
-	// mdl->edges.emplace_front(5);
-	// WEdge *e = &mdl->edges.front();
-	// mdl->edges.emplace_front(6);
-	// WEdge *f = &mdl->edges.front();
-
-
-	// // mdl->vertices.reserve(4);
-	// mdl->vertices.emplace_front(1, glm::vec3{0,0,0}, a);
-	// Vertex *A = &mdl->vertices.front();
-	// mdl->vertices.emplace_front(2, glm::vec3{1,0,1}, b);
-	// Vertex *B = &mdl->vertices.front();
-	// mdl->vertices.emplace_front(3, glm::vec3{2,0,0}, e);
-	// Vertex *C = &mdl->vertices.front();
-	// mdl->vertices.emplace_front(4, glm::vec3{1,1,0}, e);
-	// Vertex *D = &mdl->vertices.front();
-
-	// mdl->loops.emplace_front(1,a);
-	// Loop *l1 = &mdl->loops.front();
-	// mdl->loops.emplace_front(2,c);
-	// Loop *l2 = &mdl->loops.front();
-	// mdl->loops.emplace_front(3,a);
-	// Loop *l3 = &mdl->loops.front();
-	// mdl->loops.emplace_front(4,b);
-	// Loop *l4 = &mdl->loops.front();
-
-	// a->vstart = A;
-	// a->vend = D;
-	// a->cwloop = l3;
-	// a->ccwloop = l1;
-	// a->cwpred = e;
-	// a->cwsucc = f;
-	// a->ccwpred = b;
-	// a->ccwsucc = c;
-
-	// b->vstart = A;
-	// b->vend = B;
-	// b->cwloop = l1;
-	// b->ccwloop = l4;
-	// b->cwpred = c;
-	// b->cwsucc = a;
-	// b->ccwpred = f;
-	// b->ccwsucc = d;
-
-	// c->vstart = B;
-	// c->vend = D;
-	// c->cwloop = l1;
-	// c->ccwloop = l2;
-	// c->cwpred = a;
-	// c->cwsucc = b;
-	// c->ccwpred = d;
-	// c->ccwsucc = e;
-
-	// d->vstart = B;
-	// d->vend = C;
-	// d->cwloop = l2;
-	// d->ccwloop = l4;
-	// d->cwpred = e;
-	// d->cwsucc = c;
-	// d->ccwpred = b;
-	// d->ccwsucc = f;
-
-	// e->vstart = C;
-	// e->vend = D;
-	// e->cwloop = l2;
-	// e->ccwloop = l3;
-	// e->cwpred = c;
-	// e->cwsucc = d;
-	// e->ccwpred = f;
-	// e->ccwsucc = a;
-
-	// f->vstart = A;
-	// f->vend = C;
-	// f->cwloop = l4;
-	// f->ccwloop = l3;
-	// f->cwpred = d;
-	// f->cwsucc = b;
-	// f->ccwpred = a;
-	// f->ccwsucc = c;	
-
-	// std::vector<WEdge*> ae = l1->adjedge();
-
-	// std::cout << "Face 1 adj edges\n";
-	// for (WEdge*& we : ae) {
-		// std::cout << we->id << " ";
-		// mdl->marked.emplace(we->id,1);
-	// }
-	// std::cout << "\n---\n";
-
-	// std::vector<Vertex*> av = l1->adjvertex();
-
-	// std::cout << "Face 1 adj vertex\n";
-	// for (Vertex*& wv : av) {
-	// 	std::cout << wv->id << " ";
-	// }
-	// std::cout << "\n---\n";
-
-	// std::vector<Loop*> al = l1->adjloop();
-
-	// std::cout << "Face 1 adj loop\n";
-	// for (Loop*& wl : al) {
-	// 	std::cout << wl->id << " ";
-	// }
-	// std::cout << "\n---\n";
-
-	// std::vector<WEdge*> be = a->adjedge();
-	// std::cout << "Edge a adj edge\n";
-	// mdl->selected_edge = a->id;
-	// for (WEdge*& we : be) {
-	// 	std::cout << we->id << " ";
-		// mdl->marked.emplace(we->id,1);
-	// }
-	// std::cout << "\n---\n";
-
-	// std::vector<WEdge*> ce = B->adjedge();
-	// std::cout << "Vertex A adj edge\n";
-	// mdl->marked.emplace(B->id,0);
-	// for (WEdge*& we : ce) {
-	// 	std::cout << we->id << " ";
-	// 	mdl->marked.emplace(we->id,1);
-	// }
-	// std::cout << "\n---\n";
-
-	// std::vector<Vertex*> cv = A->adjvertex();
-	// std::cout << "Vertex A adj vertex\n";
-	// for (Vertex*& we : cv) {
-	// 	std::cout << we->id << " ";
-	// }
-	// std::cout << "\n---\n";
-
-	// std::vector<Loop*> cl = A->adjloop();
-	// std::cout << "Vertex A adj loop\n";
-	// for (Loop*& we : cl) {
-	// 	std::cout << we->id << " ";
-	// }
-	// std::cout << "\n---\n";
-
-	//EULER OPERATORS TESTS
-	// std::cout << "Euler operators\n";
-
-	models.push_back(std::make_unique<tnw::BRep>());
 	auto mdl = (tnw::BRep*)models[0].get();
 
 	using namespace tnw::wed;
@@ -247,7 +95,45 @@ int main(void) {
 
 	mdl->loops.emplace_front(1,a);
 	Loop *l1 = &mdl->loops.front();
-	
+	mdl->loops.emplace_front(2,a);
+	Loop *l2 = &mdl->loops.front();
+
+	a->vstart = A;
+	a->vend = B;
+	a->ccwloop = l2;
+	a->cwloop = l1;
+	a->ccwsucc =
+	a->cwpred = b;
+	a->ccwpred =
+	a->cwsucc = d;
+
+	b->vstart = C;
+	b->vend = B;
+	b->ccwloop = l1;
+	b->cwloop = l2;
+	b->cwpred =
+	b->ccwsucc = a;
+	b->cwsucc =
+	b->ccwpred = c;
+
+	c->vstart = C;
+	c->vend = D;
+	c->ccwloop = l2;
+	c->cwloop = l1;
+	c->cwpred =
+	c->ccwsucc = d;
+	c->cwsucc =
+	c->ccwpred = b;
+
+	d->vstart = A;
+	d->vend = D;
+	d->ccwloop = l1;
+	d->cwloop = l2;
+	d->cwsucc =
+	d->ccwpred = c;
+	d->cwpred =
+	d->ccwsucc = a;
+
 	// models.push_back(std::make_unique<tnw::BRep>());
 	// auto brep = (tnw::BRep*)models[0].get();
 

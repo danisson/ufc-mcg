@@ -20,6 +20,8 @@ tnw::wed::WEdge::WEdge(size_t id, Vertex* vstart, Vertex* vend, Loop* cwloop, Lo
 
 tnw::wed::Loop::Loop(size_t id, WEdge* iedge) : id(id), iedge(iedge) {};
 
+tnw::BRep::BRep(size_t vi, size_t ei, size_t li) : currVertexId(vi), currEdgeId(ei), currLoopId(li)  {};
+
 std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
 	WEdge* curredge = iedge;
 	std::vector<WEdge*> adjedgev;
@@ -107,19 +109,19 @@ std::vector<tnw::wed::Vertex*> tnw::wed::Loop::adjvertex() {
 	WEdge* curredge = iedge;
 	std::vector<Vertex*> adjvertexv;
 
+	// Qual loop eu sou?
+	bool ccwtravel = (iedge->cwloop == this);
+
 	do {
-		cout << "curredge: " << curredge->id << endl;
-
-		//Primeiro, descobre se é ccwloop ou cwloop
-		//Se for ccwloop, coloca o vend, se for cwloop, coloca vbegin
-		if (curredge->ccwloop == this) {
+		adjvertexv.push_back(curredge->vstart);
+		if (curredge->vend)
 			adjvertexv.push_back(curredge->vend);
+		if (ccwtravel)
 			curredge = curredge->ccwsucc;
-		} else {
-			adjvertexv.push_back(curredge->vstart);
+		else
 			curredge = curredge->cwsucc;
-		}
-
+		if (curredge->vstart == curredge->cwsucc->vstart)
+			ccwtravel = !ccwtravel;
 	} while (curredge != iedge);
 
 	return adjvertexv;
@@ -265,15 +267,19 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 	std::vector<WEdge*> ledges = l1->adjedge();
 	WEdge *a = nullptr, *b = nullptr;
 	//Get correct edges
-	for (WEdge *adjedge : ledges) {
-		if (adjedge->vstart && adjedge->vstart->id == v1->id && adjedge->vend && adjedge->vend->id == v2->id) {
-			a = adjedge;
-		} else if (adjedge->vstart && adjedge->vstart->id == v3->id && adjedge->vend && adjedge->vend->id == v4->id) {
-			b = adjedge;
+	for (auto e : ledges) {
+		if (e->vstart && e->vstart->id == v1->id &&
+			e->vend   && e->vend->id   == v2->id) {
+			a = e;
+		}
+		if (e->vstart && e->vstart->id == v3->id &&
+		    e->vend   && e->vend->id   == v4->id) {
+			b = e;
 		}
 	}
 
 	if (!a || !b) {
+		printf("Nenhuma aresta\n");
 		return;
 	}
 
@@ -289,6 +295,9 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 	if (a->cwloop->id == l1->id) {
 		a->cwsucc = e;
 	}
+
+	e->vstart = v1;
+	e->vend = v3;
 
 	//Starting to walk backwards through the edges that will be transferred to l1
 	WEdge *curredge = nullptr, *nextedge = a;
@@ -347,7 +356,7 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 
 	e->cwloop = l1;
 	e->cwsucc = curredge;
-	e->cwpred = b;		
+	e->cwpred = b;
 }
 
 //Euler operator: special Make Edge Vertex
@@ -522,6 +531,7 @@ tnw::owner_ptr<tnw::Model> tnw::BRep::clone() const {
 }
 
 void tnw::BRep::setColor(const float c[3]) {
+	clear_marks();
 	for (int i = 0; i < 3; ++i)
 		color[i] = c[i];
 }
@@ -530,6 +540,17 @@ PaintColor tnw::BRep::getColor() const {
 	for (int i = 0; i < 3; ++i)
 		ret[i] = color[i];
 	return ret;
+}
+
+void tnw::BRep::mark_edge(size_t id) {
+	marked.emplace(id,1);
+}
+void tnw::BRep::mark_vertex(size_t id) {
+	marked.emplace(id,0);
+}
+void tnw::BRep::clear_marks() {
+	marked.clear();
+	selected_edge = 0;
 }
 
 Loop* tnw::BRep::get_loop(size_t id) {
@@ -557,7 +578,11 @@ void tnw::BRep::print_info() const {
 	}
 	printf("\n}\ne {");
 	for (auto&& e : edges) {
-		printf("\n[%zu] vs [%zu,%zu] loop [%zu,%zu] succ [%zu,%zu] pred [%zu,%zu]", e.id,e.vstart->id,e.vend?e.vend->id:0,e.cwloop->id,e.ccwloop->id,e.cwsucc->id,e.ccwsucc->id,e.cwpred->id,e.ccwpred->id);
+		printf("\n[%zu] vs [%zu,%zu] loop [%zu,%zu] succ [%zu,%zu] pred [%zu,%zu]", e.id,e.vstart?e.vstart->id:0,e.vend?e.vend->id:0,e.cwloop?e.cwloop->id:0,e.ccwloop?e.ccwloop->id:0,e.cwsucc?e.cwsucc->id:0,e.ccwsucc?e.ccwsucc->id:0,e.cwpred?e.cwpred->id:0,e.ccwpred?e.ccwpred->id:0);
+	}
+	printf("\n}\nl {");
+	for (auto&& l : loops) {
+		printf("\n[%lu] iedge [%lu]", l.id, l.iedge->id);
 	}
 	printf("\n}\n");
 }
