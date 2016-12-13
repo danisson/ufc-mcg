@@ -213,10 +213,18 @@ int main(void) {
 	//EULER OPERATORS TESTS
 	std::cout << "Euler operators\n";
 
+	models.push_back(std::make_unique<tnw::BRep>());
+	auto brep = (tnw::BRep*)models[0].get();
+	
 	std::cout << "MVFS:\n";
+	brep->mvfs({0,0,0});
+	std::cout << "MVFS ok\n";
+	std::cout << "SMEV:\n";
+	brep->smev(1,1,{0,0.5,0});
+	brep->smev(1,2,{0.5,0,0});
+	std::cout << "SMEV ok\n";
 
-	// tnw::BRep brep = tnw::BRep();
-	// brep.mvfs({0.1,0.1,0.1});
+
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
@@ -233,6 +241,7 @@ int main(void) {
 		glLoadMatrixf(glm::value_ptr(view));
 
 		tnw::draw_axis();
+		
 		for (auto&& model : models)
 			model->draw();
 

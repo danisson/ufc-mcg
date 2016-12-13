@@ -252,7 +252,7 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 	Vertex *v1 = get_vertex(vid_start);
 	Loop *l = get_loop(lid);
 
-	if (!v1 && !l) {
+	if (!v1 || !l) {
 		return;
 	}
 
@@ -266,7 +266,7 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 	 */
 	std::vector<WEdge*> ledges = l->adjedge();
 
-	for (WEdge*& b : ledges) {
+	for (WEdge* b : ledges) {
 
 		if (b->vstart->id == v1->id) {
 			//Caso 1: b é um edge com vstart em v1
@@ -277,10 +277,10 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				e->ccwpred = b;
 				e->cwsucc = b->cwsucc;
 
-				if (lid == b->cwsucc->cwloop) {
+				if (lid == b->cwsucc->cwloop->id) {
 					b->cwsucc->cwpred = e;
 				}
-				if (lid == b->cwsucc->ccwloop) {
+				if (lid == b->cwsucc->ccwloop->id) {
 					b->cwsucc->ccwpred = e;
 				}
 
@@ -293,10 +293,10 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				e->ccwpred = b->ccwpred;
 				e->cwsucc = b;
 
-				if (lid == b->ccwpred->cwloop) {
+				if (lid == b->ccwpred->cwloop->id) {
 					b->ccwpred->cwsucc = e;
 				}
-				if (lid == b->ccwpred->ccwloop) {
+				if (lid == b->ccwpred->ccwloop->id) {
 					b->ccwpred->ccwsucc = e;
 				}
 
@@ -315,10 +315,10 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				e->ccwpred = b->cwpred;
 				e->cwsucc = b;
 
-				if (lid == b->cwpred->cwloop) {
+				if (lid == b->cwpred->cwloop->id) {
 					b->cwpred->cwsucc = e;
 				}
-				if (lid == b->cwpred->ccwloop) {
+				if (lid == b->cwpred->ccwloop->id) {
 					b->cwpred->ccwsucc = e;
 				}
 
@@ -330,10 +330,10 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				e->ccwpred = b;
 				e->cwsucc = b->ccwsucc;
 
-				if (lid == b->ccwsucc->cwloop) {
+				if (lid == b->ccwsucc->cwloop->id) {
 					b->ccwsucc->cwpred = e;
 				}
-				if (lid == b->ccwsucc->ccwloop) {
+				if (lid == b->ccwsucc->ccwloop->id) {
 					b->ccwsucc->ccwpred = e;
 				}
 
@@ -438,4 +438,12 @@ Vertex* tnw::BRep::get_vertex(size_t id) {
 	for (auto&& i : vertices)
 		if (i.id == id) return &i;
 	return nullptr;
+}
+
+void tnw::BRep::print_vertices() {
+	printf("{ ");
+	for (Vertex& v : vertices) {
+		printf("\nv [%lu] iedge [%lu] pos [%f,%f,%f]", v.id, v.iedge->id, v.position[0], v.position[1], v.position[2]);	
+	}
+	printf("}");
 }

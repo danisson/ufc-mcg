@@ -144,6 +144,9 @@ public:
 	void mvfs(glm::vec3 position);
 	void smef(size_t lid, size_t v1id, size_t v2id);
 	void smev(size_t lid, size_t vid_start, glm::vec3 position);
+
+	//Debug
+	void print_vertices();
 };
 
 } // tnw
