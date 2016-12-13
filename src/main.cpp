@@ -130,9 +130,9 @@ int main(void) {
 	d->ccwloop = l1;
 	d->cwloop = l2;
 	d->cwsucc =
-	d->ccwpred = c;
+	d->ccwpred = a;
 	d->cwpred =
-	d->ccwsucc = a;
+	d->ccwsucc = c;
 
 	// models.push_back(std::make_unique<tnw::BRep>());
 	// auto brep = (tnw::BRep*)models[0].get();

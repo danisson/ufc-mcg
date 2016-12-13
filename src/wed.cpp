@@ -89,18 +89,22 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
 	std::vector<WEdge*> adjedgev;
 
 	// Qual loop eu sou?
-	bool ccwtravel = (iedge->cwloop == this);
+	bool ccwtravel = (iedge->ccwloop->id == this->id);
 
 	do {
-		// cout << "curredge: " << curredge->id << endl;
+		printf("id: %zu curredge: %zu\n", id,curredge->id);
 		adjedgev.push_back(curredge);
-		if (ccwtravel)
+		if (ccwtravel) {
+			if ((curredge->vstart->id == curredge->ccwsucc->vstart->id) || (curredge->vend->id == curredge->ccwsucc->vend->id))
+				ccwtravel = !ccwtravel;
 			curredge = curredge->ccwsucc;
-		else
+		}
+		else {
+			if ((curredge->vstart->id == curredge->cwsucc->vstart->id) || (curredge->vend->id == curredge->cwsucc->vend->id))
+				ccwtravel = !ccwtravel;
 			curredge = curredge->cwsucc;
-		if (curredge->vstart == curredge->cwsucc->vstart)
-			ccwtravel = !ccwtravel;
-	} while (curredge != iedge);
+		}
+	} while (curredge->id != iedge->id);
 
 	return adjedgev;
 }
@@ -283,6 +287,8 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 		return;
 	}
 
+	l1->iedge = b;
+
 	edges.emplace_front(currEdgeId++);
 	WEdge *e = &edges.front();
 
@@ -313,6 +319,7 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 			nextedge = curredge->cwpred;
 		}
 
+		printf("loop 1: %zu %zu\n", curredge->id, nextedge->id);
 	} while (nextedge->id != b->id);
 
 	if (curredge->ccwloop->id == l1->id) {
@@ -345,6 +352,7 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 			nextedge = curredge->cwpred;
 		}
 
+		printf("loop 2: %zu %zu\n", curredge->id, nextedge->id);
 	} while (nextedge->id != a->id);
 
 	if (curredge->ccwloop->id == l1->id) {
