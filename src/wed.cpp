@@ -90,7 +90,7 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
 	bool ccwtravel = (iedge->cwloop == this);
 
 	do {
-		cout << "curredge: " << curredge->id << endl;
+		// cout << "curredge: " << curredge->id << endl;
 		adjedgev.push_back(curredge);
 		if (ccwtravel)
 			curredge = curredge->ccwsucc;
@@ -196,6 +196,15 @@ void tnw::BRep::rdraw() {
 		// Reset color
 		if (is_marked || is_selected)
 			glColor3fv(color);
+	}
+	glEnd();
+	glColor3f(0,1,0);
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	for (auto&& p : vertices) {
+		const bool is_marked = marked.count(std::make_tuple(p.id,0));
+		if (is_marked)
+			glVertex3fv(glm::value_ptr(p.position));
 	}
 	glEnd();
 	glLineWidth(1);

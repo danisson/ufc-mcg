@@ -99,14 +99,14 @@ private:
 
 	// Wireframe color
 	float color[3] = {.5,.5,.5};
-	std::set<std::tuple<size_t,char>> marked;
-	size_t selected_edge = 0;
 
 public:
 	//Temporariamente
 	std::list<wed::Vertex> vertices;
 	std::list<wed::WEdge> edges;
 	std::list<wed::Loop> loops;
+	std::set<std::tuple<size_t,char>> marked;
+	size_t selected_edge = 0;
 	// Blá
 	BRep() = default;
 	// Geometric operations
@@ -126,7 +126,7 @@ public:
 	BooleanErrorCodes bool_or(const Model& y) override;
 
 	//Serialize
-	std::string serialize() const override override;
+	std::string serialize() const override;
 
 	//Set color
 	void setColor(const float c[3]) override;
