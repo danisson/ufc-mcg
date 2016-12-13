@@ -146,7 +146,7 @@ public:
 	void smev(size_t lid, size_t vid_start, glm::vec3 position);
 
 	//Debug
-	void print_vertices();
+	void print_info() const;
 };
 
 } // tnw
