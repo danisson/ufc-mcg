@@ -201,13 +201,13 @@ void tnw::BRep::rdraw() {
 			glColor3fv(color);
 	}
 	glEnd();
-	glColor3f(0,1,0);
 	glPointSize(10);
 	glBegin(GL_POINTS);
 	for (auto&& p : vertices) {
 		const bool is_marked = marked.count(std::make_tuple(p.id,0));
-		if (is_marked)
-			glVertex3fv(glm::value_ptr(p.position));
+		if (is_marked) glColor3f(0,1,0);
+		glVertex3fv(glm::value_ptr(p.position));
+		if (is_marked) glColor3fv(color);
 	}
 	glEnd();
 	glLineWidth(1);

@@ -224,7 +224,7 @@ int main(void) {
 
 	// models.push_back(std::make_unique<tnw::BRep>());
 	// auto brep = (tnw::BRep*)models[0].get();
-	
+
 	// std::cout << "MVFS:\n";
 	// brep->mvfs({1,0,0});
 	// std::cout << "MVFS ok\n";
@@ -251,7 +251,7 @@ int main(void) {
 		glLoadMatrixf(glm::value_ptr(view));
 
 		tnw::draw_axis();
-		
+
 		for (auto&& model : models)
 			model->draw();
 

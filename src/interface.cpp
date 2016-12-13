@@ -8,6 +8,8 @@
 #include <random>
 #include "helper.h"
 #include "raycast.h"
+#include <typeindex>
+#include <typeinfo>
 
 MainMenu::MainMenu(std::vector<std::unique_ptr<tnw::Model>>& m, IsometricCamera& c) : models(m), camera(c) {
 	const size_t m_size = m.size();
@@ -175,12 +177,21 @@ void MainMenu::draw() {
 		ImGui::PopItemWidth();
 
 		bool isSelected = curr_item >= 0 && static_cast<size_t>(curr_item) < models.size();
+		bool isBRep = isSelected && (std::type_index(typeid(*models[curr_item])) == std::type_index(typeid(tnw::BRep)));
 
 
 		ImVec2 buttonSize = ImVec2(0,0);
 		float fullWidth = ImGui::GetWindowContentRegionMax().x;
 		float margin = ImGui::GetStyle().ItemSpacing.x;
 		buttonSize.x = fullWidth/2-margin;
+
+		if (isBRep) {
+			auto* m = (tnw::BRep*)models[curr_item].get();
+			buttonSize.x = fullWidth/3-margin;
+			if (ImGui::Button("Adjacencia",buttonSize) && !!m->vertices.size())
+				ImGui::OpenPopup("Parâmetros das Adjacencias");
+			ImGui::SameLine();
+		}
 
 		if (ImGui::Button("Translação",buttonSize) && isSelected) {
 			ImGui::OpenPopup("Parâmetros da Translação");
@@ -221,58 +232,121 @@ void MainMenu::draw() {
 		}
 
 		// ImGui::SameLine();
-		buttonSize.x = fullWidth/2-margin;
-		if (ImGui::Button("União",buttonSize) && isSelected) {
-			ImGui::OpenPopup("Parâmetros de União");
-		}
+		if (isBRep) {
+			auto* m = (tnw::BRep*)models[curr_item].get();
+			buttonSize.x = fullWidth/3-margin;
+			if (ImGui::Button("MVFS",buttonSize) && !m->vertices.size()) {
+				ImGui::OpenPopup("MVFS##2");
+			}
+			if (ImGui::BeginPopupModal("MVFS##2", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+				ImVec2 buttonSize = ImVec2(0,0);
+				float halfWidth = ImGui::GetWindowContentRegionMax().x*.5f;
+				float margin = ImGui::GetStyle().ItemSpacing.x;
+				buttonSize.x = halfWidth-margin;
+				ImGui::Text("novo vértice:");
+				ImGui::InputFloat("x", &x);
+				ImGui::InputFloat("y", &y);
+				ImGui::InputFloat("z", &z);
+				ImGui::Separator();
 
-		if (ImGui::BeginPopupModal("Parâmetros de União", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			static int selected_or = -1;
-			ImGui::Combo("selecione a árvore com que operar", &selected_or, tree_names, model_names.size());
-
-
-			if (ImGui::Button("OK", ImVec2(120,0)) && (selected_or >= 0 && static_cast<size_t>(selected_or) < models.size())) {
-				tnw::BooleanErrorCodes result;
-
-				result = models[curr_item]->bool_or(*models[selected_or]);
-
-				if (result == tnw::BooleanErrorCodes::unimplementedType) { open_type_error_popup = true; }
-				else if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
-				else { model_names[curr_item] = model_names[curr_item].append(" OR ").append(model_names[selected_or]); }
-				ImGui::CloseCurrentPopup();
-
+				if (ImGui::Button("OK", buttonSize)) {
+					m->mvfs(glm::vec3{x,y,z});
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", buttonSize))
+					ImGui::CloseCurrentPopup();
+				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("MEV",buttonSize) && !!m->vertices.size()) {
+				ImGui::OpenPopup("MEV##2");
+			}
+			if (ImGui::BeginPopupModal("MEV##2", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+				ImVec2 buttonSize = ImVec2(0,0);
+				float halfWidth = ImGui::GetWindowContentRegionMax().x*.5f;
+				float margin = ImGui::GetStyle().ItemSpacing.x;
+				buttonSize.x = halfWidth-margin;
 
-			ImGui::EndPopup();
-		}
+				ImGui::Text("loop:");
+				ImGui::InputInt("id##loop", (int*)&brep_ids[0]);
+				ImGui::Separator();
+				ImGui::Text("vértice:");
+				ImGui::InputInt("id##vertice", (int*)&brep_ids[1]);
+				ImGui::Separator();
+				ImGui::Text("novo vértice:");
+				ImGui::InputFloat("x", &x);
+				ImGui::InputFloat("y", &y);
+				ImGui::InputFloat("z", &z);
+				ImGui::Separator();
 
-		ImGui::SameLine();
-		if (ImGui::Button("Interseção",buttonSize) && isSelected) {
-			ImGui::OpenPopup("Parâmetros de Interseção");
-		}
+				if (ImGui::Button("OK", buttonSize)) {
+					m->smev(brep_ids[0],brep_ids[1],glm::vec3{x,y,z});
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", buttonSize))
+					ImGui::CloseCurrentPopup();
+				ImGui::EndPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("MEF",buttonSize) && !!m->vertices.size()) {
+				ImGui::OpenPopup("MEF##2");
+			}
+		} else {
+			buttonSize.x = fullWidth/2-margin;
+			if (ImGui::Button("União",buttonSize) && isSelected) {
+				ImGui::OpenPopup("Parâmetros de União");
+			}
 
-		if (ImGui::BeginPopupModal("Parâmetros de Interseção", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			if (ImGui::BeginPopupModal("Parâmetros de União", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+				static int selected_or = -1;
+				ImGui::Combo("selecione a árvore com que operar", &selected_or, tree_names, model_names.size());
 
-			static int selected_and = -1;
-			ImGui::Combo("selecione a árvore com que operar", &selected_and, tree_names, model_names.size());
 
-			if (ImGui::Button("OK", ImVec2(120,0)) && (selected_and >= 0 && static_cast<unsigned int>(selected_and) < models.size())) {
-				tnw::BooleanErrorCodes result;
+				if (ImGui::Button("OK", ImVec2(120,0)) && (selected_or >= 0 && static_cast<size_t>(selected_or) < models.size())) {
+					tnw::BooleanErrorCodes result;
 
-				result = models[curr_item]->bool_and(*models[selected_and]);
+					result = models[curr_item]->bool_or(*models[selected_or]);
 
-				if (result == tnw::BooleanErrorCodes::unimplementedType) { open_type_error_popup = true; }
-				else if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
-				else { model_names[curr_item] = model_names[curr_item].append(" AND ").append(model_names[selected_and]); }
+					if (result == tnw::BooleanErrorCodes::unimplementedType) { open_type_error_popup = true; }
+					else if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
+					else { model_names[curr_item] = model_names[curr_item].append(" OR ").append(model_names[selected_or]); }
+					ImGui::CloseCurrentPopup();
 
-				ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+
+				ImGui::EndPopup();
 			}
 
 			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::EndPopup();
+			if (ImGui::Button("Interseção",buttonSize) && isSelected) {
+				ImGui::OpenPopup("Parâmetros de Interseção");
+			}
+
+			if (ImGui::BeginPopupModal("Parâmetros de Interseção", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+
+				static int selected_and = -1;
+				ImGui::Combo("selecione a árvore com que operar", &selected_and, tree_names, model_names.size());
+
+				if (ImGui::Button("OK", ImVec2(120,0)) && (selected_and >= 0 && static_cast<unsigned int>(selected_and) < models.size())) {
+					tnw::BooleanErrorCodes result;
+
+					result = models[curr_item]->bool_and(*models[selected_and]);
+
+					if (result == tnw::BooleanErrorCodes::unimplementedType) { open_type_error_popup = true; }
+					else if (result == tnw::BooleanErrorCodes::boundingboxMismatch) { open_bb_mismatch_error_popup = true; }
+					else { model_names[curr_item] = model_names[curr_item].append(" AND ").append(model_names[selected_and]); }
+
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
 		}
 
 		if (open_type_error_popup) {
@@ -297,15 +371,17 @@ void MainMenu::draw() {
 			ImGui::EndPopup();
 		}
 
-		// ImGui::SameLine();
-		buttonSize.x = fullWidth/1-margin;
-		if (ImGui::Button("Volume",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
-			volumeCache = models[curr_item]->volume();
-			ImGui::OpenPopup("Volume##2");
-		}
-		if (ImGui::BeginPopup("Volume##2")) {
-			ImGui::Text("%lf",volumeCache);
-			ImGui::EndPopup();
+		if (!isBRep) {
+			// ImGui::SameLine();
+			buttonSize.x = fullWidth/1-margin;
+			if (ImGui::Button("Volume",buttonSize) && (curr_item >= 0 && static_cast<unsigned int>(curr_item) < models.size())) {
+				volumeCache = models[curr_item]->volume();
+				ImGui::OpenPopup("Volume##2");
+			}
+			if (ImGui::BeginPopup("Volume##2")) {
+				ImGui::Text("%lf",volumeCache);
+				ImGui::EndPopup();
+			}
 		}
 
 
@@ -323,9 +399,7 @@ void MainMenu::draw() {
 				std::uniform_real_distribution<> dis(0,1);
 
 				for (int i = 0; i < 3; ++i)
-				{
 					color[i] = dis(gen);
-				}
 			}
 			if (ImGui::Button("OK", ImVec2(120,0))) {
 				models[curr_item]->setColor(color);
@@ -803,6 +877,13 @@ void MainMenu::draw() {
 				f->cwsucc = b;
 				f->ccwpred = a;
 				f->ccwsucc = c;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Vazio")) {
+				models.push_back(std::make_unique<tnw::BRep>());
+				std::stringstream ss;
+				ss << "BRep " << model_names.size() << "[TETRA]";
+				model_names.push_back(ss.str());
 			}
 		}
 		ImGui::PopID();
