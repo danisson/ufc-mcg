@@ -100,13 +100,13 @@ int main(void) {
 	Vertex *D = &mdl->vertices.front();
 
 	mdl->loops.emplace_front(1,a);
-	Loop *l1 = &mdl->vertices.front();
+	Loop *l1 = &mdl->loops.front();
 	mdl->loops.emplace_front(2,c);
-	Loop *l2 = &mdl->vertices.front();
+	Loop *l2 = &mdl->loops.front();
 	mdl->loops.emplace_front(3,a);
-	Loop *l3 = &mdl->vertices.front();
+	Loop *l3 = &mdl->loops.front();
 	mdl->loops.emplace_front(4,b);
-	Loop *l4 = &mdl->vertices.front();
+	Loop *l4 = &mdl->loops.front();
 
 	a->vstart = A;
 	a->vend = D;
