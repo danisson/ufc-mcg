@@ -285,7 +285,7 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				}
 
 				b->cwsucc = e;
-				
+
 			} else {
 				//Caso 1.2: loop dado é counterclockwise loop de b
 				e->ccwsucc = e;
@@ -307,7 +307,7 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 
 		} else if (b->vend->id == v1->id) {
 			//Caso 2: b é um edge com vend em v1
-			
+
 			if (lid == b->cwloop->id) {
 				//Caso 2.1: loop dado é clockwise loop de b
 				e->ccwsucc = e;
@@ -338,7 +338,7 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				}
 
 				b->ccwsucc = e;
-			}			
+			}
 			break;
 		}
 
@@ -440,10 +440,14 @@ Vertex* tnw::BRep::get_vertex(size_t id) {
 	return nullptr;
 }
 
-void tnw::BRep::print_vertices() {
-	printf("{ ");
-	for (Vertex& v : vertices) {
-		printf("\nv [%lu] iedge [%lu] pos [%f,%f,%f]", v.id, v.iedge->id, v.position[0], v.position[1], v.position[2]);	
+void tnw::BRep::print_info() const {
+	printf("v { ");
+	for (auto&& v : vertices) {
+		printf("\nv [%lu] iedge [%lu] pos [%f,%f,%f]", v.id, v.iedge->id, v.position[0], v.position[1], v.position[2]);
 	}
-	printf("}");
+	printf("\n}\ne {");
+	for (auto&& e : edges) {
+		printf("\ne [%zu] vs [%zu,%zu] loop [%zu,%zu] succ [%zu,%zu] pred [%zu,%zu]", e.id,e.vstart->id,e.vend?e.vend->id:0,e.cwloop->id,e.ccwloop->id,e.cwsucc->id,e.ccwsucc->id,e.cwpred->id,e.ccwpred->id);
+	}
+	printf("\n}\n");
 }
