@@ -256,28 +256,83 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 	 */
 	std::vector<WEdge*> ledges = l->adjedge();
 
-	for (WEdge*& we : ledges) {
-		if (we->vstart->id == v1->id) {
-			//Caso 1: we é um edge com vstart em v1
-			WEdge *weprev = we->ccwpred;
+	for (WEdge*& b : ledges) {
 
-			e->ccwsucc = e;
-			e->ccwpred = we->ccwpred;
-			e->cwsucc = e;
-			e->cwpred = we;
+		if (b->vstart->id == v1->id) {
+			//Caso 1: b é um edge com vstart em v1
+			if (lid == b->cwloop->id) {
+				//Caso 1.1: loop dado é clockwise loop de b
+				e->ccwsucc = e;
+				e->cwpred = e;
+				e->ccwpred = b;
+				e->cwsucc = b->cwsucc;
 
-			we->ccwpred = e;
-			we->cwsucc = e;
+				if (lid == b->cwsucc->cwloop) {
+					b->cwsucc->cwpred = e;
+				}
+				if (lid == b->cwsucc->ccwloop) {
+					b->cwsucc->ccwpred = e;
+				}
 
-			weprev->ccwsucc = e;
-			weprev->cwpred = e;
+				b->cwsucc = e;
+				
+			} else {
+				//Caso 1.2: loop dado é counterclockwise loop de b
+				e->ccwsucc = e;
+				e->cwpred = e;
+				e->ccwpred = b->ccwpred;
+				e->cwsucc = b;
+
+				if (lid == b->ccwpred->cwloop) {
+					b->ccwpred->cwsucc = e;
+				}
+				if (lid == b->ccwpred->ccwloop) {
+					b->ccwpred->ccwsucc = e;
+				}
+
+				b->ccwpred = e;
+			}
 
 			break;
 
-		} else {
+		} else if (b->vend->id == v1->id) {
+			//Caso 2: b é um edge com vend em v1
+			
+			if (lid == b->cwloop->id) {
+				//Caso 2.1: loop dado é clockwise loop de b
+				e->ccwsucc = e;
+				e->cwpred = e;
+				e->ccwpred = b->cwpred;
+				e->cwsucc = b;
 
+				if (lid == b->cwpred->cwloop) {
+					b->cwpred->cwsucc = e;
+				}
+				if (lid == b->cwpred->ccwloop) {
+					b->cwpred->ccwsucc = e;
+				}
+
+				b->cwpred = e;
+			} else {
+				//Caso 2.2: loop dado é counterclockwise loop de b
+				e->ccwsucc = e;
+				e->cwpred = e;
+				e->ccwpred = b;
+				e->cwsucc = b->ccwsucc;
+
+				if (lid == b->ccwsucc->cwloop) {
+					b->ccwsucc->cwpred = e;
+				}
+				if (lid == b->ccwsucc->ccwloop) {
+					b->ccwsucc->ccwpred = e;
+				}
+
+				b->ccwsucc = e;
+			}			
 			break;
 		}
+
+		//Caso 3: nem vstart nem vend são v1, ignorar
 	}
 
 }
