@@ -181,6 +181,9 @@ void tnw::BRep::rdraw() {
 	glLineWidth(0.5);
 	glBegin(GL_LINES);
 	for (auto&& e : edges) {
+		if (!e.vstart || !e.vend) {
+			continue;
+		}
 		bool is_marked = marked.count(std::make_tuple(e.id,1));
 		bool is_selected = (e.id == selected_edge);
 		const auto& vstart = *e.vstart;
@@ -212,12 +215,15 @@ void tnw::BRep::rdraw() {
 
 //Euler operator: Make Vertex Face Shell
 void tnw::BRep::mvfs(glm::vec3 position) {
-	//Creates a "fake" vertex
-	WEdge* e = new WEdge(currEdgeId++);
-	//Creates a vertex with the assigned position and the fake incident edge
-	Vertex* V = new Vertex(currVertexId++, position, e);
-	//Creates a face
-	Loop* l = new Loop(currLoopId++, e);
+	 //Creates a "fake" vertex
+	edges.emplace_front(currEdgeId++);
+	WEdge* e = &edges.front();
+  //Creates a vertex with the assigned position and the fake incident edge
+	vertices.emplace_front(currVertexId++, position, e);
+	Vertex* V = &vertices.front();
+  //Creates a face
+	loops.emplace_front(currLoopId++, e);
+	Loop* l = &loops.front();
 
 	e->vstart = V;
 	e->vend = nullptr;
@@ -228,9 +234,6 @@ void tnw::BRep::mvfs(glm::vec3 position) {
 	e->ccwpred = e;
 	e->ccwsucc = e;
 
-	vertices.push_back(*V);
-	edges.push_back(*e);
-	loops.push_back(*l);
 }
 
 //Euler operator: special Make Edge Face
@@ -248,7 +251,6 @@ void tnw::BRep::smef(size_t lid, size_t v1id, size_t v2id) {
 //Euler operator: special Make Edge Vertex
 //Covers cases where we want to create a new vertex eid starting from vid_start in face fid
 void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
-	WEdge *e = new WEdge(currEdgeId++);
 	Vertex *v1 = get_vertex(vid_start);
 	Loop *l = get_loop(lid);
 
@@ -256,10 +258,16 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 		return;
 	}
 
-	Vertex *v2 = new Vertex(currVertexId++, position, e);
+	edges.emplace_front(currEdgeId++);
+	WEdge *e = &edges.front();
+
+	vertices.emplace_front(currVertexId++, position, e);
+	Vertex *v2 = &vertices.front();
 
 	e->vstart = v1;
 	e->vend = v2;
+	e->cwloop = l;
+	e->ccwloop = l;
 
 	/* Procura uma aresta na face que tenha o vstart no v1. Caso não exista vértice com vstart em v1
 	 * escolhe um vertice com vend em v1
@@ -268,7 +276,7 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 
 	for (WEdge* b : ledges) {
 
-		if (b->vstart->id == v1->id) {
+		if (b->vstart && (b->vstart->id == v1->id)) {
 			//Caso 1: b é um edge com vstart em v1
 			if (lid == b->cwloop->id) {
 				//Caso 1.1: loop dado é clockwise loop de b
@@ -305,7 +313,7 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 
 			break;
 
-		} else if (b->vend->id == v1->id) {
+		} else if (b->vend && (b->vend->id == v1->id)) {
 			//Caso 2: b é um edge com vend em v1
 			
 			if (lid == b->cwloop->id) {
