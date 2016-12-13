@@ -86,17 +86,18 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
 	WEdge* curredge = iedge;
 	std::vector<WEdge*> adjedgev;
 
+	// Qual loop eu sou?
+	bool ccwtravel = (iedge->cwloop == this);
+
 	do {
-		cout << "curredge: " << curredge->id << endl;
+		// cout << "curredge: " << curredge->id << endl;
 		adjedgev.push_back(curredge);
-
-		//Primeiro, descobre se é ccwloop ou cwloop
-		if (curredge->ccwloop == this) {
+		if (ccwtravel)
 			curredge = curredge->ccwsucc;
-		} else {
+		else
 			curredge = curredge->cwsucc;
-		}
-
+		if (curredge->vstart == curredge->cwsucc->vstart)
+			ccwtravel = !ccwtravel;
 	} while (curredge != iedge);
 
 	return adjedgev;
@@ -195,6 +196,15 @@ void tnw::BRep::rdraw() {
 		// Reset color
 		if (is_marked || is_selected)
 			glColor3fv(color);
+	}
+	glEnd();
+	glColor3f(0,1,0);
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	for (auto&& p : vertices) {
+		const bool is_marked = marked.count(std::make_tuple(p.id,0));
+		if (is_marked)
+			glVertex3fv(glm::value_ptr(p.position));
 	}
 	glEnd();
 	glLineWidth(1);
@@ -391,6 +401,14 @@ tnw::BooleanErrorCodes tnw::BRep::bool_and(const Model& y) {
 //Shouldn't be called!
 tnw::BooleanErrorCodes tnw::BRep::bool_or(const Model& y) {
 	return BooleanErrorCodes::unimplementedType;
+}
+
+std::string tnw::BRep::serialize() const {
+	throw 0;
+}
+
+tnw::owner_ptr<tnw::Model> tnw::BRep::clone() const {
+	throw 0;
 }
 
 void tnw::BRep::setColor(const float c[3]) {

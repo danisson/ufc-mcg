@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
+#include <list>
 #include <set>
 #include <tuple>
 #include "model.h"
@@ -88,9 +89,6 @@ namespace wed {
 
 class BRep : public Model {
 private:
-	std::vector<wed::Vertex> vertices;
-	std::vector<wed::WEdge> edges;
-	std::vector<wed::Loop> loops;
 	void rdraw() override;
 	//Helper function to geometric transforms
 	void applyTransform(const glm::mat4& t);
@@ -101,11 +99,16 @@ private:
 
 	// Wireframe color
 	float color[3] = {.5,.5,.5};
-	std::set<std::tuple<size_t,char>> marked;
-	size_t selected_edge = 0;
 
 public:
-	BRep();
+	//Temporariamente
+	std::list<wed::Vertex> vertices;
+	std::list<wed::WEdge> edges;
+	std::list<wed::Loop> loops;
+	std::set<std::tuple<size_t,char>> marked;
+	size_t selected_edge = 0;
+	// Blá
+	BRep() = default;
 	// Geometric operations
 	//Intersections won't be implemented
 	Color intersect_point(const glm::vec3&) const override;
@@ -123,14 +126,14 @@ public:
 	BooleanErrorCodes bool_or(const Model& y) override;
 
 	//Serialize
-	// virtual std::string serialize() const = 0;
+	std::string serialize() const override;
 
 	//Set color
 	void setColor(const float c[3]) override;
 	PaintColor getColor() const override;
 
 	// Misc
-	// virtual owner_ptr<Model> clone() const = 0;
+	owner_ptr<Model> clone() const override;
 
 	//Get operators
 	wed::Loop* get_loop(size_t id);

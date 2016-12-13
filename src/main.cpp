@@ -21,7 +21,6 @@
 #include <sstream>
 #include <limits>
 #include <glm/gtx/string_cast.hpp>
-using namespace tnw::wed;
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #undef near
 #undef far
@@ -71,18 +70,34 @@ int main(void) {
 	camera.aspect = 480/640.;
 	MainMenu mainMenu(models,camera);
 
-	WEdge *a = new WEdge(1);
-	WEdge *b = new WEdge(2);
-	WEdge *c = new WEdge(3);
-	WEdge *d = new WEdge(4);
-	WEdge *e = new WEdge(5);
-	WEdge *f = new WEdge(6);
+	models.push_back(std::make_unique<tnw::BRep>());
+	auto mdl = (tnw::BRep*)models[0].get();
+
+	using namespace tnw::wed;
+	// mdl->edges.reserve(6);
+	mdl->edges.emplace_front(1);
+	WEdge *a = &mdl->edges.front();
+	mdl->edges.emplace_front(2);
+	WEdge *b = &mdl->edges.front();
+	mdl->edges.emplace_front(3);
+	WEdge *c = &mdl->edges.front();
+	mdl->edges.emplace_front(4);
+	WEdge *d = &mdl->edges.front();
+	mdl->edges.emplace_front(5);
+	WEdge *e = &mdl->edges.front();
+	mdl->edges.emplace_front(6);
+	WEdge *f = &mdl->edges.front();
 
 
-	Vertex *A = new Vertex(1, {0,0,0}, a);
-	Vertex *B = new Vertex(2, {1,0,1}, b);
-	Vertex *C = new Vertex(3, {2,0,0}, e);
-	Vertex *D = new Vertex(4, {1,1,0}, e);
+	// mdl->vertices.reserve(4);
+	mdl->vertices.emplace_front(1, glm::vec3{0,0,0}, a);
+	Vertex *A = &mdl->vertices.front();
+	mdl->vertices.emplace_front(2, glm::vec3{1,0,1}, b);
+	Vertex *B = &mdl->vertices.front();
+	mdl->vertices.emplace_front(3, glm::vec3{2,0,0}, e);
+	Vertex *C = &mdl->vertices.front();
+	mdl->vertices.emplace_front(4, glm::vec3{1,1,0}, e);
+	Vertex *D = &mdl->vertices.front();
 
 	Loop *l1 = new Loop(1, a);
 	Loop *l2 = new Loop(2, c);
@@ -91,57 +106,57 @@ int main(void) {
 
 	a->vstart = A;
 	a->vend = D;
-	a->lloop = l3;
-	a->rloop = l1;
-	a->lpred = e;
-	a->lsucc = f;
-	a->rpred = b;
-	a->rsucc = c;
+	a->cwloop = l3;
+	a->ccwloop = l1;
+	a->cwpred = e;
+	a->cwsucc = f;
+	a->ccwpred = b;
+	a->ccwsucc = c;
 
 	b->vstart = A;
 	b->vend = B;
-	b->lloop = l1;
-	b->rloop = l4;
-	b->lpred = c;
-	b->lsucc = a;
-	b->rpred = f;
-	b->rsucc = d;
+	b->cwloop = l1;
+	b->ccwloop = l4;
+	b->cwpred = c;
+	b->cwsucc = a;
+	b->ccwpred = f;
+	b->ccwsucc = d;
 
 	c->vstart = B;
 	c->vend = D;
-	c->lloop = l1;
-	c->rloop = l2;
-	c->lpred = a;
-	c->lsucc = b;
-	c->rpred = d;
-	c->rsucc = e;
+	c->cwloop = l1;
+	c->ccwloop = l2;
+	c->cwpred = a;
+	c->cwsucc = b;
+	c->ccwpred = d;
+	c->ccwsucc = e;
 
 	d->vstart = B;
 	d->vend = C;
-	d->lloop = l2;
-	d->rloop = l4;
-	d->lpred = e;
-	d->lsucc = c;
-	d->rpred = b;
-	d->rsucc = f;
+	d->cwloop = l2;
+	d->ccwloop = l4;
+	d->cwpred = e;
+	d->cwsucc = c;
+	d->ccwpred = b;
+	d->ccwsucc = f;
 
 	e->vstart = C;
 	e->vend = D;
-	e->lloop = l2;
-	e->rloop = l3;
-	e->lpred = c;
-	e->lsucc = d;
-	e->rpred = f;
-	e->rsucc = a;
+	e->cwloop = l2;
+	e->ccwloop = l3;
+	e->cwpred = c;
+	e->cwsucc = d;
+	e->ccwpred = f;
+	e->ccwsucc = a;
 
 	f->vstart = A;
 	f->vend = C;
-	f->lloop = l4;
-	f->rloop = l3;
-	f->lpred = d;
-	f->lsucc = b;
-	f->rpred = a;
-	f->rsucc = c;
+	f->cwloop = l4;
+	f->ccwloop = l3;
+	f->cwpred = d;
+	f->cwsucc = b;
+	f->ccwpred = a;
+	f->ccwsucc = c;
 
 	std::vector<WEdge*> ae = l1->adjedge();
 
