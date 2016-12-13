@@ -2,6 +2,7 @@
 #include "shapes.h"
 #include "octree.h"
 #include "csgtree.h"
+#include "wed.h"
 #include <sstream>
 #include <iostream>
 #include <random>
@@ -662,6 +663,147 @@ void MainMenu::draw() {
 				ImGui::EndPopup();
 			}
 			errorDialog("Erro de seleção","Selecione um objeto.");
+		}
+		ImGui::PopID();
+
+		ImGui::PushID("Brep");
+		if (ImGui::CollapsingHeader("Nova Brep")) {
+			if (ImGui::Button("Esfera")) {
+				ImGui::OpenPopup("Parâmetros da Esfera");
+			}
+			if (ImGui::BeginPopupModal("Parâmetros da Esfera")) {
+				ImGui::Text("centro:");
+				ImGui::InputFloat("x", &x);
+				ImGui::InputFloat("y", &y);
+				ImGui::InputFloat("z", &z);
+				ImGui::Separator();
+				ImGui::InputFloat("raio", &r);
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					auto s = new tnw::Sphere({x,y,z}, r);
+					models.push_back(std::make_unique<tnw::CSGTree>(s));
+					std::stringstream ss;
+					ss << "CSG " << model_names.size() << "[ESFERA]";
+					model_names.push_back(ss.str());
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Caixa")) {
+				ImGui::OpenPopup("Parâmetros da Caixa");
+			}
+			if (ImGui::BeginPopupModal("Parâmetros da Caixa")) {
+				ImGui::Text("centro:");
+				ImGui::InputFloat("x", &x);
+				ImGui::InputFloat("y", &y);
+				ImGui::InputFloat("z", &z);
+				ImGui::Separator();
+				ImGui::InputFloat("largura", &l);
+				ImGui::InputFloat("altura", &h);
+				ImGui::InputFloat("profundidade", &d);
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					auto bb = new tnw::Box({x,y,z}, l, d, h);
+					models.push_back(std::make_unique<tnw::CSGTree>(bb));
+					std::stringstream ss;
+					ss << "CSG " << model_names.size() << "[CAIXA]";
+					model_names.push_back(ss.str());
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Tetraedro")) {
+				models.push_back(std::make_unique<tnw::BRep>());
+				std::stringstream ss;
+				ss << "BRep " << model_names.size() << "[TETRA]";
+				model_names.push_back(ss.str());
+				auto mdl = (tnw::BRep*)models.back().get();
+
+				using namespace tnw::wed;
+				mdl->edges.emplace_front(1);
+				WEdge *a = &mdl->edges.front();
+				mdl->edges.emplace_front(2);
+				WEdge *b = &mdl->edges.front();
+				mdl->edges.emplace_front(3);
+				WEdge *c = &mdl->edges.front();
+				mdl->edges.emplace_front(4);
+				WEdge *d = &mdl->edges.front();
+				mdl->edges.emplace_front(5);
+				WEdge *e = &mdl->edges.front();
+				mdl->edges.emplace_front(6);
+				WEdge *f = &mdl->edges.front();
+				mdl->vertices.emplace_front(1, glm::vec3{0,0,1}, a);
+				Vertex *A = &mdl->vertices.front();
+				mdl->vertices.emplace_front(2, glm::vec3{-1,0,0}, b);
+				Vertex *B = &mdl->vertices.front();
+				mdl->vertices.emplace_front(3, glm::vec3{1,0,0}, e);
+				Vertex *C = &mdl->vertices.front();
+				mdl->vertices.emplace_front(4, glm::vec3{0,1,0}, e);
+				Vertex *D = &mdl->vertices.front();
+				Loop *l1 = &mdl->loops.front();
+				mdl->loops.emplace_front(2,c);
+				Loop *l2 = &mdl->loops.front();
+				mdl->loops.emplace_front(3,a);
+				Loop *l3 = &mdl->loops.front();
+				mdl->loops.emplace_front(4,b);
+				Loop *l4 = &mdl->loops.front();
+				a->vstart = A;
+				a->vend = D;
+				a->cwloop = l3;
+				a->ccwloop = l1;
+				a->cwpred = e;
+				a->cwsucc = f;
+				a->ccwpred = b;
+				a->ccwsucc = c;
+				b->vstart = A;
+				b->vend = B;
+				b->cwloop = l1;
+				b->ccwloop = l4;
+				b->cwpred = c;
+				b->cwsucc = a;
+				b->ccwpred = f;
+				b->ccwsucc = d;
+				c->vstart = B;
+				c->vend = D;
+				c->cwloop = l1;
+				c->ccwloop = l2;
+				c->cwpred = a;
+				c->cwsucc = b;
+				c->ccwpred = d;
+				c->ccwsucc = e;
+				d->vstart = B;
+				d->vend = C;
+				d->cwloop = l2;
+				d->ccwloop = l4;
+				d->cwpred = e;
+				d->cwsucc = c;
+				d->ccwpred = b;
+				d->ccwsucc = f;
+				e->vstart = C;
+				e->vend = D;
+				e->cwloop = l2;
+				e->ccwloop = l3;
+				e->cwpred = c;
+				e->cwsucc = d;
+				e->ccwpred = f;
+				e->ccwsucc = a;
+				f->vstart = A;
+				f->vend = C;
+				f->cwloop = l4;
+				f->ccwloop = l3;
+				f->cwpred = d;
+				f->cwsucc = b;
+				f->ccwpred = a;
+				f->ccwsucc = c;
+			}
 		}
 		ImGui::PopID();
 	}

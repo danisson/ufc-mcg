@@ -73,7 +73,7 @@ int main(void) {
 	// models.push_back(std::make_unique<tnw::BRep>());
 	// auto mdl = (tnw::BRep*)models[0].get();
 
-	using namespace tnw::wed;
+	// using namespace tnw::wed;
 	// mdl->edges.reserve(6);
 	// mdl->edges.emplace_front(1);
 	// WEdge *a = &mdl->edges.front();
@@ -222,18 +222,18 @@ int main(void) {
 	//EULER OPERATORS TESTS
 	// std::cout << "Euler operators\n";
 
-	models.push_back(std::make_unique<tnw::BRep>());
-	auto brep = (tnw::BRep*)models[0].get();
+	// models.push_back(std::make_unique<tnw::BRep>());
+	// auto brep = (tnw::BRep*)models[0].get();
 	
-	std::cout << "MVFS:\n";
-	brep->mvfs({1,0,0});
-	std::cout << "MVFS ok\n";
-	std::cout << "SMEV:\n";
-	brep->smev(1,1,{1,0.5,0});
-	brep->smev(1,2,{1.5,1,0});
-	brep->smev(1,3,{2,0.5,0});
-	brep->smev(1,1,{2,0,0});
-	std::cout << "SMEV ok\n";
+	// std::cout << "MVFS:\n";
+	// brep->mvfs({1,0,0});
+	// std::cout << "MVFS ok\n";
+	// std::cout << "SMEV:\n";
+	// brep->smev(1,1,{1,0.5,0});
+	// brep->smev(1,2,{1.5,1,0});
+	// brep->smev(1,3,{2,0.5,0});
+	// brep->smev(1,1,{2,0,0});
+	// std::cout << "SMEV ok\n";
 
 
 	// Loop until the user closes the window
