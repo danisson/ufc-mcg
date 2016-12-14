@@ -823,31 +823,6 @@ void MainMenu::draw() {
 
 		ImGui::PushID("Brep");
 		if (ImGui::CollapsingHeader("Nova Brep")) {
-			if (ImGui::Button("Esfera")) {
-				ImGui::OpenPopup("Parâmetros da Esfera");
-			}
-			if (ImGui::BeginPopupModal("Parâmetros da Esfera")) {
-				ImGui::Text("centro:");
-				ImGui::InputFloat("x", &x);
-				ImGui::InputFloat("y", &y);
-				ImGui::InputFloat("z", &z);
-				ImGui::Separator();
-				ImGui::InputFloat("raio", &r);
-
-				if (ImGui::Button("OK", ImVec2(120,0))) {
-					auto s = new tnw::Sphere({x,y,z}, r);
-					models.push_back(std::make_unique<tnw::CSGTree>(s));
-					std::stringstream ss;
-					ss << "CSG " << model_names.size() << "[ESFERA]";
-					model_names.push_back(ss.str());
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
-				ImGui::EndPopup();
-			}
-
-			ImGui::SameLine();
 			if (ImGui::Button("Caixa")) {
 				ImGui::OpenPopup("Parâmetros da Caixa");
 			}
@@ -876,14 +851,13 @@ void MainMenu::draw() {
 
 			ImGui::SameLine();
 			if (ImGui::Button("Tetraedro")) {
-				models.push_back(std::make_unique<tnw::BRep>(5,7,4));
+				models.push_back(std::make_unique<tnw::BRep>(5,7,5));
 				std::stringstream ss;
 				ss << "BRep " << model_names.size() << "[TETRA]";
 				model_names.push_back(ss.str());
-				auto mdl = (tnw::BRep*)models.back().get();
-
-				using namespace tnw::wed;
+				auto mdl = (tnw::BRep*)models.back().get(); {
 				mdl->edges.emplace_front(1);
+				using namespace tnw::wed;
 				WEdge *a = &mdl->edges.front();
 				mdl->edges.emplace_front(2);
 				WEdge *b = &mdl->edges.front();
@@ -894,70 +868,80 @@ void MainMenu::draw() {
 				mdl->edges.emplace_front(5);
 				WEdge *e = &mdl->edges.front();
 				mdl->edges.emplace_front(6);
-				WEdge *f = &mdl->edges.front();
-				mdl->vertices.emplace_front(1, glm::vec3{0,0,1}, a);
+				WEdge *f = &mdl->edges.front();	
+
+				mdl->vertices.emplace_front(1, glm::vec3{-1,0,0}, a);
 				Vertex *A = &mdl->vertices.front();
-				mdl->vertices.emplace_front(2, glm::vec3{-1,0,0}, b);
+				mdl->vertices.emplace_front(2, glm::vec3{0,0,1}, b);
 				Vertex *B = &mdl->vertices.front();
-				mdl->vertices.emplace_front(3, glm::vec3{1,0,0}, e);
+				mdl->vertices.emplace_front(3, glm::vec3{1,0,0}, c);
 				Vertex *C = &mdl->vertices.front();
-				mdl->vertices.emplace_front(4, glm::vec3{0,1,0}, e);
+				mdl->vertices.emplace_front(4, glm::vec3{0,1,0}, d);
 				Vertex *D = &mdl->vertices.front();
+			
+				mdl->loops.emplace_front(1,a);
 				Loop *l1 = &mdl->loops.front();
-				mdl->loops.emplace_front(1,c);
+				mdl->loops.emplace_front(2,b);
 				Loop *l2 = &mdl->loops.front();
-				mdl->loops.emplace_front(2,a);
+				mdl->loops.emplace_front(3,c);
 				Loop *l3 = &mdl->loops.front();
-				mdl->loops.emplace_front(3,b);
+				mdl->loops.emplace_front(4,d);
 				Loop *l4 = &mdl->loops.front();
-				a->vstart = A;
+
+				a->vstart = A; 
 				a->vend = D;
-				a->cwloop = l3;
-				a->ccwloop = l1;
-				a->cwpred = e;
-				a->cwsucc = f;
-				a->ccwpred = b;
+				a->cwloop = l1; 
+				a->ccwloop = l3;
+				a->cwpred = b;
+				a->ccwpred = e;
+				a->cwsucc = d;
 				a->ccwsucc = c;
-				b->vstart = A;
-				b->vend = B;
-				b->cwloop = l1;
-				b->ccwloop = l4;
+
+				b->vstart = B; 
+				b->vend = D;
+				b->cwloop = l2;
+				b->ccwloop = l1;
 				b->cwpred = c;
-				b->cwsucc = a;
-				b->ccwpred = f;
-				b->ccwsucc = d;
-				c->vstart = B;
+				b->ccwpred = d;
+				b->cwsucc = f;
+				b->ccwsucc = a;
+
+				c->vstart = C; 
 				c->vend = D;
-				c->cwloop = l1;
+				c->cwloop = l3;
 				c->ccwloop = l2;
 				c->cwpred = a;
-				c->cwsucc = b;
-				c->ccwpred = d;
-				c->ccwsucc = e;
-				d->vstart = B;
-				d->vend = C;
-				d->cwloop = l2;
+				c->ccwpred = f;
+				c->cwsucc = e;
+				c->ccwsucc = b;
+
+				d->vstart = B; 
+				d->vend = A;
+				d->cwloop = l1;
 				d->ccwloop = l4;
-				d->cwpred = e;
-				d->cwsucc = c;
-				d->ccwpred = b;
-				d->ccwsucc = f;
-				e->vstart = C;
-				e->vend = D;
-				e->cwloop = l2;
-				e->ccwloop = l3;
+				d->cwpred = a;
+				d->ccwpred = f;
+				d->cwsucc = b;
+				d->ccwsucc = e;
+			
+				e->vstart = A; 
+				e->vend = C;
+				e->cwloop = l3;
+				e->ccwloop = l4;
 				e->cwpred = c;
-				e->cwsucc = d;
-				e->ccwpred = f;
-				e->ccwsucc = a;
-				f->vstart = A;
-				f->vend = C;
-				f->cwloop = l4;
-				f->ccwloop = l3;
-				f->cwpred = d;
-				f->cwsucc = b;
-				f->ccwpred = a;
-				f->ccwsucc = c;
+				e->ccwpred = d;
+				e->cwsucc = a;
+				e->ccwsucc = f;
+			
+				f->vstart = C; 
+				f->vend = B;
+				f->cwloop = l2;
+				f->ccwloop = l4;
+				f->cwpred = b;
+				f->ccwpred = e;
+				f->cwsucc = c;
+				f->ccwsucc = d;
+				}
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Vazio")) {
