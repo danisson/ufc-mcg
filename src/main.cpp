@@ -144,32 +144,32 @@ int main(void) {
 	a->ccwpred =
 	a->cwsucc = d;
 
-	b->vstart = C;
-	b->vend = B;
-	b->ccwloop = l1;
-	b->cwloop = l2;
+	b->vstart = B;
+	b->vend = C;
+	b->ccwloop = l2;
+	b->cwloop = l1;
 	b->cwpred =
-	b->ccwsucc = a;
+	b->ccwsucc = c;
 	b->cwsucc =
-	b->ccwpred = c;
+	b->ccwpred = a;
 
-	c->vstart = D;
-	c->vend = C;
-	c->ccwloop = l1;
-	c->cwloop = l2;
+	c->vstart = C;
+	c->vend = D;
+	c->ccwloop = l2;
+	c->cwloop = l1;
 	c->cwpred =
-	c->ccwsucc = b;
+	c->ccwsucc = d;
 	c->cwsucc =
-	c->ccwpred = d;
+	c->ccwpred = b;
 
-	d->vstart = D;
-	d->vend = A;
-	d->ccwloop = l2;
-	d->cwloop = l1;
+	d->vstart = A;
+	d->vend = D;
+	d->ccwloop = l1;
+	d->cwloop = l2;
 	d->cwsucc =
-	d->ccwpred = c;
+	d->ccwpred = a;
 	d->cwpred =
-	d->ccwsucc = a;}
+	d->ccwsucc = c;}
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
