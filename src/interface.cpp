@@ -366,7 +366,7 @@ void MainMenu::draw() {
 
 				if (ImGui::Button("OK", buttonSize)) {
 					m->mef(brep_ids[0],brep_ids[1],brep_ids[2],brep_ids[3],brep_ids[4]);
-					m->print_info();
+					// m->print_info();
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::SameLine();

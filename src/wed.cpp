@@ -86,47 +86,42 @@ std::vector<tnw::wed::Loop*> tnw::wed::Vertex::adjloop() {
 
 std::vector<tnw::wed::WEdge*> tnw::wed::Loop::adjedge() {
 	WEdge* curredge = iedge;
-	std::vector<WEdge*> adjedgev;
+	std::vector<WEdge*> adjedge;
+	auto less = [](auto* a, auto* b){return a->id < b->id;};
+	std::set<WEdge*,decltype(less)> adjedgev(less);
 
 	// Qual loop eu sou?
 	bool ccwtravel = (iedge->ccwloop->id == this->id);
+	bool og_ccwtravel = ccwtravel;
 
 	do {
-		printf("id: %zu curredge: %zu\n", id,curredge->id);
-		adjedgev.push_back(curredge);
+		printf("%zu %s ", curredge->id,ccwtravel?"t":"f");
+		adjedgev.insert(curredge);
 		if (ccwtravel) {
 			if ((curredge->vstart->id == curredge->ccwsucc->vstart->id) || (curredge->vend->id == curredge->ccwsucc->vend->id))
 				ccwtravel = !ccwtravel;
 			curredge = curredge->ccwsucc;
+			printf("%zu %s\n", curredge->id,ccwtravel?"t":"f");
 		}
 		else {
 			if ((curredge->vstart->id == curredge->cwsucc->vstart->id) || (curredge->vend->id == curredge->cwsucc->vend->id))
 				ccwtravel = !ccwtravel;
 			curredge = curredge->cwsucc;
+			printf("%zu %s\n", curredge->id,ccwtravel?"t":"f");
 		}
-	} while (curredge->id != iedge->id);
+	} while (curredge->id != iedge->id || og_ccwtravel != ccwtravel);
 
-	return adjedgev;
+	printf("%zu\n\n",id);
+	std::copy(adjedgev.begin(), adjedgev.end(), std::back_inserter(adjedge));
+	return adjedge;
 }
 
 std::vector<tnw::wed::Vertex*> tnw::wed::Loop::adjvertex() {
-	WEdge* curredge = iedge;
 	std::vector<Vertex*> adjvertexv;
-
-	// Qual loop eu sou?
-	bool ccwtravel = (iedge->cwloop == this);
-
-	do {
-		adjvertexv.push_back(curredge->vstart);
-		if (curredge->vend)
-			adjvertexv.push_back(curredge->vend);
-		if (ccwtravel)
-			curredge = curredge->ccwsucc;
-		else
-			curredge = curredge->cwsucc;
-		if (curredge->vstart == curredge->cwsucc->vstart)
-			ccwtravel = !ccwtravel;
-	} while (curredge != iedge);
+	for (auto&& e : adjedge()) {
+		adjvertexv.push_back(e->vstart);
+		if(e->vend) adjvertexv.push_back(e->vend);
+	}
 
 	return adjvertexv;
 }
@@ -270,15 +265,28 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 
 	std::vector<WEdge*> ledges = l1->adjedge();
 	WEdge *a = nullptr, *b = nullptr;
+
+	bool a_reverso = false;
+	bool b_reverso = false;
 	//Get correct edges
 	for (auto e : ledges) {
 		if (e->vstart && e->vstart->id == v1->id &&
 			e->vend   && e->vend->id   == v2->id) {
 			a = e;
 		}
+		if (e->vstart && e->vstart->id == v2->id &&
+			e->vend   && e->vend->id   == v1->id) {
+			a = e;
+			a_reverso = true;
+		}
 		if (e->vstart && e->vstart->id == v3->id &&
 		    e->vend   && e->vend->id   == v4->id) {
 			b = e;
+		}
+		if (e->vstart && e->vstart->id == v4->id &&
+		    e->vend   && e->vend->id   == v3->id) {
+			b = e;
+			b_reverso = true;
 		}
 	}
 
@@ -314,7 +322,7 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 			curredge->ccwloop = l2;
 			nextedge = curredge->ccwpred;
 		}
-		if (curredge->cwloop->id == l1->id) {
+		else if (curredge->cwloop->id == l1->id) {
 			curredge->cwloop = l2;
 			nextedge = curredge->cwpred;
 		}
@@ -341,14 +349,13 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 	}
 	//Walking backwards from the v3v4 edge
 	curredge = nullptr, nextedge = b;
-
 	do {
 		curredge = nextedge;
 
 		if (curredge->ccwloop->id == l1->id) {
 			nextedge = curredge->ccwpred;
 		}
-		if (curredge->cwloop->id == l1->id) {
+		else if (curredge->cwloop->id == l1->id) {
 			nextedge = curredge->cwpred;
 		}
 
@@ -377,8 +384,13 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 		return;
 	}
 
-	edges.emplace_front(currEdgeId++);
-	WEdge *e = &edges.front();
+	WEdge *e;
+	if (v1->iedge->vend) {
+		edges.emplace_front(currEdgeId++);
+		e = &edges.front();
+	}
+	else e = v1->iedge;
+
 
 	vertices.emplace_front(currVertexId++, position, e);
 	Vertex *v2 = &vertices.front();
@@ -404,11 +416,11 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				e->ccwpred = b;
 				e->cwsucc = b->cwsucc;
 
-				if (lid == b->cwsucc->cwloop->id) {
-					b->cwsucc->cwpred = e;
-				}
 				if (lid == b->cwsucc->ccwloop->id) {
 					b->cwsucc->ccwpred = e;
+				}
+				else if (lid == b->cwsucc->cwloop->id) {
+					b->cwsucc->cwpred = e;
 				}
 
 				b->cwsucc = e;
@@ -423,7 +435,7 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				if (lid == b->ccwpred->cwloop->id) {
 					b->ccwpred->cwsucc = e;
 				}
-				if (lid == b->ccwpred->ccwloop->id) {
+				else if (lid == b->ccwpred->ccwloop->id) {
 					b->ccwpred->ccwsucc = e;
 				}
 
@@ -442,11 +454,11 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				e->ccwpred = b->cwpred;
 				e->cwsucc = b;
 
-				if (lid == b->cwpred->cwloop->id) {
-					b->cwpred->cwsucc = e;
-				}
 				if (lid == b->cwpred->ccwloop->id) {
 					b->cwpred->ccwsucc = e;
+				}
+				else if (lid == b->cwpred->cwloop->id) {
+					b->cwpred->cwsucc = e;
 				}
 
 				b->cwpred = e;
@@ -460,7 +472,7 @@ void tnw::BRep::smev(size_t lid, size_t vid_start, glm::vec3 position) {
 				if (lid == b->ccwsucc->cwloop->id) {
 					b->ccwsucc->cwpred = e;
 				}
-				if (lid == b->ccwsucc->ccwloop->id) {
+				else if (lid == b->ccwsucc->ccwloop->id) {
 					b->ccwsucc->ccwpred = e;
 				}
 

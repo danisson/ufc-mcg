@@ -68,12 +68,49 @@ int main(void) {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	camera.aspect = 480/640.;
+	// models.push_back(std::make_unique<tnw::BRep>(4,3,2));
 	models.push_back(std::make_unique<tnw::BRep>(5,5,3));
 	MainMenu mainMenu(models,camera);
 
-	auto mdl = (tnw::BRep*)models[0].get();
-
 	using namespace tnw::wed;
+	// auto mdl = (tnw::BRep*)models[0].get();
+	// {mdl->edges.emplace_front(1);
+	// WEdge *a = &mdl->edges.front();
+	// mdl->edges.emplace_front(2);
+	// WEdge *b = &mdl->edges.front();
+
+
+	// mdl->vertices.emplace_front(1, glm::vec3{0,0,.25}, a);
+	// Vertex *A = &mdl->vertices.front();
+	// mdl->vertices.emplace_front(2, glm::vec3{0,1,.25}, a);
+	// Vertex *B = &mdl->vertices.front();
+	// mdl->vertices.emplace_front(3, glm::vec3{1,0,.25}, a);
+	// Vertex *C = &mdl->vertices.front();
+
+	// mdl->loops.emplace_front(1,a);
+	// Loop *l1 = &mdl->loops.front();
+
+	// a->vstart = A;
+	// a->vend = B;
+	// a->ccwloop = l1;
+	// a->cwloop = l1;
+	// a->ccwsucc =
+	// a->cwpred = a;
+	// a->ccwpred =
+	// a->cwsucc = b;
+
+	// b->vstart = A;
+	// b->vend = C;
+	// b->ccwloop = l1;
+	// b->cwloop = l1;
+	// b->ccwsucc =
+	// b->cwpred = b;
+	// b->ccwpred =
+	// b->cwsucc = a;
+	// }
+
+	// quadrado
+	auto mdl = (tnw::BRep*)models[0].get(); {
 	mdl->edges.emplace_front(1);
 	WEdge *a = &mdl->edges.front();
 	mdl->edges.emplace_front(2);
@@ -84,13 +121,13 @@ int main(void) {
 	WEdge *d = &mdl->edges.front();
 
 
-	mdl->vertices.emplace_front(1, glm::vec3{0,0,0}, a);
+	mdl->vertices.emplace_front(1, glm::vec3{0,0,.5}, a);
 	Vertex *A = &mdl->vertices.front();
-	mdl->vertices.emplace_front(2, glm::vec3{0,1,0}, b);
+	mdl->vertices.emplace_front(2, glm::vec3{0,1,.5}, b);
 	Vertex *B = &mdl->vertices.front();
-	mdl->vertices.emplace_front(3, glm::vec3{1,1,0}, c);
+	mdl->vertices.emplace_front(3, glm::vec3{1,1,.5}, c);
 	Vertex *C = &mdl->vertices.front();
-	mdl->vertices.emplace_front(4, glm::vec3{1,0,0}, d);
+	mdl->vertices.emplace_front(4, glm::vec3{1,0,.5}, d);
 	Vertex *D = &mdl->vertices.front();
 
 	mdl->loops.emplace_front(1,a);
@@ -116,37 +153,23 @@ int main(void) {
 	b->cwsucc =
 	b->ccwpred = c;
 
-	c->vstart = C;
-	c->vend = D;
-	c->ccwloop = l2;
-	c->cwloop = l1;
+	c->vstart = D;
+	c->vend = C;
+	c->ccwloop = l1;
+	c->cwloop = l2;
 	c->cwpred =
-	c->ccwsucc = d;
+	c->ccwsucc = b;
 	c->cwsucc =
-	c->ccwpred = b;
+	c->ccwpred = d;
 
-	d->vstart = A;
-	d->vend = D;
-	d->ccwloop = l1;
-	d->cwloop = l2;
+	d->vstart = D;
+	d->vend = A;
+	d->ccwloop = l2;
+	d->cwloop = l1;
 	d->cwsucc =
-	d->ccwpred = a;
+	d->ccwpred = c;
 	d->cwpred =
-	d->ccwsucc = c;
-
-	// models.push_back(std::make_unique<tnw::BRep>());
-	// auto brep = (tnw::BRep*)models[0].get();
-
-	// std::cout << "MVFS:\n";
-	// brep->mvfs({1,0,0});
-	// std::cout << "MVFS ok\n";
-	// std::cout << "SMEV:\n";
-	// brep->smev(1,1,{1,0.5,0});
-	// brep->smev(1,2,{1.5,1,0});
-	// brep->smev(1,3,{2,0.5,0});
-	// brep->smev(1,1,{2,0,0});
-	// std::cout << "SMEV ok\n";
-
+	d->ccwsucc = a;}
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
