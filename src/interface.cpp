@@ -931,6 +931,7 @@ void MainMenu::draw() {
 				// [edge h]
 				// [edge g]
 				// [edge f]
+				#undef set_e
 			}
 
 			ImGui::SameLine();
