@@ -68,47 +68,10 @@ int main(void) {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	camera.aspect = 480/640.;
-	// models.push_back(std::make_unique<tnw::BRep>(4,3,2));
 	models.push_back(std::make_unique<tnw::BRep>(5,5,3));
 	MainMenu mainMenu(models,camera);
 
 	using namespace tnw::wed;
-	// auto mdl = (tnw::BRep*)models[0].get();
-	// {mdl->edges.emplace_front(1);
-	// WEdge *a = &mdl->edges.front();
-	// mdl->edges.emplace_front(2);
-	// WEdge *b = &mdl->edges.front();
-
-
-	// mdl->vertices.emplace_front(1, glm::vec3{0,0,.25}, a);
-	// Vertex *A = &mdl->vertices.front();
-	// mdl->vertices.emplace_front(2, glm::vec3{0,1,.25}, a);
-	// Vertex *B = &mdl->vertices.front();
-	// mdl->vertices.emplace_front(3, glm::vec3{1,0,.25}, a);
-	// Vertex *C = &mdl->vertices.front();
-
-	// mdl->loops.emplace_front(1,a);
-	// Loop *l1 = &mdl->loops.front();
-
-	// a->vstart = A;
-	// a->vend = B;
-	// a->ccwloop = l1;
-	// a->cwloop = l1;
-	// a->ccwsucc =
-	// a->cwpred = a;
-	// a->ccwpred =
-	// a->cwsucc = b;
-
-	// b->vstart = A;
-	// b->vend = C;
-	// b->ccwloop = l1;
-	// b->cwloop = l1;
-	// b->ccwsucc =
-	// b->cwpred = b;
-	// b->ccwpred =
-	// b->cwsucc = a;
-	// }
-
 	// quadrado
 	auto mdl = (tnw::BRep*)models[0].get(); {
 	mdl->edges.emplace_front(1);
