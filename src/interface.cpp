@@ -241,6 +241,27 @@ void MainMenu::draw() {
 					}
 					ImGui::CloseCurrentPopup();
 				}
+				buttonSize.x = width/2.0-margin;
+				if (ImGui::Button("VV", buttonSize)) {
+					m->print_info();
+					auto l = m->get_vertex(brep_ids[0]);
+					if (!l) goto failGet;
+					// m->selected_edge = l->id;
+					for (auto x : l->adjvertex()) {
+						m->mark_vertex(x->id);
+					}
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("VE", buttonSize)) {
+					auto l = m->get_vertex(brep_ids[0]);
+					if (!l) goto failGet;
+					// m->selected_edge = l->id;
+					for (auto x : l->adjedge()) {
+						m->mark_edge(x->id);
+					}
+					ImGui::CloseCurrentPopup();
+				}
 				buttonSize.x = width-margin;
 				if (ImGui::Button("Cancel", buttonSize)) {
 					m->print_info();
@@ -823,55 +844,93 @@ void MainMenu::draw() {
 
 		ImGui::PushID("Brep");
 		if (ImGui::CollapsingHeader("Nova Brep")) {
-			if (ImGui::Button("Esfera")) {
-				ImGui::OpenPopup("Parâmetros da Esfera");
-			}
-			if (ImGui::BeginPopupModal("Parâmetros da Esfera")) {
-				ImGui::Text("centro:");
-				ImGui::InputFloat("x", &x);
-				ImGui::InputFloat("y", &y);
-				ImGui::InputFloat("z", &z);
-				ImGui::Separator();
-				ImGui::InputFloat("raio", &r);
+			if (ImGui::Button("Cubo")) {
+				models.push_back(std::make_unique<tnw::BRep>(9,13,7));
+				std::stringstream ss;
+				ss << "BRep " << model_names.size() << "[CUBO]";
+				model_names.push_back(ss.str());
+				auto mdl = (tnw::BRep*)models.back().get();
 
-				if (ImGui::Button("OK", ImVec2(120,0))) {
-					auto s = new tnw::Sphere({x,y,z}, r);
-					models.push_back(std::make_unique<tnw::CSGTree>(s));
-					std::stringstream ss;
-					ss << "CSG " << model_names.size() << "[ESFERA]";
-					model_names.push_back(ss.str());
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
-				ImGui::EndPopup();
-			}
+				using namespace tnw::wed;
 
-			ImGui::SameLine();
-			if (ImGui::Button("Caixa")) {
-				ImGui::OpenPopup("Parâmetros da Caixa");
-			}
-			if (ImGui::BeginPopupModal("Parâmetros da Caixa")) {
-				ImGui::Text("centro:");
-				ImGui::InputFloat("x", &x);
-				ImGui::InputFloat("y", &y);
-				ImGui::InputFloat("z", &z);
-				ImGui::Separator();
-				ImGui::InputFloat("largura", &l);
-				ImGui::InputFloat("altura", &h);
-				ImGui::InputFloat("profundidade", &d);
+				mdl->edges.emplace_front(1);WEdge *a = &mdl->edges.front();
+				mdl->edges.emplace_front(2);WEdge *b = &mdl->edges.front();
+				mdl->edges.emplace_front(3);WEdge *c = &mdl->edges.front();
+				mdl->edges.emplace_front(4);WEdge *d = &mdl->edges.front();
+				mdl->edges.emplace_front(5);WEdge *e = &mdl->edges.front();
+				mdl->edges.emplace_front(6);WEdge *f = &mdl->edges.front();
+				mdl->edges.emplace_front(7);WEdge *g = &mdl->edges.front();
+				mdl->edges.emplace_front(8);WEdge *h = &mdl->edges.front();
+				mdl->edges.emplace_front(9);WEdge *i = &mdl->edges.front();
+				mdl->edges.emplace_front(10);WEdge *j = &mdl->edges.front();
+				mdl->edges.emplace_front(11);WEdge *k = &mdl->edges.front();
+				mdl->edges.emplace_front(12);WEdge *l = &mdl->edges.front();
 
-				if (ImGui::Button("OK", ImVec2(120,0))) {
-					auto bb = new tnw::Box({x,y,z}, l, d, h);
-					models.push_back(std::make_unique<tnw::CSGTree>(bb));
-					std::stringstream ss;
-					ss << "CSG " << model_names.size() << "[CAIXA]";
-					model_names.push_back(ss.str());
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::SameLine();
-				if (ImGui::Button("Cancel", ImVec2(120,0))) { ImGui::CloseCurrentPopup(); }
-				ImGui::EndPopup();
+				mdl->vertices.emplace_front(1, glm::vec3{0,0,0}, a);
+				Vertex *A = &mdl->vertices.front();
+				mdl->vertices.emplace_front(2, glm::vec3{0,1,0},b);
+				Vertex *B = &mdl->vertices.front();
+				mdl->vertices.emplace_front(3, glm::vec3{1,1,0}, c);
+				Vertex *C = &mdl->vertices.front();
+				mdl->vertices.emplace_front(4, glm::vec3{1,0,0}, d);
+				Vertex *D = &mdl->vertices.front();
+				mdl->vertices.emplace_front(5, glm::vec3{0,0,1}, e);
+				Vertex *E = &mdl->vertices.front();
+				mdl->vertices.emplace_front(6, glm::vec3{0,1,1}, f);
+				Vertex *F = &mdl->vertices.front();
+				mdl->vertices.emplace_front(7, glm::vec3{1,1,1}, g);
+				Vertex *G = &mdl->vertices.front();
+				mdl->vertices.emplace_front(8, glm::vec3{1,0,1}, h);
+				Vertex *H = &mdl->vertices.front();
+
+				mdl->loops.emplace_front(1,a);Loop *l1 = &mdl->loops.front();
+				mdl->loops.emplace_front(2,l);Loop *l2 = &mdl->loops.front();
+				mdl->loops.emplace_front(3,l);Loop *l3 = &mdl->loops.front();
+				mdl->loops.emplace_front(4,i);Loop *l4 = &mdl->loops.front();
+				mdl->loops.emplace_front(5,k);Loop *l5 = &mdl->loops.front();
+				mdl->loops.emplace_front(6,e);Loop *l6 = &mdl->loops.front();
+
+				#define set_e(v1,v2,v3,v4,v5,v6,v7,v8,v9) \
+				v1->vstart  = v2 ;v1->vend    = v3;\
+				v1->cwloop  = v4 ;v1->ccwloop = v5;\
+				v1->cwpred  = v6 ;v1->cwsucc  = v7;\
+				v1->ccwpred = v8 ;v1->ccwsucc = v9
+
+				// loop 1
+				set_e(a,A,B,l4,l1,i,j,d,b);
+				set_e(b,B,C,l5,l1,k,i,a,c);
+				set_e(c,C,D,l2,l1,l,k,b,d);
+				set_e(d,D,A,l3,l1,j,l,c,a);
+
+				// loop 2
+				set_e(l,H,D,l3,l2,d,e,h,c);
+				// [edge c]
+				set_e(k,G,C,l2,l5,c,h,g,b);
+				set_e(h,H,G,l2,l6,k,l,e,g);
+
+				// loop 3
+				// [edge l]
+				set_e(e,E,H,l3,l6,l,j,f,h);
+				set_e(j,A,E,l3,l4,e,d,a,f);
+				// [edge d]
+
+				// loop 4
+				set_e(i,F,B,l5,l4,b,g,f,a);
+				// [edge a]
+				// [edge j]
+				set_e(f,F,E,l4,l6,j,i,g,e);
+
+				// loop 5
+				// [edge k]
+				// [edge b]
+				// [edge i]
+				set_e(g,G,F,l5,l6,i,k,h,f);
+
+				// loop 6
+				// [edge e]
+				// [edge h]
+				// [edge g]
+				// [edge f]
 			}
 
 			ImGui::SameLine();
@@ -903,12 +962,13 @@ void MainMenu::draw() {
 				Vertex *C = &mdl->vertices.front();
 				mdl->vertices.emplace_front(4, glm::vec3{0,1,0}, e);
 				Vertex *D = &mdl->vertices.front();
-				Loop *l1 = &mdl->loops.front();
 				mdl->loops.emplace_front(1,c);
-				Loop *l2 = &mdl->loops.front();
+				Loop *l1 = &mdl->loops.front();
 				mdl->loops.emplace_front(2,a);
-				Loop *l3 = &mdl->loops.front();
+				Loop *l2 = &mdl->loops.front();
 				mdl->loops.emplace_front(3,b);
+				Loop *l3 = &mdl->loops.front();
+				mdl->loops.emplace_front(4,f);
 				Loop *l4 = &mdl->loops.front();
 				a->vstart = A;
 				a->vend = D;
@@ -963,7 +1023,7 @@ void MainMenu::draw() {
 			if (ImGui::Button("Vazio")) {
 				models.push_back(std::make_unique<tnw::BRep>());
 				std::stringstream ss;
-				ss << "BRep " << model_names.size() << "[TETRA]";
+				ss << "BRep " << model_names.size();
 				model_names.push_back(ss.str());
 			}
 		}

@@ -40,20 +40,11 @@ std::vector<tnw::wed::WEdge*> tnw::wed::Vertex::adjedge() {
 	return adjedgev;
 }
 std::vector<tnw::wed::Vertex*> tnw::wed::Vertex::adjvertex() {
-	WEdge* curredge = iedge;
 	std::vector<Vertex*> adjvertexv;
-
-	do {
-		//Checa se é vstart ou vend
-		if (curredge->vstart == this) {
-			curredge = curredge->ccwpred;
-			adjvertexv.push_back(curredge->vend);
-		} else {
-			curredge = curredge->cwpred;
-			adjvertexv.push_back(curredge->vend);
-		}
-
-	} while (curredge != iedge);
+	for (auto&& e : adjedge()) {
+		adjvertexv.push_back(e->vstart);
+		if(e->vend) adjvertexv.push_back(e->vend);
+	}
 
 	return adjvertexv;
 }
@@ -179,7 +170,7 @@ std::vector<Loop*> tnw::wed::WEdge::adjloop() {
 // Desenha wireframe do BRep
 void tnw::BRep::rdraw() {
 	glColor3fv(color);
-	glLineWidth(0.5);
+	glLineWidth(2);
 	glBegin(GL_LINES);
 	for (auto&& e : edges) {
 		if (!e.vstart || !e.vend) {
@@ -191,7 +182,7 @@ void tnw::BRep::rdraw() {
 		const auto& vend = *e.vend;
 
 		// Set color if selected
-		if (is_marked)   glColor3f(0,1,0);
+		if (is_marked)   glColor3f(.6,.7,.45);
 		if (is_selected) glColor3f(1,0,1);
 
 		glVertex3fv(glm::value_ptr(vstart.position));
@@ -212,6 +203,7 @@ void tnw::BRep::rdraw() {
 	}
 	glEnd();
 	glLineWidth(1);
+	glPointSize(1);
 }
 
 //Euler operator: Make Vertex Face Shell
@@ -294,6 +286,9 @@ void tnw::BRep::mef(size_t lid, size_t v1id, size_t v2id, size_t v3id, size_t v4
 		printf("Nenhuma aresta\n");
 		return;
 	}
+
+	if (a_reverso) printf("a_reverso\n");
+	if (b_reverso) printf("b_reverso\n");
 
 	l1->iedge = b;
 
